@@ -198,6 +198,8 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+
+
 // UPDATE user role (admin)
 const updateUserRole = async (req, res) => {
   try {

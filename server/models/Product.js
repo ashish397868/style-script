@@ -1,4 +1,4 @@
-const { Schema, model } = mongoose;
+const { Schema, model } = require("mongoose");;
 
 const ProductSchema = new Schema(
   {
@@ -17,5 +17,7 @@ const ProductSchema = new Schema(
   },
   { timestamps: true }
 );
+// 🔍 Create text index for full-text search
+ProductSchema.index({ title: "text", description: "text", tags: "text" });
 
 module.exports = model("Product", ProductSchema);

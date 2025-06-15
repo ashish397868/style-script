@@ -13,17 +13,17 @@ const{
 }=require('../controllers/userController');
 
 // Public routes
-router.post('/api/signup', handleSignup);//tested
-router.post('/api/login',handleLogin);//tested
-router.post('/api/forgot-password',forgotPassword);//tested
-router.post('/api/reset-password',resetPassword);//tested
+router.post('/signup', handleSignup);//tested
+router.post('/login',handleLogin);//tested
+router.post('/forgot-password',forgotPassword);//tested
+router.post('/reset-password',resetPassword);//tested
 
 // Protected routes
-router.patch('/api/users/profile', authenticateUser,updateProfile);//tested
+router.patch('/users/profile', authenticateUser,updateProfile);//tested
 
 // Admin routes
-router.get('/api/users', authenticateUser, isAdmin, getAllUsers);//tested
-router.patch('/api/users/:id', authenticateUser, isAdmin,updateUserRole);
-router.delete('/api/users/:id', authenticateUser, isAdmin,deleteUser);
+router.get('/users', authenticateUser, isAdmin, getAllUsers);//tested
+router.patch('/users/:id', authenticateUser, isAdmin,updateUserRole);
+router.delete('/users/:id', authenticateUser, isAdmin,deleteUser);
 
 module.exports = router;

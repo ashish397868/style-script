@@ -12,8 +12,10 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const cors = require('cors');
 
 app.use(cors({
-  origin: 'http://localhost:3000', // your React app URL
-  credentials: true
+  origin: ['http://localhost:3000', 'http://localhost:5173'], // Allow both React and Vite URLs
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

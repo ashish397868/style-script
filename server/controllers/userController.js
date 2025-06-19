@@ -259,6 +259,7 @@ const forgotPassword = async (req, res) => {
       <h2>Reset Your Password</h2>
       <p>Click the link below to reset your password:</p>
       <a href="${resetUrl}">${resetUrl}</a>
+      <p>Token :-  ${token} </p>
       <p>This link will expire in 15 minutes.</p>
     `;
     await sendEmail({
@@ -281,6 +282,8 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, token, newPassword } = req.body;
+    console.log("Reset Password Data:", { email, token, newPassword });
+    console.log("Reset Password Body:", req.body);
     if (!email || !token || !newPassword) return res.status(400).json({ message: "All fields are required!" });
 
     if (newPassword.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters long" });

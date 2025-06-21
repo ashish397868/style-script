@@ -4,6 +4,7 @@ import { useCartStore } from "../../store/cartStore";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import api from '../../services/api';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -27,13 +28,40 @@ export default function Checkout() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
-    // Here you would send order and address info to backend
-    toast.success("Order placed! (demo only)");
-    setTimeout(() => {
-      navigate("/review-order");
-    }, 1000);
+    try {
+      const orderId = 'ORD-' + Date.now();
+      const orderPayload = {
+        email: form.email,
+        name: form.name,
+        orderId,
+        products: Object.entries(cart).map(([key, item]) => ({
+          productId: item._id || item.productId || key,
+          name: item.name,
+          price: item.price,
+          quantity: item.qty,
+          size: item.size,
+          color: item.color,
+        })),
+        phone: form.phone,
+        address: {
+          addressLine1: form.addressLine1,
+          addressLine2: form.addressLine2,
+          city: form.city,
+          state: form.state,
+          pincode: form.pincode,
+        },
+        amount: subTotal,
+      };
+      await api.post('/orders', orderPayload);
+      toast.success("Order placed successfully!");
+      setTimeout(() => {
+        navigate("/review-order");
+      }, 1000);
+    } catch (err) {
+      toast.error("Failed to place order. Please try again.");
+    }
   };
 
   return (

@@ -5,6 +5,7 @@ import { BeatLoader } from "react-spinners";
 import { productAPI } from "../../services/api";
 import { useCartStore } from "../../store/cartStore";
 import { useUserStore } from "../../store/userStore";
+import api from '../../services/api';
 import "react-toastify/dist/ReactToastify.css";
 
 // =============== ColorButton Component ===============
@@ -78,6 +79,9 @@ export default function ProductDetailPage() {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   const addToCart = useCartStore((state) => state.addToCart);
   const isAuthenticated = useUserStore((state) => state.isAuthenticated);
@@ -163,6 +167,34 @@ export default function ProductDetailPage() {
 
   const handleSizeChange = (e) => {
     setSize(e.target.value);
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error("Please login to add a review.");
+      navigate("/login");
+      return;
+    }
+    if (!reviewRating || !reviewComment) {
+      toast.error("Please provide a rating and comment.");
+      return;
+    }
+    setReviewSubmitting(true);
+    try {
+      await api.post('/reviews', {
+        productId: product._id,
+        rating: reviewRating,
+        comment: reviewComment,
+      });
+      toast.success("Review submitted!");
+      setReviewComment("");
+      setReviewRating(5);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Failed to submit review.");
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   if (isLoading) {
@@ -289,6 +321,40 @@ export default function ProductDetailPage() {
                 </span>
               </div>
             )}
+
+            {/* Add Review Form */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold mb-2">Add a Review</h3>
+              <form onSubmit={handleReviewSubmit} className="flex flex-col gap-2">
+                <label className="flex items-center gap-2">
+                  <span>Rating:</span>
+                  <select
+                    value={reviewRating}
+                    onChange={e => setReviewRating(Number(e.target.value))}
+                    className="border rounded px-2 py-1"
+                  >
+                    {[5,4,3,2,1].map(r => (
+                      <option key={r} value={r}>{r} Star{r > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </label>
+                <textarea
+                  className="border rounded px-2 py-1"
+                  placeholder="Write your review..."
+                  value={reviewComment}
+                  onChange={e => setReviewComment(e.target.value)}
+                  required
+                  rows={3}
+                />
+                <button
+                  type="submit"
+                  disabled={reviewSubmitting}
+                  className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50 self-start"
+                >
+                  {reviewSubmitting ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>

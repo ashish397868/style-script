@@ -198,7 +198,18 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-
+// GET single user (self)
+const getUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.json(user);
+  } catch (error) {
+    console.error("Get User Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 // UPDATE user role (admin)
 const updateUserRole = async (req, res) => {
@@ -317,4 +328,5 @@ module.exports = {
   updateUserRole,
   getAllUsers,
   deleteUser,
+  getUser, // <-- export the new controller
 };

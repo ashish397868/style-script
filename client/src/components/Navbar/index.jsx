@@ -48,7 +48,7 @@ const Navbar = ({
 
   return (
     <>
-      <nav className={`${backgroundColor} shadow-lg fixed w-full z-50`}>
+      <nav className={`${backgroundColor} shadow-lg w-full z-50`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center py-4 px-2">

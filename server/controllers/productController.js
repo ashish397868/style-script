@@ -21,6 +21,20 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
+// get product by category (from route param)
+exports.getProductsByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    const products = await Product.find({ category }).sort({ createdAt: -1 });
+
+    return res.json(products);
+  } catch (error) {
+    console.error("Get Products By Category Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // Get a single product by slug (public)
 exports.getProductBySlug = async (req, res) => {
   try {
@@ -170,6 +184,41 @@ exports.createProduct = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+// Create multiple products (admin)
+exports.createMultipleProducts = async (req, res) => {
+  try {
+    const products = req.body;
+
+    // Validate input
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ message: "Product array is required." });
+    }
+
+    // Optional: Validate each product object
+    for (const product of products) {
+      const { title, slug, description, price, availableQty } = product;
+      if (!title || !slug || !description || price == null || availableQty == null) {
+        return res.status(400).json({ message: "Each product must have title, slug, description, price, and availableQty." });
+      }
+
+      // Ensure slugs are unique
+      const existing = await Product.findOne({ slug });
+      if (existing) {
+        return res.status(400).json({ message: `Slug '${slug}' already exists.` });
+      }
+    }
+
+    // Insert all products
+    const inserted = await Product.insertMany(products);
+
+    return res.status(201).json({ message: "Products created successfully.", products: inserted });
+  } catch (error) {
+    console.error("Create Multiple Products Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 // Update a product (admin)
 exports.updateProduct = async (req, res) => {

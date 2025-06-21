@@ -7,21 +7,19 @@ export const useCartStore = create(
       cart: {},
       subTotal: 0,
   
-      addToCart: (key, qty) => {
+      addToCart: (key, qty, itemDetails) => {
         set((state) => {
           const newCart = { ...state.cart };
           if (key in newCart) {
             newCart[key].qty += qty;
           } else {
-            newCart[key] = { qty };
+            newCart[key] = { ...itemDetails, qty };
           }
-          
           // Calculate new subtotal
           const newSubTotal = Object.keys(newCart).reduce(
-            (total, k) => total + (newCart[k].price * newCart[k].qty), 
+            (total, k) => total + (newCart[k].price * newCart[k].qty),
             0
           );
-  
           return { cart: newCart, subTotal: newSubTotal };
         });
       },

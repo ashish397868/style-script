@@ -9,7 +9,8 @@ const{
     updateProfile,
     getAllUsers,
     updateUserRole,
-    deleteUser
+    deleteUser,
+    getUser
 }=require('../controllers/userController');
 
 // Public routes
@@ -19,6 +20,7 @@ router.post('/forgot-password',forgotPassword);//tested
 router.post('/reset-password',resetPassword);//tested
 
 // Protected routes
+router.get('/users/profile', authenticateUser, getUser);
 router.patch('/users/profile', authenticateUser,updateProfile);//tested
 
 // Admin routes

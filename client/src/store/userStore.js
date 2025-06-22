@@ -6,6 +6,7 @@ export const useUserStore = create(
   persist(
     (set) => ({
       user: null,
+      setUser: (user) => set({ user }),
       isLoading: false,
       error: null,
       isAuthenticated: false,

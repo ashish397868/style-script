@@ -10,6 +10,7 @@ const colorMap = [
   { name: "Forest Green", className: "bg-green-700" },
   { name: "Sea Green", className: "bg-teal-400" },
   { name: "Green", className: "bg-green-800" },
+  {name: "White", className: "bg-white border border-gray-300" },
 ];
 
 const ProductCard = ({ product }) => {
@@ -22,7 +23,7 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="lg:w-1/5 md:w-1/4 p-4 w-full cursor-pointer shadow-lg m-4 hover:shadow-xl transition-shadow duration-300 ease-in-out hover:shadow-rose-200"
+      className="lg:w-1/5 md:w-1/4 p-4 w-full cursor-pointer shadow-lg m-4 hover:shadow-xl transition-shadow duration-300 ease-in-out hover:shadow-rose-200 flex flex-col"
     >
       <div className="block relative rounded overflow-hidden bg-white">
         <img

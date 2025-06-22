@@ -15,6 +15,7 @@ import Checkout from "../src/components/Checkout";
 import ReviewOrder from "../src/components/ReviewOrder";
 import Success from "../src/components/Success";
 import UserManagement from "../src/components/Admin/UserManagement";  
+import UserProfile from "./components/UserProfile";
 
 import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
@@ -53,6 +54,7 @@ function App() {
 
         </Route>
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
         </>
 

@@ -66,7 +66,10 @@ const Navbar = ({
               <Dropdown label="Products" items={productItems.map((item) => ({ ...item, component: Link }))} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${""} ${hoverColor}`} />
 
               {isAuthenticated ? (
-                <UserDropdown user={user} actions={[{ label: "Logout", onClick: handleLogout }]} />
+                <UserDropdown user={user} actions={[
+                  { label: "Profile", onClick: () => navigate("/profile") },
+                  { label: "Logout", onClick: handleLogout }
+                ]} />
               ) : (
                 <div className="flex items-center">
                   <Link to="/login" className="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition duration-150 ease-in-out mx-2">

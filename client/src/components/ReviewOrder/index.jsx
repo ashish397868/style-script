@@ -1,4 +1,5 @@
 import { useCartStore } from "../../store/cartStore";
+import { useCheckoutStore } from "../../store/checkoutStore";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
@@ -8,8 +9,15 @@ export default function ReviewOrder() {
   const addToCart = useCartStore((state) => state.addToCart);
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const clearCart = useCartStore((state) => state.clearCart);
+  const selectedAddress = useCheckoutStore((state) => state.selectedAddress);
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
+
+  // Redirect if no address is selected
+  if (!selectedAddress) {
+    navigate('/checkout');
+    return null;
+  }
 
   const handleIncrease = (key, item) => {
     addToCart(key, 1, item);
@@ -77,6 +85,27 @@ export default function ReviewOrder() {
     <section className="max-w-2xl mx-auto p-6 bg-white rounded shadow mt-10">
       <h2 className="text-2xl font-bold mb-6">Review Order</h2>
 
+      {/* Delivery Address Section */}
+      <div className="mb-6 p-4 border rounded-lg">
+        <h3 className="text-lg font-semibold mb-2">Delivery Address</h3>
+        <p className="font-medium">{selectedAddress.name}</p>
+        <p className="text-gray-600">
+          {selectedAddress.addressLine1}
+          {selectedAddress.addressLine2 && `, ${selectedAddress.addressLine2}`}
+        </p>
+        <p className="text-gray-600">
+          {selectedAddress.city}, {selectedAddress.state}, {selectedAddress.pincode}
+        </p>
+        <p className="text-gray-600">Phone: {selectedAddress.phone}</p>
+        <button
+          onClick={() => navigate('/checkout')}
+          className="mt-2 text-indigo-600 hover:text-indigo-800"
+        >
+          Change Address
+        </button>
+      </div>
+
+      {/* Cart Items */}
       {Object.keys(cart).length === 0 ? (
         <div>Your cart is empty.</div>
       ) : (

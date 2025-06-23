@@ -8,7 +8,8 @@ function App() {
         menuItems={menuItems}
         productItems={productItems}
         adminItems={adminItems}
-        brandName="FitnessPro"
+        brandName="StyleScript"
+        logoSrc="https://www.svgrepo.com/show/42638/clothes.svg"
         backgroundColor="bg-gray-900"
         textColor="text-white"
         hoverColor="hover:text-blue-300"

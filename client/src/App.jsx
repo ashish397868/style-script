@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import "./App.css";
 import Navbar from "../src/screen/Navbar";
 import { Routes, Route } from "react-router-dom";
-import Home from "../src/screen/Home";
+import Home from "../src/components/HomePage";
 import About from "../src/screen/About";
 import Login from "../src/components/Login";
 import Signup from "../src/components/Signup";
@@ -16,6 +16,7 @@ import ReviewOrder from "../src/components/ReviewOrder";
 import Success from "../src/components/Success";
 import UserManagement from "../src/components/Admin/UserManagement";  
 import UserProfile from "./components/UserProfile";
+import Footer from "./screen/Footer"
 
 import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
@@ -56,6 +57,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<UserProfile />} />
       </Routes>
+      <Footer/>
         </>
 
   );

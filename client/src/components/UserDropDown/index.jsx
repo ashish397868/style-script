@@ -1,5 +1,6 @@
 // components/UserDropdown.js
 import { useState, useRef, useEffect } from "react";
+import { FaUserCircle } from "react-icons/fa";
 
 const UserDropdown = ({ user, actions = [] }) => {
   const [open, setOpen] = useState(false);
@@ -17,8 +18,13 @@ const UserDropdown = ({ user, actions = [] }) => {
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} className="flex items-center text-white">
-        Welcome, {user?.name}
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center focus:outline-none"
+        style={{ borderRadius: '50%', padding: 0, border: 'none', background: 'none' }}
+        aria-label="User menu"
+      >
+        <FaUserCircle className="w-8 h-8 text-pink-600" />
       </button>
 
       {open && (

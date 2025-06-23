@@ -1,5 +1,6 @@
 import Navbar from "../../components/Navbar";
 import { menuItems, productItems,adminItems } from "../../constants/menuItems";
+import { TbShirtOff } from "react-icons/tb";
 function App() {
   
 
@@ -10,9 +11,10 @@ function App() {
         adminItems={adminItems}
         brandName="StyleScript"
         logoSrc="https://www.svgrepo.com/show/42638/clothes.svg"
-        backgroundColor="bg-gray-900"
-        textColor="text-white"
-        hoverColor="hover:text-blue-300"
+        // logoSrc={TbShirtOff}
+        backgroundColor="bg-white"
+        textColor="text-black"
+        hoverColor="hover:text-pink-300"
       />
 
   );

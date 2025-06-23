@@ -16,7 +16,7 @@ import ReviewOrder from "../src/components/ReviewOrder";
 import Success from "../src/components/Success";
 import UserManagement from "../src/components/Admin/UserManagement";  
 import UserProfile from "./components/UserProfile";
-import Footer from "./screen/Footer"
+import Footer from "../src/screen/Footer"
 
 import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";

@@ -1,17 +1,15 @@
 import { Link } from 'react-router-dom';
 
 export const menuItems = [
-  { label: 'Home', href: '/', component: Link },
-  { label: 'About', href: '/about', component: Link },
-  { label: 'Contact', href: '/contact', component: Link },
+  { label: 'Sweatshirts', href: '/products/sweatshirts', component: Link },
+  { label: 'Hoodies', href: '/products/hoodies', component: Link },
+  { label: 'Zipper Hoodies', href: '/products/zipper-hoodies', component: Link },
 ];
 
 export const productItems = [
-  { label: 'All Products', href: '/products', component: Link },
   { label: 'T-Shirts', href: '/products/t-shirts', component: Link },
-  { label: 'Hoodies', href: '/products/hoodies', component: Link },
-  { label: 'Pants', href: '/products/pants', component: Link },
-  { label: 'Accessories', href: '/products/accessories', component: Link },
+  { label: 'Polo TShirts', href: '/products/polo-tshirts', component: Link },
+  { label: 'Oversized Tshirts', href: '/products/oversized-tshirts', component: Link },
 ];
 
 export const adminItems = [

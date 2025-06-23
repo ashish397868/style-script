@@ -18,8 +18,8 @@ const Navbar = ({
   backgroundColor = "bg-white",
   textColor = "text-white",
   hoverColor = "hover:text-gray-800",
-  cartIconColor = "text-white",
-  cartIconHover = "hover:text-blue-500",
+  cartIconColor = "text-pink-600",
+  cartIconHover = "hover:text-pink-700",
 }) => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart, subTotal, clearCart } = useCartStore();
@@ -52,8 +52,8 @@ const Navbar = ({
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center py-4 px-2">
-              {logoSrc && <img src={logoSrc} alt="Logo" className="h-8 w-8 mr-2 rounded" />}
-              <span className={`font-semibold text-lg ${textColor} ${hoverColor}`}>{brandName}</span>
+              {logoSrc && <img src={logoSrc} alt="Logo" className="h-8 w-8 mr-2 rounded " />}
+              <span className={`font-bold text-lg text-pink-600 `}>{brandName}</span>
             </Link>
 
             <div className="hidden md:flex items-center space-x-4">
@@ -63,7 +63,7 @@ const Navbar = ({
                 </Link>
               ))}
 
-              <Dropdown label="Products" items={productItems.map((item) => ({ ...item, component: Link }))} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${""} ${hoverColor}`} />
+              <Dropdown label="Tshirts" items={productItems.map((item) => ({ ...item, component: Link }))} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${""} ${hoverColor}`} />
 
               {isAuthenticated ? (
                 <UserDropdown user={user} actions={[
@@ -72,10 +72,10 @@ const Navbar = ({
                 ]} />
               ) : (
                 <div className="flex items-center">
-                  <Link to="/login" className="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition duration-150 ease-in-out mx-2">
+                  <Link to="/login" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out mx-2">
                     Login
                   </Link>
-                  <Link to="/signup" className="px-3 py-1 rounded bg-indigo-600 text-white hover:bg-indigo-700 font-medium transition duration-150 ease-in-out">
+                  <Link to="/signup" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
                     Signup
                   </Link>
                 </div>

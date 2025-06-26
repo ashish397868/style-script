@@ -97,7 +97,7 @@ exports.deleteReview = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    await review.remove();
+    await Review.findByIdAndDelete(id);
     return res.json({ message: "Review deleted" });
   } catch (err) {
     console.error("deleteReview error:", err);

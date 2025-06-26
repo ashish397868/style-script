@@ -27,16 +27,17 @@ const AdminDashboard = () => {
         ]);
 
         const orders = ordersRes.data;
-        const totalSales = orders.reduce((sum, order) => 
-          order.status === 'delivered' ? sum + order.totalAmount : sum, 0);
-        
+        // Total sales: sum of amount for paid orders
+        const totalSales = orders.reduce((sum, order) =>
+          order.status === 'Paid' ? sum + (order.amount || 0) : sum, 0);
+
         setStats({
           totalSales,
           totalOrders: orders.length,
           totalProducts: productsRes.data.length,
           totalUsers: usersRes.data.length,
-          deliveredOrders: orders.filter(order => order.status === 'delivered').length,
-          cancelledOrders: orders.filter(order => order.status === 'cancelled').length,
+          deliveredOrders: orders.filter(order => order.deliveryStatus === 'delivered').length,
+          cancelledOrders: orders.filter(order => order.status === 'Cancelled').length,
         });
       } catch (error) {
         console.error('Error fetching stats:', error);

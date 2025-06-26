@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { FiTrash2, FiSearch, FiAlertTriangle, FiTruck } from 'react-icons/fi';
 import { format } from 'date-fns';
 import showToast from "../..//utils/toastUtils";
@@ -26,12 +26,7 @@ const OrderManagement = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/orders', {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get('/orders');
         setOrders(response.data);
         setLoading(false);
       } catch (error) {
@@ -50,17 +45,11 @@ const OrderManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
-        `http://localhost:5000/api/orders/${selectedOrder._id}`,
+      await api.patch(
+        `/orders/${selectedOrder._id}`,
         { 
           status: 'Cancelled',
           cancellationReason: cancelReason
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
         }
       );
 
@@ -89,7 +78,6 @@ const OrderManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
       // Only send fields that are set (avoid sending empty status)
       const updatePayload = {
         deliveryStatus: shippingData.deliveryStatus,
@@ -99,14 +87,9 @@ const OrderManagement = () => {
       if (shippingData.status && shippingData.status.trim()) {
         updatePayload.status = shippingData.status;
       }
-      await axios.patch(
-        `http://localhost:5000/api/orders/${selectedOrder._id}`,
-        updatePayload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+      await api.patch(
+        `/orders/${selectedOrder._id}`,
+        updatePayload
       );
 
       setOrders(orders.map(order => 

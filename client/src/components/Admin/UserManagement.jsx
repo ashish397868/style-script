@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../services/api';
 import { FiSearch, FiTrash2, FiUserCheck, FiUserX } from 'react-icons/fi';
 import showToast from "../../utils/toastUtils"; 
 const UserManagement = () => {
@@ -13,10 +13,7 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/users');
       setUsers(response.data);
       setLoading(false);
     } catch (error) {
@@ -27,12 +24,7 @@ const UserManagement = () => {
 
   const handleToggleAdmin = async (userId, isAdmin) => {
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
-        `http://localhost:5000/api/users/${userId}`,
-        { makeAdmin: !isAdmin },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.patch(`/users/${userId}`, { makeAdmin: !isAdmin });
       setUsers(users.map(user =>
         user._id === userId
           ? { ...user, role: !isAdmin ? 'admin' : 'user' }
@@ -47,10 +39,7 @@ const UserManagement = () => {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/users/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.delete(`/users/${userId}`);
       setUsers(users.filter(user => user._id !== userId));
       showToast('User deleted', 'success');
     } catch (error) {

@@ -191,6 +191,11 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Review */}
+      <div>
+        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Tempora quos quae dolorem consequuntur eveniet eius quia commodi similique. Dolore laboriosam optio provident non totam eum fuga at saepe culpa assumenda?
+      </div>
     </section>
   );
 }

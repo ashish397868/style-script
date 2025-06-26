@@ -5,6 +5,7 @@ const database = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
+const pincodeRoutes = require("./routes/pincodeRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
@@ -23,6 +24,7 @@ app.use(express.json());
 database();
 
 app.use("/api/", userRoutes);
+app.use("/api/", pincodeRoutes);
 app.use("/api/products/", productRoutes);
 app.use("/api/media/", mediaRoutes);
 app.use("/api/reviews/", reviewRoutes);

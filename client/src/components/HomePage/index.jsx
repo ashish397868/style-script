@@ -58,7 +58,7 @@ const Index = () => {
         <Carousel autoPlay infiniteLoop showThumbs={false} showStatus={false} showIndicators={true} interval={3000} stopOnHover dynamicHeight={false}>
           {imageLink.map((src, index) => (
             <div key={index}>
-              <img src={src} alt={`Banner ${index + 1}`} className="w-full h-auto" />
+              <img src={src} loading="lazy" alt={`Banner ${index + 1}`} className="w-full h-auto" />
             </div>
           ))}
         </Carousel>
@@ -76,6 +76,7 @@ const Index = () => {
           whileHover={{ scale: 1.1 }}
            transition={{ type: "spring", stiffness: 300,delay: 0.2 }}
             className="rounded-lg shadow-md cursor-pointer"
+            loading="lazy"
              />
         ))}
       </div>
@@ -86,6 +87,7 @@ const Index = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {themeCollectionImageLink.map((src, index) => (
             <motion.img
+                loading="lazy"
                 key={index}
                 src={src}
                 alt={`Theme ${index + 1}`}

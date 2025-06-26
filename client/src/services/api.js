@@ -1,3 +1,7 @@
+// Pincode Routes
+export const pincodeAPI = {
+  getPincodes: () => api.get('/get-pincode'),
+};
 import axios from 'axios';
 
 const api = axios.create({

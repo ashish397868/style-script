@@ -1,5 +1,6 @@
 // src/components/PincodeChecker.jsx
 import { useState } from "react";
+import { pincodeAPI } from "../../services/api";
 import { toast } from "react-toastify";
 
 export default function PincodeChecker({ onCheck }) {
@@ -8,9 +9,7 @@ export default function PincodeChecker({ onCheck }) {
 
   const checkServicability = async () => {
     try {
-      // replace with your pincode API call
-      const response = await fetch("/api/get-pincode");
-      const pinJson = await response.json();
+      const { data: pinJson } = await pincodeAPI.getPincodes();
       const available = Object.keys(pinJson).includes(pin);
       setService(available);
       toast[available ? "success" : "error"](

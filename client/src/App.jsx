@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import "./App.css";
 import Navbar from "../src/screen/Navbar";
 import { Routes, Route } from "react-router-dom";
@@ -25,14 +26,14 @@ import AddEditProduct from "./components/Admin/AddEditProduct";
 
 function App() {
   const { initAuth } = useUserStore();
+  const location = useLocation();
 
   useEffect(() => {
     initAuth();
   }, []);
-
   return (
     <>
-      <Navbar />
+      {!location.pathname.startsWith('/admin') && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -52,14 +53,12 @@ function App() {
           <Route path="reviews" element={<ReviewManagement />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="products" element={<AddEditProduct />} />
-
         </Route>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<UserProfile />} />
       </Routes>
-      <Footer/>
-        </>
-
+      {!location.pathname.startsWith('/admin') && <Footer />}
+    </>
   );
 }
 

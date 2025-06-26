@@ -16,9 +16,10 @@ const OrderManagement = () => {
   const [showShippingModal, setShowShippingModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [shippingData, setShippingData] = useState({
-    provider: '',
+    shippingProvider: '',
     trackingId: '',
-    deliveryStatus: 'shipped'
+    deliveryStatus: 'shipped',
+    status: '' // optional, for admin to update order status if needed
   });
   const ordersPerPage = 10;
 
@@ -82,16 +83,25 @@ const OrderManagement = () => {
   };
 
   const handleUpdateShipping = async () => {
-    if (!shippingData.provider.trim() || !shippingData.trackingId.trim()) {
+    if (!shippingData.shippingProvider.trim() || !shippingData.trackingId.trim()) {
       showToast("Please provide shipping provider and tracking ID", "error");
       return;
     }
 
     try {
       const token = localStorage.getItem('token');
+      // Only send fields that are set (avoid sending empty status)
+      const updatePayload = {
+        deliveryStatus: shippingData.deliveryStatus,
+        shippingProvider: shippingData.shippingProvider,
+        trackingId: shippingData.trackingId
+      };
+      if (shippingData.status && shippingData.status.trim()) {
+        updatePayload.status = shippingData.status;
+      }
       await axios.patch(
-        `http://localhost:5000/api/orders/${selectedOrder._id}/shipping`,
-        shippingData,
+        `http://localhost:5000/api/orders/${selectedOrder._id}`,
+        updatePayload,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -103,16 +113,18 @@ const OrderManagement = () => {
         order._id === selectedOrder._id ? { 
           ...order, 
           deliveryStatus: shippingData.deliveryStatus,
-          shippingProvider: shippingData.provider,
-          trackingId: shippingData.trackingId
+          shippingProvider: shippingData.shippingProvider,
+          trackingId: shippingData.trackingId,
+          ...(shippingData.status && shippingData.status.trim() ? { status: shippingData.status } : {})
         } : order
       ));
 
       setShowShippingModal(false);
       setShippingData({
-        provider: '',
+        shippingProvider: '',
         trackingId: '',
-        deliveryStatus: 'shipped'
+        deliveryStatus: 'shipped',
+        status: ''
       });
       setSelectedOrder(null);
       showToast("Shipping information updated successfully", "success");
@@ -130,9 +142,10 @@ const OrderManagement = () => {
   const openShippingModal = (order) => {
     setSelectedOrder(order);
     setShippingData({
-      provider: order.shippingProvider || '',
+      shippingProvider: order.shippingProvider || '',
       trackingId: order.trackingId || '',
-      deliveryStatus: order.deliveryStatus || 'shipped'
+      deliveryStatus: order.deliveryStatus || 'shipped',
+      status: order.status || ''
     });
     setShowShippingModal(true);
   };
@@ -142,9 +155,10 @@ const OrderManagement = () => {
     setShowShippingModal(false);
     setCancelReason('');
     setShippingData({
-      provider: '',
+      shippingProvider: '',
       trackingId: '',
-      deliveryStatus: 'shipped'
+      deliveryStatus: 'shipped',
+      status: ''
     });
     setSelectedOrder(null);
   };
@@ -444,10 +458,27 @@ const OrderManagement = () => {
                 <input
                   type="text"
                   className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
-                  value={shippingData.provider}
-                  onChange={(e) => setShippingData({...shippingData, provider: e.target.value})}
+                  value={shippingData.shippingProvider}
+                  onChange={(e) => setShippingData({...shippingData, shippingProvider: e.target.value})}
                   placeholder="e.g., Shiprocket, Delhivery"
                 />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Order Status (optional)
+                </label>
+                <select
+                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  value={shippingData.status}
+                  onChange={(e) => setShippingData({...shippingData, status: e.target.value})}
+                >
+                  <option value="">(No Change)</option>
+                  <option value="Initiated">Initiated</option>
+                  <option value="Processing">Processing</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Failed">Failed</option>
+                  <option value="Cancelled">Cancelled</option>
+                </select>
               </div>
 
               <div className="mb-4">

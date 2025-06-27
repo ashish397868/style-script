@@ -17,12 +17,15 @@ export const useProductStore = create((set, get) => ({
   totalPages: 1,
 
   // Fetch all products with filters
-  fetchProducts: async () => {
-    const { filters } = get();
+  fetchProducts: async (force = false) => {
+    const { filters, products } = get();
+    // Only fetch if products are not loaded or force is true
+    if (!force && products && products.length > 0) {
+      return products;
+    }
     set({ loading: true });
     try {
       const response = await productAPI.getAllProducts(filters);
-      // Server returns an array, not { products, totalPages }
       set({
         products: Array.isArray(response.data) ? response.data : response.data.products || [],
         totalPages: 1,

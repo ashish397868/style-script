@@ -7,9 +7,9 @@ export const menuItems = [
 ];
 
 export const productItems = [
-  { label: 'T-Shirts', href: '/products/t-shirts', component: Link },
-  { label: 'Polo TShirts', href: '/products/polo-tshirts', component: Link },
-  { label: 'Oversized Tshirts', href: '/products/oversized-tshirts', component: Link },
+  { label: 'T-Shirts', href: '/products/tshirts', component: Link },
+  { label: 'Polo TShirts', href: '/products/polotshirts', component: Link },
+  { label: 'Oversized Tshirts', href: '/products/oversizedtshirts', component: Link },
 ];
 
 export const adminItems = [

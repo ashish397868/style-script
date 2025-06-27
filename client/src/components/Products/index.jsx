@@ -18,7 +18,9 @@ const Products = () => {
   const [sortBy, setSortBy] = useState('newest');
 
   useEffect(() => {
-    fetchProducts();
+    if (!products || products.length === 0) {
+      fetchProducts();
+    }
     // eslint-disable-next-line
   }, []);
 
@@ -137,7 +139,7 @@ const Products = () => {
         <h2 className="font-bold text-xl mb-2">Error Loading Products</h2>
         <p>{error}</p>
         <button 
-          onClick={fetchProducts}
+          onClick={() => fetchProducts(true)}
           className="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Try Again

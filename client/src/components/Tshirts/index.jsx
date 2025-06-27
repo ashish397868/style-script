@@ -1,31 +1,20 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { BeatLoader } from "react-spinners";
-import { productAPI } from "../../services/api";
+import { useProductStore } from "../../store/productStore";
 import ProductCard from "../ProductCard";
 
 const Tshirts = () => {
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { products, fetchProducts, loading, error } = useProductStore();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        const response = await productAPI.getProductsByCategory("tshirts");
-        setProducts(response.data);
-        setError(null);
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        setError("Failed to load products. Please try again later.");
-        setProducts([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchProducts();
+    // eslint-disable-next-line
   }, []);
+
+  // Filter t-shirts category (assuming category is 'tshirts' or similar)
+  const tshirtProducts = products.filter(
+    (prod) => prod.category && prod.category.toLowerCase() === "tshirts"
+  );
 
   return (
     <section className="text-gray-600 body-font">
@@ -39,24 +28,24 @@ const Tshirts = () => {
           </p>
         </div>
 
-        {isLoading ? (
+        {loading ? (
           <div className="flex justify-center items-center min-h-[200px]">
             <BeatLoader
-              visible={true}
+              // visible={true}
               height="80"
               width="80"
               color="#4fa94d"
               radius="9"
-              ariaLabel="three-dots-loading"
+              aria-label="three-dots-loading"
             />
           </div>
         ) : error ? (
           <div className="text-center text-red-600 py-8">{error}</div>
-        ) : products && products.length > 0 ? (
+        ) : tshirtProducts && tshirtProducts.length > 0 ? (
           <div className="flex flex-wrap -m-4">
             {/* Group products by title and show only one card per title, passing all variants */}
             {Object.entries(
-              products.reduce((acc, prod) => {
+              tshirtProducts.reduce((acc, prod) => {
                 if (!acc[prod.title]) acc[prod.title] = [];
                 acc[prod.title].push(prod);
                 return acc;

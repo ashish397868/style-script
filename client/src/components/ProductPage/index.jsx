@@ -1,7 +1,7 @@
 
 // src/pages/ProductPage.jsx
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { BeatLoader } from "react-spinners";
 import { FaStar, FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
@@ -197,12 +197,12 @@ useEffect(() => {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <a href="/" className="text-gray-600 hover:text-indigo-600 text-sm">Home</a>
+              <Link to="/" className="text-gray-600 hover:text-indigo-600 text-sm">Home</Link>
             </li>
             <li>
               <div className="flex items-center">
                 <svg className="w-3 h-3 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                <a href="/products" className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">Products</a>
+                <Link to="/products/t-shirts" className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">Tshirts</Link>
               </div>
             </li>
             <li aria-current="page">

@@ -54,8 +54,15 @@ const Tshirts = () => {
           <div className="text-center text-red-600 py-8">{error}</div>
         ) : products && products.length > 0 ? (
           <div className="flex flex-wrap -m-4">
-            {products.map((product) => (
-              <ProductCard key={product._id} product={product} />
+            {/* Group products by title and show only one card per title, passing all variants */}
+            {Object.entries(
+              products.reduce((acc, prod) => {
+                if (!acc[prod.title]) acc[prod.title] = [];
+                acc[prod.title].push(prod);
+                return acc;
+              }, {})
+            ).map(([title, variants]) => (
+              <ProductCard key={variants[0]._id} product={variants[0]} variants={variants} />
             ))}
           </div>
         ) : (

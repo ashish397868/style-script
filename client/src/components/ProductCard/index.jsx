@@ -13,12 +13,24 @@ const colorMap = [
   {name: "White", className: "bg-white border border-gray-300" },
 ];
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, variants }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
     navigate(`/product/${product.slug}`);
   };
+
+  // Use variants prop if provided, else fallback to product.variants or just product
+  const variantList = Array.isArray(variants) && variants.length > 0
+    ? variants
+    : Array.isArray(product.variants) && product.variants.length > 0
+      ? product.variants
+      : [product];
+
+  // Only show variants with the same title and availableQty > 0
+  const filteredVariants = variantList.filter(v => v.title === product.title && v.availableQty > 0);
+  const uniqueColors = [...new Set(filteredVariants.map(v => v.color).filter(Boolean))];
+  const uniqueSizes = [...new Set(filteredVariants.map(v => v.size).filter(Boolean))];
 
   return (
     <div
@@ -42,41 +54,41 @@ const ProductCard = ({ product }) => {
         </h2>
         <p className="mt-1 font-semibold">₹{product.price}</p>
         <p className="text-gray-600 text-xs mb-1">{product.description.substring(0, 100)}...</p>
-        {/* Show only sizes/colors for same title variants if product.variants exists */}
-<div className="mt-1">
-  {Array.isArray(product.variants)
-    ? (() => {
-        // Only show sizes for the same title and current color (if color exists)
-        const filtered = product.variants.filter(
-          v =>
-            v.title === product.title &&
-            v.availableQty > 0 &&
-            (!product.color || v.color === product.color)
-        );
-        const uniqueSizes = [...new Set(filtered.map(v => v.size))];
-        return uniqueSizes.map(size => (
-          <span
-            key={size}
-            className="border border-gray-300 mx-1 px-1 text-xs"
-          >
-            {size}
-          </span>
-        ));
-      })()
-    : sizeList.map(
-        (size) =>
-          product.size && product.size.includes(size) && (
-            <span
-              key={size}
-              className="border border-gray-300 mx-1 px-1 text-xs"
-            >
-              {size}
-            </span>
-          )
-      )}
-</div>
 
-        
+        {/* Color swatches */}
+        {uniqueColors.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2 items-center">
+            {uniqueColors.map((color) => {
+              const colorObj = colorMap.find(c => c.name.toLowerCase() === color.toLowerCase());
+              return (
+                <span
+                  key={color}
+                  className={`inline-block w-5 h-5 rounded-full border border-gray-300 mr-1 ${colorObj ? colorObj.className : ''}`}
+                  title={color}
+                >
+                  {!colorObj && (
+                    <span className="text-xs text-gray-700">{color[0]}</span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Size chips */}
+        {uniqueSizes.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2 items-center">
+            {uniqueSizes.map(size => (
+              <span
+                key={size}
+                className="border border-gray-300 px-2 py-0.5 text-xs rounded"
+              >
+                {size}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="mt-2">
           {product.availableQty > 0 ? (
             <span className="text-green-600 font-medium">

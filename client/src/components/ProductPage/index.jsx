@@ -1,3 +1,4 @@
+
 // src/pages/ProductPage.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -33,52 +34,87 @@ export default function ProductDetailPage() {
   const isAuthenticated = useUserStore((s) => s.isAuthenticated);
 
   // Fetch product + variants
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setIsLoading(true);
-        const { data: prod } = await productAPI.getProductBySlug(slug);
-        setProduct(prod);
-        const { data: allVariants } = await productAPI.getAllProducts({ title: prod.title });
-        setVariants(allVariants);
-        setColor(prod.color || "");
-        setSize(prod.size || "");
-        setError(null);
-      } catch {
-        setError("Product not found.");
-        setProduct(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchData();
-  }, [slug]);
+useEffect(() => {
+  async function fetchData() {
+    setIsLoading(true);
+    try {
+      const { data: prod } = await productAPI.getProductBySlug(slug);
+      setProduct(prod);
 
-  // Filter options
-  const colorOptions = Array.from(
+      try {
+        // Fetch all products with the same title, then filter for exact title match (in case API returns more)
+        const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
+        const filteredVariants = allVariantsRaw.filter(v => v.title === prod.title);
+        setVariants(filteredVariants);
+      } catch (variantErr) {
+        setVariants([]); // fallback: no variants
+      }
+
+      setColor(prod.color || "");
+      setSize(prod.size || "");
+      setError(null);
+    } catch {
+      setError("Product not found.");
+      setProduct(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+  fetchData();
+}, [slug]);
+  // When color changes, set size to a valid size for that color if current size is not available
+  useEffect(() => {
+    if (!color || !variants.length) return;
+    const validSizes = variants.filter(v => v.color === color && v.title === product?.title && v.availableQty > 0).map(v => v.size);
+    if (validSizes.length && !validSizes.includes(size)) {
+      setSize(validSizes[0]);
+    }
+  }, [color, variants, product?.title]);
+  
+
+  // Filter options - FIXED: Only show options for this specific product
+  // Always include the current product's color and size if not present in variants
+  // Only show colors and sizes for variants with the same title as the current product
+  // Show all unique colors and sizes for the current product title
+  let colorOptions = Array.from(
     new Set(
       variants
-        .filter((v) => v.availableQty > 0 && (!size || v.size === size))
+        .filter((v) => v.title === product?.title && v.availableQty > 0)
         .map((v) => v.color)
         .filter(Boolean)
     )
   );
+  if (product && product.color && !colorOptions.includes(product.color)) {
+    colorOptions = [product.color, ...colorOptions];
+  }
 
-  const sizeOptions = Array.from(
+  let sizeOptions = Array.from(
     new Set(
       variants
-        .filter((v) => v.availableQty > 0 && v.color === color)
+        .filter((v) => v.title === product?.title && v.availableQty > 0)
         .map((v) => v.size)
         .filter(Boolean)
     )
   );
+  if (product && product.size && !sizeOptions.includes(product.size)) {
+    sizeOptions = [product.size, ...sizeOptions];
+  }
 
-  // Update product when color/size changes
+  // Update product when color/size changes - FIXED: Only show variants of this product
+
   useEffect(() => {
     if (!color || !size) return;
+    // Always update product to the selected variant (even if _id is the same)
     const match = variants.find((v) => v.color === color && v.size === size);
-    if (match) setProduct(match);
+    if (match) {
+      setProduct(match);
+    }
   }, [color, size, variants]);
+
+  // Reset image index to 0 whenever product changes (for color/size switch)
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [product]);
 
   // Fetch reviews
   useEffect(() => {
@@ -155,6 +191,7 @@ export default function ProductDetailPage() {
   return (
     <section className="text-gray-800 body-font overflow-hidden">
       <ToastContainer position="top-right" autoClose={3000} />
+      {console.log("Variants : - ",variants)}
       <div className="container px-5 py-10 mx-auto">
         {/* Breadcrumb */}
         <nav className="flex mb-8" aria-label="Breadcrumb">
@@ -196,7 +233,11 @@ export default function ProductDetailPage() {
                   <button 
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${selectedImageIndex === index ? 'border-indigo-600 scale-105' : 'border-gray-200 hover:border-gray-400'}`}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
+                      selectedImageIndex === index 
+                        ? 'border-indigo-600 scale-105' 
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
                   >
                     <img 
                       src={img} 
@@ -250,21 +291,33 @@ export default function ProductDetailPage() {
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Color</h3>
                 <div className="flex flex-wrap gap-2">
-                  {colorOptions.map((c) => (
-                    <ColorButton 
-                      key={c} 
-                      color={c} 
-                      isActive={color === c} 
-                      onClick={() => setColor(c)}
-                    />
-                  ))}
+                  {colorOptions.length > 0 ? (
+                    colorOptions.map((c) => (
+                      <ColorButton 
+                        key={c} 
+                        color={c} 
+                        isActive={color === c} 
+                        onClick={() => setColor(c)}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">No color options available</p>
+                  )}
                 </div>
               </div>
               
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Size</h3>
                 <div className="flex flex-wrap gap-2">
-                  <SizeSelect sizes={sizeOptions} value={size} onChange={(e) => setSize(e.target.value)} />
+                  {sizeOptions.length > 0 ? (
+                    <SizeSelect 
+                      sizes={sizeOptions} 
+                      value={size} 
+                      onChange={(e) => setSize(e.target.value)} 
+                    />
+                  ) : (
+                    <p className="text-gray-500 text-sm">No size options available</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -358,10 +411,16 @@ export default function ProductDetailPage() {
                 
                 <h3 className="text-xl font-bold mb-4 mt-8">Features</h3>
                 <ul className="list-disc pl-5 space-y-2">
-                  <li>High-quality materials for durability</li>
-                  <li>Designed for comfort and style</li>
-                  <li>Easy to maintain and care for</li>
-                  <li>Eco-friendly production process</li>
+                  {product.features?.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  )) || (
+                    <>
+                      <li>High-quality materials for durability</li>
+                      <li>Designed for comfort and style</li>
+                      <li>Easy to maintain and care for</li>
+                      <li>Eco-friendly production process</li>
+                    </>
+                  )}
                 </ul>
               </div>
             ) : (

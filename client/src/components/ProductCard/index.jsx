@@ -42,31 +42,41 @@ const ProductCard = ({ product }) => {
         </h2>
         <p className="mt-1 font-semibold">₹{product.price}</p>
         <p className="text-gray-600 text-xs mb-1">{product.description.substring(0, 100)}...</p>
-        <div className="mt-1">
-          {sizeList.map(
-            (size) =>
-              product.size && product.size.includes(size) && (
-                <span
-                  key={size}
-                  className="border border-gray-300 mx-1 px-1 text-xs"
-                >
-                  {size}
-                </span>
-              )
-          )}
-        </div>
-        <div className="mt-1 flex flex-wrap">
-          {colorMap.map(
-            (color) =>
-              product.color && product.color.includes(color.name) && (
-                <span
-                  key={color.name}
-                  className={`border-2 border-gray-300 ml-1 ${color.className} rounded-full w-5 h-5 inline-block`}
-                  title={color.name}
-                ></span>
-              )
-          )}
-        </div>
+        {/* Show only sizes/colors for same title variants if product.variants exists */}
+<div className="mt-1">
+  {Array.isArray(product.variants)
+    ? (() => {
+        // Only show sizes for the same title and current color (if color exists)
+        const filtered = product.variants.filter(
+          v =>
+            v.title === product.title &&
+            v.availableQty > 0 &&
+            (!product.color || v.color === product.color)
+        );
+        const uniqueSizes = [...new Set(filtered.map(v => v.size))];
+        return uniqueSizes.map(size => (
+          <span
+            key={size}
+            className="border border-gray-300 mx-1 px-1 text-xs"
+          >
+            {size}
+          </span>
+        ));
+      })()
+    : sizeList.map(
+        (size) =>
+          product.size && product.size.includes(size) && (
+            <span
+              key={size}
+              className="border border-gray-300 mx-1 px-1 text-xs"
+            >
+              {size}
+            </span>
+          )
+      )}
+</div>
+
+        
         <div className="mt-2">
           {product.availableQty > 0 ? (
             <span className="text-green-600 font-medium">

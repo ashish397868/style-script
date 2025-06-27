@@ -8,6 +8,7 @@ import About from "../src/screen/About";
 import Login from "../src/components/Login";
 import Signup from "../src/components/Signup";
 import Admin from "../src/components/Admin/AdminDashboard";
+import AddProductPage from "../src/components/Admin/AddProductPage";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import ForgotPassword from "../src/components/ForgotPassword";
 import Tshirts from "../src/components/Tshirts";
@@ -22,7 +23,7 @@ import Footer from "../src/screen/Footer"
 import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
 import OrderManagement from "./components/Admin/OrderManagement";
-import AddEditProduct from "./components/Admin/AddEditProduct";
+
 
 function App() {
   const { initAuth } = useUserStore();
@@ -52,7 +53,7 @@ function App() {
           <Route path="users" element={<UserManagement />} />
           <Route path="reviews" element={<ReviewManagement />} />
           <Route path="orders" element={<OrderManagement />} />
-          <Route path="products" element={<AddEditProduct />} />
+          <Route path="add-product" element={<AddProductPage />} />
         </Route>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<UserProfile />} />

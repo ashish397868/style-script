@@ -88,6 +88,7 @@ export const productAPI = {
   getProductsByCategory: (category) => api.get(`/products/category/${category}`),
   searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
   getProductReviews: (productId) => api.get(`/products/${productId}/reviews`),
+  createProduct: (productData) => api.post('/products', productData),
 };
 
 // Order Routes

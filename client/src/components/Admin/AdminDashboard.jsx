@@ -102,13 +102,14 @@ const AdminDashboard = () => {
             <FiShoppingCart className="text-lg" />
             {sidebarOpen && <span className="ml-3">Orders</span>}
           </Link>
+
           <Link 
-            to="products" 
-            className={`flex items-center p-3 ${activeTab === 'products' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
-            onClick={() => setActiveTab('products')}
+            to="add-product" 
+            className={`flex items-center p-3 ${activeTab === 'add-product' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('add-product')}
           >
             <FiBox className="text-lg" />
-            {sidebarOpen && <span className="ml-3">Products</span>}
+            {sidebarOpen && <span className="ml-3">Add Product</span>}
           </Link>
           <Link 
             to="users" 

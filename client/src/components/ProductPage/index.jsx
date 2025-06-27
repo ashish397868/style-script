@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { BeatLoader } from "react-spinners";
 import { FaStar, FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
 import { productAPI, reviewAPI } from "../../services/api";
+import { useProductStore } from "../../store/productStore";
 import { useCartStore } from "../../store/cartStore";
 import { useUserStore } from "../../store/userStore";
 import PincodeChecker from "../../components/PincodeChecker";
@@ -14,9 +15,11 @@ import ColorButton from "../ColorButton";
 import SizeSelect from "../SelectSize";
 import "react-toastify/dist/ReactToastify.css";
 
+
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const { products, fetchProducts, loading: productsLoading } = useProductStore();
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -34,33 +37,52 @@ export default function ProductDetailPage() {
 
   // Fetch product + variants
   useEffect(() => {
-    async function fetchData() {
-      setIsLoading(true);
-      try {
-        const { data: prod } = await productAPI.getProductBySlug(slug);
-        setProduct(prod);
-
-        try {
-          // Fetch all products with the same title, then filter for exact title match (in case API returns more)
-          const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
-          const filteredVariants = allVariantsRaw.filter((v) => v.title === prod.title);
-          setVariants(filteredVariants);
-        } catch (variantErr) {
-          setVariants([]); // fallback: no variants
-        }
-
-        setColor(prod.color || "");
-        setSize(prod.size || "");
-        setError(null);
-      } catch {
-        setError("Product not found.");
-        setProduct(null);
-      } finally {
-        setIsLoading(false);
-      }
+    let foundProduct = null;
+    if (products && products.length > 0) {
+      foundProduct = products.find((p) => p.slug === slug);
     }
-    fetchData();
-  }, [slug]);
+    if (foundProduct) {
+      setProduct(foundProduct);
+      setColor(foundProduct.color || "");
+      setSize(foundProduct.size || "");
+      setError(null);
+      setIsLoading(false);
+      // Find all variants with the same title
+      const filteredVariants = products.filter((v) => v.title === foundProduct.title);
+      setVariants(filteredVariants);
+    } else {
+      // If not found in global products, fetch from API
+      setIsLoading(true);
+      (async () => {
+        try {
+          const { data: prod } = await productAPI.getProductBySlug(slug);
+          setProduct(prod);
+          setColor(prod.color || "");
+          setSize(prod.size || "");
+          setError(null);
+          // Try to get variants from global products if possible
+          let filteredVariants = [];
+          if (products && products.length > 0) {
+            filteredVariants = products.filter((v) => v.title === prod.title);
+          } else {
+            // fallback: fetch all variants from API
+            try {
+              const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
+              filteredVariants = allVariantsRaw.filter((v) => v.title === prod.title);
+            } catch {
+              filteredVariants = [];
+            }
+          }
+          setVariants(filteredVariants);
+        } catch {
+          setError("Product not found.");
+          setProduct(null);
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+    }
+  }, [slug, products]);
   // When color changes, set size to a valid size for that color if current size is not available
   useEffect(() => {
     if (!color || !variants.length) return;
@@ -173,7 +195,7 @@ export default function ProductDetailPage() {
   // Calculate average rating
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1) : 0;
 
-  if (isLoading) {
+  if (isLoading || productsLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <BeatLoader height={80} width={80} color="#4fa94d" radius={9} />

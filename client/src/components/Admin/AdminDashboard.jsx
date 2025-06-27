@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import { FiHome, FiUsers, FiSettings, FiLogOut, FiBox, FiShoppingCart, FiCheckCircle, FiXCircle, FiMessageSquare, FiDollarSign } from 'react-icons/fi';
+import { FiHome, FiUsers, FiSettings, FiLogOut, FiBox, FiShoppingCart, FiCheckCircle, FiXCircle, FiMessageSquare, FiDollarSign, FiList } from 'react-icons/fi';
+
 import api from '../../services/api';
 
 const AdminDashboard = () => {
@@ -111,6 +112,17 @@ const AdminDashboard = () => {
             <FiBox className="text-lg" />
             {sidebarOpen && <span className="ml-3">Add Product</span>}
           </Link>
+
+          <Link 
+            to="all-products" 
+            className={`flex items-center p-3 ${activeTab === 'all-products' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}
+            onClick={() => setActiveTab('all-products')}
+          >
+            <FiList className="text-lg" />
+            {sidebarOpen && <span className="ml-3">All Products</span>}
+          </Link>
+
+
           <Link 
             to="users" 
             className={`flex items-center p-3 ${activeTab === 'users' ? 'bg-gray-700' : 'hover:bg-gray-700'}`}

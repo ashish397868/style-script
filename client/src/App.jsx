@@ -23,6 +23,8 @@ import Footer from "../src/screen/Footer"
 import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
 import OrderManagement from "./components/Admin/OrderManagement";
+import AdminProductList from "../src/components/Admin/AdminProductList";
+import EditProductPage from "../src/components/Admin/EditProductPage";
 
 
 function App() {
@@ -54,6 +56,8 @@ function App() {
           <Route path="reviews" element={<ReviewManagement />} />
           <Route path="orders" element={<OrderManagement />} />
           <Route path="add-product" element={<AddProductPage />} />
+          <Route path="all-products" element={<AdminProductList />} />
+          <Route path="edit-product/:id" element={<EditProductPage />} />
         </Route>
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<UserProfile />} />

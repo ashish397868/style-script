@@ -199,20 +199,56 @@ const EditProductPage = () => {
               {/* Category & Brand */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                <select
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                >
-                  <option value="">Select category</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Home & Kitchen">Home & Kitchen</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Sports">Sports</option>
-                </select>
+                <div className="flex gap-2">
+                  <select
+                    name="category"
+                    value={form.category}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                  >
+                    <option value="">Select category</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Home & Kitchen">Home & Kitchen</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Sports">Sports</option>
+                    {form.category && !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.category) && (
+                      <option value={form.category}>{form.category}</option>
+                    )}
+                  </select>
+                  <input
+                    type="text"
+                    placeholder="Add new category"
+                    value={form.newCategory || ''}
+                    onChange={e =>
+                      setForm(prev => ({
+                        ...prev,
+                        newCategory: e.target.value
+                      }))
+                    }
+                    className="px-4 py-3 border border-gray-300 rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded-lg"
+                    onClick={() => {
+                      if (
+                        form.newCategory &&
+                        !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.newCategory)
+                      ) {
+                        setForm(prev => ({
+                          ...prev,
+                          category: prev.newCategory,
+                          newCategory: ''
+                        }));
+                      }
+                    }}
+                  >
+                    Add
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">Select or add a new category</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>

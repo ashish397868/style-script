@@ -1,5 +1,5 @@
-// src/pages/ProductDetailPage.jsx
-import { useEffect, useState } from "react";
+// src/pages/ProductPage.jsx
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { BeatLoader } from "react-spinners";
@@ -11,6 +11,7 @@ import PincodeChecker from "../../components/PincodeChecker";
 import ReviewForm from "../../components/ReviewForm";
 import ColorButton from "../ColorButton";
 import SizeSelect from "../SelectSize";
+import ImageZoom from "../ImageZoom"; // Import the new component
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -133,11 +134,14 @@ export default function ProductDetailPage() {
       <ToastContainer />
       <div className="container px-5 py-16 mx-auto">
         <div className="lg:w-4/5 mx-auto flex flex-wrap">
-          <img
-            className="lg:w-1/2 w-full lg:h-auto px-24 object-cover object-top rounded"
-            alt={product.title}
-            src={product.images?.[0] || "/placeholder-image.jpg"}
-          />
+          {/* Replace the image with ImageZoom component */}
+          <div className="lg:w-1/2 w-full px-4">
+            <ImageZoom 
+              src={product.images?.[0] || "/placeholder-image.jpg"}
+              alt={product.title}
+              className="w-full h-auto max-h-[500px] object-cover object-top rounded"
+            />
+          </div>
 
           <div className="lg:w-1/2 w-full lg:pl-10 mt-6 lg:mt-0">
             <h2 className="text-sm title-font text-gray-500 tracking-widest">

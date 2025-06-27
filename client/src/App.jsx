@@ -19,6 +19,8 @@ import Success from "../src/components/Success";
 import UserManagement from "../src/components/Admin/UserManagement";  
 import UserProfile from "./components/UserProfile";
 import Footer from "../src/screen/Footer"
+import Orders from "./components/Orders";
+import OrderDetail from "./components/OrderDetail";
 
 // import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
@@ -63,7 +65,9 @@ function App() {
         <Route path="/product/:slug" element={<ProductPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/review-order" element={<ReviewOrder />} />
-        <Route path="/success" element={<Success />} />
+        <Route path="/orders" element={<Orders />} />
+        <Route path="/order/:id" element={<OrderDetail />} />
+        <Route path="/success/:id" element={<Success />} />
         <Route path="/admin" element={
           <ProtectedRoute requireAdmin>
             <Admin />

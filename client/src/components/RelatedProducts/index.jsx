@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import { useCartStore } from "../../store/cartStore";
 import { useProductStore } from "../../store/productStore";
-import { useNavigate, Link } from "react-router-dom";
-import { FiArrowRight, FiCheckCircle, FiShoppingBag, FiStar, FiTruck } from "react-icons/fi";
+import { Link, useNavigate } from "react-router-dom";
+import { FiCheckCircle, FiShoppingBag, FiTruck, FiArrowRight } from "react-icons/fi";
 import { BeatLoader } from "react-spinners";
 
+// Related Products Component
+function RelatedProducts({ excludeIds, categories = [] }) {
+  const navigate = useNavigate();
   const { products, fetchProducts, loading: productsLoading } = useProductStore();
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function getRelated() {
@@ -16,14 +19,32 @@ import { BeatLoader } from "react-spinners";
       try {
         let allProducts = products;
         if (!products || products.length === 0) {
-          // fetch if not loaded
           const res = await fetchProducts();
           allProducts = Array.isArray(res) ? res : res.products || [];
         }
+        
+        // Filtering logic
         let filtered = allProducts;
-        if (category) filtered = filtered.filter(p => p.category === category);
-        if (tag) filtered = filtered.filter(p => p.tags && p.tags.includes(tag));
-        if (excludeId) filtered = filtered.filter(p => p._id !== excludeId);
+        
+        // Exclude purchased products
+        if (excludeIds && excludeIds.length > 0) {
+          filtered = filtered.filter(p => !excludeIds.includes(p._id));
+        }
+        
+        // Filter by categories if available
+        if (categories.length > 0) {
+          filtered = filtered.filter(p => 
+            p.category && categories.includes(p.category)
+        }
+        
+        // Fallback to random products if no category match
+        if (filtered.length < 4) {
+          filtered = allProducts.filter(p => 
+            !excludeIds.includes(p._id)
+          );
+        }
+        
+        // Limit to 4 products
         setRelated(filtered.slice(0, 4));
         setError(null);
       } catch (err) {
@@ -33,14 +54,13 @@ import { BeatLoader } from "react-spinners";
       }
     }
     getRelated();
-    // eslint-disable-next-line
-  }, [category, tag, excludeId, products]);
+  }, [categories, excludeIds, products]);
 
   if (error) return <div className="text-red-500 text-center py-6">{error}</div>;
   if (!related.length && !loading) return null;
 
   return (
-    <section className="mt-16 max-w-6xl mx-auto px-4">
+    <section className="mt-16">
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-2xl font-bold text-gray-900">You May Also Like</h3>
         <button 
@@ -75,7 +95,7 @@ import { BeatLoader } from "react-spinners";
               <div className="relative">
                 <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
                   <img
-                    src={product.images && product.images[0] ? product.images[0] : "/placeholder-image.jpg"}
+                    src={product.images?.[0] || "/placeholder-image.jpg"}
                     alt={product.title}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
@@ -118,4 +138,5 @@ import { BeatLoader } from "react-spinners";
       )}
     </section>
   );
+}
 export default RelatedProducts;

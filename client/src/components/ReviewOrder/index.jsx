@@ -59,6 +59,53 @@ export default function ReviewOrder() {
       return;
     }
 
+    // Send order creation request to server
+    let orderId = null;
+    try {
+      const user = JSON.parse(localStorage.getItem('user-storage'))?.state?.user;
+      const orderIdStr = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+      const productsArr = Object.values(cart).map(item => ({
+        productId: item._id,
+        name: item.name,
+        price: item.price,
+        quantity: item.qty,
+        size: item.size,
+        color: item.color
+      }));
+      if (!productsArr.length) {
+        alert("No products in cart.");
+        setIsPaying(false);
+        return;
+      }
+      const phone = selectedAddress.phone || user?.phone;
+      if (!phone) {
+        alert("No phone number found in address or user profile.");
+        setIsPaying(false);
+        return;
+      }
+      const orderPayload = {
+        email: user?.email,
+        name: user?.name,
+        phone,
+        orderId: orderIdStr,
+        products: productsArr,
+        address: {
+          addressLine1: selectedAddress.addressLine1,
+          addressLine2: selectedAddress.addressLine2,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          pincode: selectedAddress.pincode,
+        },
+        amount: orderTotal,
+      };
+      const orderRes = await import("../../services/api").then(m => m.orderAPI.createOrder(orderPayload));
+      orderId = orderRes.data.order._id;
+    } catch (e) {
+      alert("Failed to create order. Please try again.");
+      setIsPaying(false);
+      return;
+    }
+
     const options = {
       key: "rzp_test_rcDlQK0nZIkMpa", // 🔁 Replace with your Razorpay key
       amount: subTotal * 100,
@@ -67,7 +114,7 @@ export default function ReviewOrder() {
       description: "Order Payment",
       handler: function (response) {
         clearCart();
-        navigate("/success");
+        navigate(`/success/${orderId}`);
       },
       prefill: {
         name: "", // Optional: prefill user name

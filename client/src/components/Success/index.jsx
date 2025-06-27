@@ -1,40 +1,50 @@
 import { useEffect, useState } from "react";
-import { useCartStore } from "../../store/cartStore";
-import { useProductStore } from "../../store/productStore";
-import { Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { FiCheckCircle, FiShoppingBag, FiTruck } from "react-icons/fi";
+import { BeatLoader } from "react-spinners";
+import { orderAPI } from "../../services/api";
 
-function Success() {
-  const navigate = useNavigate();
-  const { products } = useProductStore();
-  const cart = useCartStore((state) => state.cart);
-  const clearCart = useCartStore((state) => state.clearCart);
-  const [orderDetails, setOrderDetails] = useState({
-    orderId: `#ORD-${Math.floor(Math.random() * 900000 + 100000)}`,
-    items: Object.keys(cart).length,
-    total: Object.values(cart).reduce((sum, item) => sum + item.price * item.qty, 0),
-    estimatedDelivery: (() => {
-      const date = new Date();
-      date.setDate(date.getDate() + 4);
-      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    })()
-  });
+export function Success() {
+  const { id } = useParams();
+  // const id="6856f82a8176d9964b05db41"
+  console.log("Id  -   ",id)
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Clear cart on mount
   useEffect(() => {
-    clearCart();
-    // eslint-disable-next-line
-  }, []);
-
-  // Get purchased products from cart
-  const purchasedProducts = Object.values(cart)
-    .map(item => {
-      if (products && products.length > 0) {
-        return products.find(p => p._id === item.productId) || item;
+    async function fetchOrder() {
+      setLoading(true);
+      try {
+        const res = await orderAPI.getOrderById(id);
+        setOrderDetails(res.data);
+        setError(null);
+      } catch (err) {
+        setError("Failed to fetch order details.");
+      } finally {
+        setLoading(false);
       }
-      return item;
-    })
-    .slice(0, 4);
+    }
+    if (id) fetchOrder();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BeatLoader color="#6366f1" />
+      </div>
+    );
+  }
+
+  if (error || !orderDetails) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">
+        {error || "Order not found."}
+      </div>
+    );
+  }
+
+  const { _id, items, deliveryStatus, amount, estimatedDelivery, products = [] } = orderDetails;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-12">
@@ -50,7 +60,7 @@ function Success() {
               Thank you for your purchase. Your order has been placed and is being processed.
             </p>
           </div>
-          
+          {console.log(orderDetails)}
           <div className="p-8">
             {/* Order Summary */}
             <div className="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-100">
@@ -62,24 +72,21 @@ function Success() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">Order Number</h4>
-                  <p className="text-lg font-bold text-indigo-600">{orderDetails.orderId}</p>
+                  <p className="text-lg font-bold text-indigo-600">{_id}</p>
                 </div>
-                
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">Total Items</h4>
-                  <p className="text-lg font-bold">{orderDetails.items} items</p>
+                  <p className="text-lg font-bold">{products?.length || 0} items</p>
                 </div>
-                
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">Total Amount</h4>
-                  <p className="text-lg font-bold">₹{orderDetails.total.toLocaleString()}</p>
+                  <p className="text-lg font-bold">₹{amount?.toLocaleString()}</p>
                 </div>
-                
                 <div>
                   <h4 className="font-medium text-gray-700 mb-2">Estimated Delivery</h4>
                   <div className="flex items-center">
                     <FiTruck className="text-indigo-600 mr-2" />
-                    <p className="text-lg font-bold">{orderDetails.estimatedDelivery}</p>
+                    <p className="text-lg font-bold">{estimatedDelivery || "3-5 business days"}</p>
                   </div>
                 </div>
               </div>
@@ -139,47 +146,7 @@ function Success() {
           </div>
         </div>
         
-        {/* Purchased Products */}
-        <h3 className="text-2xl font-bold text-gray-900 mb-6">Your Purchased Items</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-          {purchasedProducts.length > 0 ? purchasedProducts.map((item, i) => (
-            <Link
-              key={item.productId || item._id || i}
-              to={item.slug ? `/product/${item.slug}` : '#'}
-              className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 hover:shadow-md transition-all duration-300"
-            >
-              <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
-                <img
-                  src={item.image || (item.images && item.images[0]) || "/placeholder-image.jpg"}
-                  alt={item.name || item.title}
-                  className="w-full h-40 object-cover"
-                />
-              </div>
-              <div className="p-4">
-                <h4 className="font-bold text-gray-900 mb-1 line-clamp-1">
-                  {item.name || item.title}
-                </h4>
-                <p className="text-gray-500 text-sm mb-2 line-clamp-2 h-10">
-                  {item.description || ''}
-                </p>
-                <span className="font-bold text-gray-900">₹{item.price}</span>
-              </div>
-            </Link>
-          )) : (
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-                <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden">
-                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-40" />
-                </div>
-                <div className="p-4">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/4 mb-3"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+
       </div>
     </div>
   );

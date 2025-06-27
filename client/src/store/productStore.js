@@ -22,9 +22,10 @@ export const useProductStore = create((set, get) => ({
     set({ loading: true });
     try {
       const response = await productAPI.getAllProducts(filters);
+      // Server returns an array, not { products, totalPages }
       set({
-        products: response.data.products,
-        totalPages: response.data.totalPages,
+        products: Array.isArray(response.data) ? response.data : response.data.products || [],
+        totalPages: 1,
         loading: false
       });
       return response.data;

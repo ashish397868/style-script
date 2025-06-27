@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import "./App.css";
 import Navbar from "../src/screen/Navbar";
 import { Routes, Route } from "react-router-dom";
@@ -20,20 +20,36 @@ import UserManagement from "../src/components/Admin/UserManagement";
 import UserProfile from "./components/UserProfile";
 import Footer from "../src/screen/Footer"
 
-import { useUserStore } from "./store/userStore";
+// import { useUserStore } from "./store/userStore";
 import ReviewManagement from "./components/Admin/ReviewManagement";
 import OrderManagement from "./components/Admin/OrderManagement";
 import AdminProductList from "../src/components/Admin/AdminProductList";
 import EditProductPage from "../src/components/Admin/EditProductPage";
+import Products from "../src/components/Products";
 
 
+
+// import {useNavigate} from "react-router-dom";
 function App() {
-  const { initAuth } = useUserStore();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const { initAuth, user } = useUserStore();
+  // const location = useLocation();
 
-  useEffect(() => {
-    initAuth();
-  }, []);
+  // useEffect(() => {
+  //   initAuth();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (user) {
+  //     if (user.role === 'admin') {
+  //       navigate("/admin", { replace: true });
+  //     } else {
+  //       navigate("/", { replace: true });
+  //     }
+  //   }
+  //   // eslint-disable-next-line
+  // }, [user]);
+
   return (
     <>
       {!location.pathname.startsWith('/admin') && <Navbar />}
@@ -42,6 +58,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
+        <Route path="/products" element={<Products />} />
         <Route path="/products/t-shirts" element={<Tshirts />} />
         <Route path="/product/:slug" element={<ProductPage />} />
         <Route path="/checkout" element={<Checkout />} />

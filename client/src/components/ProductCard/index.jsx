@@ -38,10 +38,10 @@ const ProductCard = ({ product }) => {
           {product.category} {product.brand && `| ${product.brand}`}
         </h3>
         <h2 className="text-gray-900 title-font text-lg font-medium">
-          {product.title}
+          {product.title.substring(0, 45)}...
         </h2>
         <p className="mt-1 font-semibold">₹{product.price}</p>
-        <p className="text-gray-600 text-xs mb-1">{product.description}</p>
+        <p className="text-gray-600 text-xs mb-1">{product.description.substring(0, 100)}...</p>
         <div className="mt-1">
           {sizeList.map(
             (size) =>

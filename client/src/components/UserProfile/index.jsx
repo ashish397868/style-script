@@ -1,520 +1,259 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { userAPI } from '../../services/api';
 import { useUserStore } from '../../store/userStore';
-import api from '../../services/api';
-import { FiUser, FiMail, FiPhone, FiHome, FiLock, FiEdit2, FiCheck, FiX, FiMapPin, FiGlobe } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX } from 'react-icons/fi';
+import { ClipLoader } from 'react-spinners';
+
 
 const UserProfile = () => {
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
-  const [isEditing, setIsEditing] = useState(false);
-  const [message, setMessage] = useState({ text: '', type: '' });
-  const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: {
-      addressLine1: user?.address?.addressLine1 || '',
-      addressLine2: user?.address?.addressLine2 || '',
-      city: user?.address?.city || '',
-      state: user?.address?.state || '',
-      pincode: user?.address?.pincode || ''
-    },
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-  const [errors, setErrors] = useState({});
+  const user = useUserStore((s) => s.user) || { name: '', email: '', phone: '' };
+  const setUser = useUserStore((s) => s.setUser);
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    if (user) {
-      setFormData(prevData => ({
-        ...prevData,
+    // If user is already in store, use it, else fetch from backend
+    if (user && user.name) {
+      setForm({
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        address: {
-          addressLine1: user.address?.addressLine1 || '',
-          addressLine2: user.address?.addressLine2 || '',
-          city: user.address?.city || '',
-          state: user.address?.state || '',
-          pincode: user.address?.pincode || ''
-        }
-      }));
-    }
-  }, [user]);
-
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters long';
-    }
-    
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
-    if (formData.phone && !/^\+?[\d\s-]{10,}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
-    }
-    
-    if (formData.newPassword) {
-      if (!formData.currentPassword) {
-        newErrors.currentPassword = 'Current password is required to set a new password';
-      }
-      if (formData.newPassword.length < 8) {
-        newErrors.newPassword = 'New password must be at least 8 characters long';
-      }
-      if (formData.newPassword !== formData.confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    
-    // Check if the field is part of the address object
-    if (name.startsWith('address.')) {
-      const addressField = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      if (!validateForm()) return;
-
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        addressLine1: formData.address.addressLine1,
-        addressLine2: formData.address.addressLine2,
-        city: formData.address.city,
-        state: formData.address.state,
-        pincode: formData.address.pincode
-      };
-
-      if (formData.newPassword) {
-        payload.currentPassword = formData.currentPassword;
-        payload.newPassword = formData.newPassword;
-      }
-
-      const response = await api.patch('/users/profile', payload);
-      if (response.status === 200 && response.data) {
-        setUser(response.data.user);
-        setMessage({ text: 'Profile updated successfully!', type: 'success' });
-        setIsEditing(false);
-        setFormData(prev => ({
-          ...prev,
-          currentPassword: '',
-          newPassword: '',
-          confirmPassword: ''
-        }));
-      } else {
-        setMessage({
-          text: response.data?.message || 'Failed to update profile',
-          type: 'error'
-        });
-      }
-    } catch (error) {
-      let errorMsg = 'Failed to update profile';
-      if (error.response && error.response.data && error.response.data.message) {
-        errorMsg = error.response.data.message;
-      } else if (error.message) {
-        errorMsg = error.message;
-      }
-      setMessage({
-        text: errorMsg,
-        type: 'error'
       });
+      setLoading(false);
+    } else {
+      const fetchProfile = async () => {
+        setLoading(true);
+        try {
+          const res = await userAPI.getProfile();
+          setUser(res.data);
+          setForm({
+            name: res.data.name || '',
+            email: res.data.email || '',
+            phone: res.data.phone || '',
+          });
+          setError('');
+        } catch (err) {
+          setError('Failed to load profile. Please try again later.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProfile();
+    }
+  }, [user, setUser]);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+    setSuccess('');
+    setError('');
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+    setForm({ name: user.name, email: user.email, phone: user.phone });
+    setSuccess('');
+    setError('');
+  };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await userAPI.updateProfile(form);
+      setUser(res.data);
+      setEditMode(false);
+      setSuccess('Profile updated successfully!');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-cyan-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <div className="inline-block p-4 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full shadow-lg mb-6">
-            <div className="bg-white p-4 rounded-full">
-              <FiUser className="h-12 w-12 text-cyan-600" />
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-6">
+            <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center">
+              <FiUser className="h-12 w-12 text-blue-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Your Profile
-          </h1>
-          <p className="mt-3 text-xl text-gray-600">
-            Manage your personal information and account settings
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">User Profile</h1>
+          <p className="text-gray-600 max-w-md mx-auto">
+            Manage your personal information and account details
           </p>
         </div>
 
-        {message.text && (
-          <div className={`rounded-lg p-4 mb-8 shadow-md transition-all duration-300 transform ${
-            message.type === 'success' 
-              ? 'bg-green-50 border border-green-200 text-green-800' 
-              : 'bg-red-50 border border-red-200 text-red-800'
-          }`}>
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                {message.type === 'success' ? (
-                  <svg className="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                ) : (
-                  <svg className="h-6 w-6 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-              <div className="ml-4">
-                <p className="text-md font-medium">{message.text}</p>
-              </div>
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <ClipLoader 
+                color="#3b82f6" 
+                size={50}
+                speedMultiplier={0.8}
+              />
             </div>
-          </div>
-        )}
-
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-          <div className="px-6 py-7 border-b border-gray-200 bg-gradient-to-r from-cyan-600 to-blue-600">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl leading-6 font-bold text-white">
-                Personal Information
-              </h3>
-              {!isEditing ? (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-full text-cyan-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white shadow-md"
-                >
-                  <FiEdit2 className="mr-2 h-4 w-4" />
-                  Edit Profile
-                </button>
-              ) : (
-                <div className="space-x-3">
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setErrors({});
-                      setFormData(prev => ({
-                        ...prev,
-                        name: user.name || '',
-                        email: user.email || '',
-                        phone: user.phone || '',
-                        address: {
-                          addressLine1: user.address?.addressLine1 || '',
-                          addressLine2: user.address?.addressLine2 || '',
-                          city: user.address?.city || '',
-                          state: user.address?.state || '',
-                          pincode: user.address?.pincode || ''
-                        },
-                        currentPassword: '',
-                        newPassword: '',
-                        confirmPassword: ''
-                      }));
-                    }}
-                    className="inline-flex items-center px-4 py-2 border border-white text-sm leading-5 font-medium rounded-full text-white bg-transparent hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
-                  >
-                    <FiX className="mr-2 h-4 w-4" />
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSubmit}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-full text-cyan-600 bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white shadow-md"
-                  >
-                    <FiCheck className="mr-2 h-4 w-4" />
-                    Save Changes
-                  </button>
+          ) : (
+            <div className="p-6 sm:p-8">
+              {error && (
+                <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {error}
                 </div>
               )}
-            </div>
-          </div>
-
-          <div className="px-6 py-8">
-            <div className="space-y-8">
-              {/* Personal Info Section */}
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200 flex items-center">
-                  <FiUser className="mr-2 text-cyan-600" />
-                  Personal Details
-                </h4>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {success && (
+                <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg mb-6 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  {success}
+                </div>
+              )}
+              
+              {!editMode ? (
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="bg-blue-100 p-3 rounded-full mr-4">
+                      <FiUser className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
+                      <p className="text-lg font-medium text-gray-900">{user.name}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="bg-blue-100 p-3 rounded-full mr-4">
+                      <FiMail className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Email Address</h3>
+                      <p className="text-lg font-medium text-gray-900">{user.email}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="bg-blue-100 p-3 rounded-full mr-4">
+                      <FiPhone className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Phone Number</h3>
+                      <p className="text-lg font-medium text-gray-900">{user.phone || 'Not provided'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-6 border-t border-gray-100">
+                    <button
+                      onClick={handleEdit}
+                      className="flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                    >
+                      <FiEdit2 className="mr-2" />
+                      Edit Profile
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSave} className="space-y-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Full Name
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                    <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <FiUser className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         type="text"
-                        id="name"
                         name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`${isEditing ? 'bg-white' : 'bg-gray-100'} pl-10 block w-full rounded-md border ${
-                          errors.name ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                        } shadow-sm sm:text-sm py-3`}
+                        value={form.name}
+                        onChange={handleChange}
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your full name"
+                        required
                       />
                     </div>
-                    {errors.name && (
-                      <p className="mt-2 text-sm text-red-600">{errors.name}</p>
-                    )}
                   </div>
-
+                  
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                    <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <FiMail className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         type="email"
-                        id="email"
                         name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`${isEditing ? 'bg-white' : 'bg-gray-100'} pl-10 block w-full rounded-md border ${
-                          errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                        } shadow-sm sm:text-sm py-3`}
+                        value={form.email}
+                        onChange={handleChange}
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your email"
+                        required
                       />
                     </div>
-                    {errors.email && (
-                      <p className="mt-2 text-sm text-red-600">{errors.email}</p>
-                    )}
                   </div>
-
+                  
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                      Phone Number
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <FiPhone className="h-5 w-5 text-gray-400" />
                       </div>
                       <input
                         type="tel"
-                        id="phone"
                         name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`${isEditing ? 'bg-white' : 'bg-gray-100'} pl-10 block w-full rounded-md border ${
-                          errors.phone ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                        } shadow-sm sm:text-sm py-3`}
-                        placeholder={isEditing ? "+1 (555) 123-4567" : ""}
-                      />
-                    </div>
-                    {errors.phone && (
-                      <p className="mt-2 text-sm text-red-600">{errors.phone}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Address Section */}
-              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200 flex items-center">
-                  <FiHome className="mr-2 text-cyan-600" />
-                  Address Information
-                </h4>
-                
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Street Address
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <FiMapPin className="h-5 w-5 text-gray-400" />
-                      </div>
-                      <input
-                        type="text"
-                        name="address.addressLine1"
-                        value={formData.address.addressLine1}
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        className={`${isEditing ? 'bg-white' : 'bg-gray-100'} pl-10 block w-full rounded-md border p-2 border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm py-3`}
-                        placeholder="Address Line 1"
+                        value={form.phone}
+                        onChange={handleChange}
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Enter your phone number"
                       />
                     </div>
                   </div>
                   
-                  <div className="relative rounded-md shadow-sm">
-                    <input
-                      type="text"
-                      name="address.addressLine2"
-                      value={formData.address.addressLine2}
-                      onChange={handleInputChange}
-                      disabled={!isEditing}
-                      className={`${isEditing ? 'bg-white' : 'bg-gray-100'} p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm py-3`}
-                      placeholder="Address Line 2 (optional)"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        City
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="address.city"
-                          value={formData.address.city}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className={`${isEditing ? 'bg-white' : 'bg-gray-100'} p-2 block w-full rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm py-3`}
-                          placeholder="City"
+                  <div className="pt-6 border-t border-gray-100 flex space-x-3">
+                    <button
+                      type="submit"
+                      className="flex-1 flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <ClipLoader 
+                          color="#ffffff" 
+                          size={20}
+                          speedMultiplier={0.8}
                         />
-                      </div>
-                    </div>
+                      ) : (
+                        <>
+                          <FiSave className="mr-2" />
+                          Save Changes
+                        </>
+                      )}
+                    </button>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        State/Province
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="address.state"
-                          value={formData.address.state}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className={`${isEditing ? 'bg-white' : 'bg-gray-100'} p-2  block w-full rounded-md border border-gray-300 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm py-3`}
-                          placeholder="State/Province"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Postal/Zip Code
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <input
-                          type="text"
-                          name="address.pincode"
-                          value={formData.address.pincode}
-                          onChange={handleInputChange}
-                          disabled={!isEditing}
-                          className={`${isEditing ? 'bg-white' : 'bg-gray-100'} block w-full rounded-md border border-gray-300 p-2 shadow-sm focus:border-cyan-500 focus:ring-cyan-500 sm:text-sm py-3`}
-                          placeholder="Postal/Zip Code"
-                        />
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCancel}
+                      className="flex-1 flex items-center justify-center px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-300"
+                    >
+                      <FiX className="mr-2" />
+                      Cancel
+                    </button>
                   </div>
-                </div>
-              </div>
-
-              {isEditing && (
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-800 mb-6 pb-2 border-b border-gray-200 flex items-center">
-                    <FiLock className="mr-2 text-cyan-600" />
-                    Change Password
-                  </h4>
-                  <p className="text-sm text-gray-600 mb-6">
-                    Leave these fields blank if you don't want to change your password.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                        Current Password
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FiLock className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="password"
-                          id="currentPassword"
-                          name="currentPassword"
-                          value={formData.currentPassword}
-                          onChange={handleInputChange}
-                          className={`block w-full pl-10 rounded-md border ${
-                            errors.currentPassword ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                          } shadow-sm sm:text-sm py-3`}
-                        />
-                      </div>
-                      {errors.currentPassword && (
-                        <p className="mt-2 text-sm text-red-600">{errors.currentPassword}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                        New Password
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FiLock className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="password"
-                          id="newPassword"
-                          name="newPassword"
-                          value={formData.newPassword}
-                          onChange={handleInputChange}
-                          className={`block w-full pl-10 rounded-md border ${
-                            errors.newPassword ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                          } shadow-sm sm:text-sm py-3`}
-                        />
-                      </div>
-                      {errors.newPassword && (
-                        <p className="mt-2 text-sm text-red-600">{errors.newPassword}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                        Confirm Password
-                      </label>
-                      <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <FiLock className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                          type="password"
-                          id="confirmPassword"
-                          name="confirmPassword"
-                          value={formData.confirmPassword}
-                          onChange={handleInputChange}
-                          className={`block w-full pl-10 rounded-md border ${
-                            errors.confirmPassword ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-cyan-500 focus:border-cyan-500'
-                          } shadow-sm sm:text-sm py-3`}
-                        />
-                      </div>
-                      {errors.confirmPassword && (
-                        <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                </form>
               )}
             </div>
-          </div>
+          )}
         </div>
-
-
       </div>
     </div>
   );

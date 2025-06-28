@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useUserStore } from "../../store/userStore";
 import { useCheckoutStore } from "../../store/checkoutStore";
 import api from "../../services/api";
-import { FiEdit2, FiPlus, FiCheck, FiX, FiMapPin, FiUser, FiPhone, FiHome, FiGlobe } from "react-icons/fi";
+import { FiEdit2, FiPlus, FiCheck, FiX, FiMapPin, FiUser, FiPhone, FiHome } from "react-icons/fi";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 Modal.setAppElement("#root");
@@ -39,16 +39,9 @@ const AddressSelection = ({ onAddressSelect }) => {
   }, []);
 
   useEffect(() => {
-    if (user && user.address) {
-      if (Array.isArray(user.address)) {
-        setAddress(user.address);
-        setSelectedAddressState(user.address.length > 0 ? user.address[0]._id : null);
-      } else {
-        const addressWithId = { ...user.address, _id: user.address._id || 'temp-id-1' };
-        const addressArray = [addressWithId];
-        setAddress(addressArray);
-        setSelectedAddressState(addressWithId._id);
-      }
+    if (user && Array.isArray(user.addresses)) {
+      setAddress(user.addresses);
+      setSelectedAddressState(user.addresses.length > 0 ? user.addresses[0] : null);
     } else {
       setAddress([]);
       setSelectedAddressState(null);
@@ -100,26 +93,32 @@ const AddressSelection = ({ onAddressSelect }) => {
     try {
       let updatedAddress;
       if (isEditing) {
-        updatedAddress = address.map((addr) => 
-          addr._id === currentAddress._id ? {
-            ...currentAddress,
-            name: currentAddress.name,
-            phone: currentAddress.phone
-          } : addr
+        updatedAddress = address.map((addr) =>
+          addr._id === currentAddress._id
+            ? {
+                ...currentAddress,
+                name: currentAddress.name,
+                phone: currentAddress.phone,
+                _id: currentAddress._id || null
+              }
+            : {
+                ...addr,
+                _id: addr._id || null
+              }
         );
       } else {
         updatedAddress = [
-          ...address,
+          ...address.map(addr => ({ ...addr, _id: addr._id || null })),
           {
             ...currentAddress,
             name: currentAddress.name,
             phone: currentAddress.phone,
-            _id: Date.now().toString()
+            _id: currentAddress._id || null
           }
         ];
       }
 
-      const payload = { address: updatedAddress };
+      const payload = { addresses: updatedAddress };
       const response = await api.patch("/users/profile", payload);
       
       if (response.data && response.data.user) {
@@ -190,19 +189,17 @@ const AddressSelection = ({ onAddressSelect }) => {
     setIsModalOpen(true);
   };
 
-  const handleSelectAddress = (addressId) => {
-    setSelectedAddressState(addressId);
+  const handleSelectAddress = (addrObj) => {
+    setSelectedAddressState(addrObj);
     if (onAddressSelect) {
-      const selectedAddr = address.find((a) => a._id === addressId);
-      onAddressSelect(selectedAddr);
+      onAddressSelect(addrObj);
     }
   };
 
   const handleDeliverToAddress = () => {
-    const selectedAddr = address.find((a) => a._id === selectedAddress);
-    if (selectedAddr) {
-      setSelectedAddress(selectedAddr);
-      onAddressSelect?.(selectedAddr);
+    if (selectedAddress) {
+      setSelectedAddress(selectedAddress);
+      onAddressSelect?.(selectedAddress);
       navigate('/review-order');
     }
   };
@@ -228,15 +225,15 @@ const AddressSelection = ({ onAddressSelect }) => {
               </h2>
               {/* {console.log("User : - -", user)} */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {address.map((addr) => (
+                {address.map((addr, idx) => (
                   <div 
-                    key={addr._id} 
+                    key={addr._id || idx} 
                     className={`border rounded-xl p-5 transition-all duration-300 cursor-pointer ${
-                      selectedAddress === addr._id 
+                      selectedAddress === addr 
                         ? "border-blue-500 bg-blue-50 shadow-md transform -translate-y-1" 
                         : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                     }`}
-                    onClick={() => handleSelectAddress(addr._id)}
+                    onClick={() => handleSelectAddress(addr)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -268,7 +265,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                         </div>
                       </div>
                       
-                      {selectedAddress === addr._id && (
+                      {selectedAddress === addr && (
                         <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
                           Selected
                         </div>

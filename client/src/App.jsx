@@ -28,6 +28,9 @@ import OrderManagement from "./components/Admin/OrderManagement";
 import AdminProductList from "../src/components/Admin/AdminProductList";
 import EditProductPage from "../src/components/Admin/EditProductPage";
 import Products from "../src/components/Products";
+import AddressesBook from "./components/AddressesBook";
+import EditAddressPage from './components/EditAddressPage';
+import NewAddressPage from './components/NewAddressPage';
 
 
 
@@ -66,6 +69,9 @@ function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/review-order" element={<ReviewOrder />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/addresses" element={<AddressesBook />} />
+        <Route path="/addresses/edit/:id" element={<EditAddressPage />} />
+        <Route path="/addresses/new" element={<NewAddressPage />} />
         <Route path="/order/:id" element={<OrderDetail />} />
         <Route path="/success/:id" element={<Success />} />
         <Route path="/admin" element={

@@ -77,6 +77,8 @@ export const userAPI = {
   updateProfile: (userData) => api.patch('/users/profile', userData),
   changePassword: (passwordData) => api.post('/users/change-password', passwordData),
   deleteAccount: () => api.delete('/users/profile'),
+  setDefaultAddress: (addresses) => api.patch('/users/profile', { addresses }),
+  removeAddress: (addresses) => api.patch('/users/profile', { addresses }),
 };
 
 // Product Routes

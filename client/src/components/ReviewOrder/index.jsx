@@ -90,11 +90,14 @@ export default function ReviewOrder() {
         orderId: orderIdStr,
         products: productsArr,
         address: {
+          name: selectedAddress.name,
+          phone: selectedAddress.phone,
           addressLine1: selectedAddress.addressLine1,
           addressLine2: selectedAddress.addressLine2,
           city: selectedAddress.city,
           state: selectedAddress.state,
           pincode: selectedAddress.pincode,
+          country: selectedAddress.country,
         },
         amount: orderTotal,
       };

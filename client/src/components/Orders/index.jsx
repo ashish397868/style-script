@@ -17,7 +17,9 @@ export default function Orders() {
         setOrders(res.data || []);
         setError(null);
       } catch (err) {
-        setError("Failed to fetch orders.");
+        setError(
+          err?.response?.data?.message || "Failed to fetch orders. Please try again later."
+        );
       } finally {
         setLoading(false);
       }
@@ -71,8 +73,9 @@ export default function Orders() {
                       <img
                         key={product._id}
                         src={product.image || product.images?.[0] || "/placeholder.png"}
-                        alt={product.name}
-                        className="w-16 h-16 object-cover rounded-lg border"
+                        alt={product.name || "Product image"}
+                        className="w-16 h-16 object-cover rounded-lg border bg-gray-100"
+                        onError={e => { e.target.onerror = null; e.target.src = "/placeholder.png"; }}
                       />
                     ))}
                     {order.products?.length > 3 && (
@@ -81,7 +84,7 @@ export default function Orders() {
                   </div>
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Order #</span>
-                    <span className="font-mono text-indigo-600 ml-1">{order._id}</span>
+                    <span className="font-mono text-indigo-600 ml-1 break-all">{order._id}</span>
                   </div>
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Total:</span>

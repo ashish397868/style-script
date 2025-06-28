@@ -71,6 +71,7 @@ const Navbar = ({
                   actions={[
                     { label: "Profile", onClick: () => navigate("/profile") },
                     { label: "Orders", onClick: () => navigate("/orders") },
+                    { label: "Addresses", onClick: () => navigate("/addresses") },
                     { label: "Logout", onClick: handleLogout }
                   ]}
                 />

@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
+const mongoose = require("mongoose");
 
 const handleSignup = async (req, res) => {
   try {
@@ -127,38 +128,56 @@ const handleLogin = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, email, phone, currentPassword, newPassword } = req.body; // Address fields removed
+    const { name, email, phone, currentPassword, newPassword, addresses } = req.body;
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // email validation
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ message: "Invalid email format" });
+    // Basic validations and updates (same as before)
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
+      return res.status(400).json({ message: "Invalid email format" });
+    if (phone && !/^\+?[\d\s-]{10,}$/.test(phone)) 
+      return res.status(400).json({ message: "Invalid phone number format" });
 
-    // phone validation (optional)
-    if (phone && !/^\+?[\d\s-]{10,}$/.test(phone)) return res.status(400).json({ message: "Invalid phone number format" });
-
-    // password change
+    // Password change logic (same as before)
     if (newPassword) {
-      if (!currentPassword) return res.status(400).json({ message: "Current password is required" });
-
+      if (!currentPassword) 
+        return res.status(400).json({ message: "Current password is required" });
       const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) return res.status(400).json({ message: "Current password is incorrect" });
-
-      if (newPassword.length < 8) return res.status(400).json({ message: "New password must be at least 8 characters long" });
-
+      if (!isMatch) 
+        return res.status(400).json({ message: "Current password is incorrect" });
+      if (newPassword.length < 8) 
+        return res.status(400).json({ message: "New password must be at least 8 characters long" });
       user.password = newPassword;
     }
 
-    // apply updates
+    // Basic field updates
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
-    // Address updates should be handled via Address model/controllers
 
+    // Address handling: update addresses array directly as subdocuments
+    if (addresses && Array.isArray(addresses)) {
+      user.addresses = addresses.map(addr => ({
+        name: addr.name || "",
+        phone: addr.phone || "",
+        country: addr.country || "India",
+        addressLine1: addr.addressLine1 || "",
+        addressLine2: addr.addressLine2 || "",
+        city: addr.city || "",
+        state: addr.state || "",
+        pincode: addr.pincode || ""
+      }));
+    }
+
+    // Save the user
     await user.save();
 
-    // issue refreshed token
+    // Fetch fresh user data (no need to populate addresses)
+    const finalUser = await User.findById(userId)
+      .select('-password -resetPasswordToken -resetPasswordExpires');
+
+    // Generate token
     const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, {
       expiresIn: "3d",
     });
@@ -166,22 +185,14 @@ const updateProfile = async (req, res) => {
     return res.json({
       message: "Profile updated successfully",
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        // address: user.address, // Address is now managed separately
-        role: user.role,
-        active: user.active,
-      },
+      user: finalUser
     });
+
   } catch (error) {
     console.error("Update Profile Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
 // GET all users (admin)
 const getAllUsers = async (req, res) => {
   try {

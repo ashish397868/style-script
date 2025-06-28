@@ -430,7 +430,7 @@ const OrderManagement = () => {
                 <div className="bg-gray-50 p-3 rounded-md">
                   <p><strong>Order ID:</strong> #{selectedOrder.orderId}</p>
                   <p><strong>Customer:</strong> {selectedOrder.name}</p>
-                  <p><strong>Address:</strong> {selectedOrder.address.addressLine1}, {selectedOrder.address.city}, {selectedOrder.address.pincode}</p>
+                  <p><strong>Address:</strong> {selectedOrder.address?.addressLine1}, {selectedOrder.address?.city}, {selectedOrder.address?.pincode}</p>
                 </div>
               </div>
 

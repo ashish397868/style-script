@@ -7,6 +7,7 @@ const OrderSchema = new Schema(
     name: { type: String, required: true },
     orderId: { type: String, required: true },
     paymentInfo: { type: Object },
+    addressId:     { type: Schema.Types.ObjectId, ref: "Address", required: true },// reference to the Address, for live updates if needed
     products: [
       {
         productId: { type: Schema.Types.ObjectId, ref: "Product" },
@@ -18,7 +19,11 @@ const OrderSchema = new Schema(
       },
     ],
     phone: { type: String, required: true },
+    // snapshot of address at order time
     address: {
+      name: { type: String, default: "" },
+      phone: { type: String, default: "" },
+      country: { type: String, default: "India" }, // default to India
       addressLine1: { type: String, default: "" },
       addressLine2: { type: String, default: "" },
       city: { type: String, default: "" },

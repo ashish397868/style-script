@@ -1,13 +1,14 @@
 // controllers/orderController.js
 const Order = require("../models/Order");
+const Address = require("../models/Address");
 
 // Create a new order (customer)
 exports.createOrder = async (req, res) => {
   try {
-    const { email, name, orderId, paymentInfo, products, phone, address, amount } = req.body;
+    const { email, name, orderId, paymentInfo, products, phone, addressId, amount } = req.body;
 
     // Basic validation
-    if (!email || !name || !orderId || !products || products.length === 0 || !phone || !amount) {
+    if (!email || !name || !orderId || !products || products.length === 0 || !phone || !amount || !addressId) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -16,6 +17,13 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: "Duplicate orderId." });
     }
 
+    // Get the address details from Address model
+    const address = await Address.findById(addressId);
+    if (!address) {
+      return res.status(400).json({ message: "Invalid address ID." });
+    }
+
+    // Create order with both addressId reference and address snapshot
     const order = await Order.create({
       userId: req.user?._id || null,
       email,
@@ -24,7 +32,16 @@ exports.createOrder = async (req, res) => {
       paymentInfo: paymentInfo || {},
       products,
       phone,
-      address,
+      addressId,
+      address: {
+        name: address.name,
+        phone: address.phone,
+        addressLine1: address.addressLine1,
+        addressLine2: address.addressLine2,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode
+      },
       amount,
     });
 
@@ -39,7 +56,10 @@ exports.createOrder = async (req, res) => {
 exports.getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
-    const order = await Order.findById(id).populate("userId", "name email").populate("products.productId", "title slug");
+    const order = await Order.findById(id)
+      .populate("userId", "name email")
+      .populate("addressId")
+      .populate("products.productId", "title slug");
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
     }
@@ -68,7 +88,10 @@ exports.getMyOrders = async (req, res) => {
 // Get all orders (admin)
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find().populate("userId", "name email").sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .populate("userId", "name email")
+      .populate("addressId")
+      .sort({ createdAt: -1 });
     return res.json(orders);
   } catch (err) {
     console.error("getAllOrders error:", err);

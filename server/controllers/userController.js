@@ -127,7 +127,7 @@ const handleLogin = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, email, phone, addressLine1, addressLine2, city, state, pincode, currentPassword, newPassword } = req.body;
+    const { name, email, phone, currentPassword, newPassword } = req.body; // Address fields removed
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -154,12 +154,7 @@ const updateProfile = async (req, res) => {
     if (name) user.name = name;
     if (email) user.email = email;
     if (phone) user.phone = phone;
-    // nested address
-    user.address.addressLine1 = addressLine1 ?? user.address.addressLine1;
-    user.address.addressLine2 = addressLine2 ?? user.address.addressLine2;
-    user.address.city = city ?? user.address.city;
-    user.address.state = state ?? user.address.state;
-    user.address.pincode = pincode ?? user.address.pincode;
+    // Address updates should be handled via Address model/controllers
 
     await user.save();
 
@@ -176,7 +171,7 @@ const updateProfile = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        address: user.address,
+        // address: user.address, // Address is now managed separately
         role: user.role,
         active: user.active,
       },

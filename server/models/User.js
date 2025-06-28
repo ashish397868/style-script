@@ -7,13 +7,9 @@ const UserSchema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     phone: { type: String },
-    address: {
-      addressLine1: { type: String, default: "" },
-      addressLine2: { type: String, default: "" },
-      city: { type: String, default: "" },
-      state: { type: String, default: "" },
-      pincode: { type: String, default: "" },
-    },
+    addresses: [
+    { type: Schema.Types.ObjectId, ref: "Address" }
+  ],
     role: {
       type: String,
       enum: ["user", "admin"],

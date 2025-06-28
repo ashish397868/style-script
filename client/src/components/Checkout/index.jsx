@@ -329,17 +329,38 @@ const AddressSelection = ({ onAddressSelect }) => {
         className="modal"
         overlayClassName="modal-overlay"
         contentLabel={isEditing ? "Edit Address" : "Add New Address"}
+        shouldCloseOnOverlayClick={true}
+        style={{
+          content: {
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: 0,
+            border: 'none',
+            borderRadius: '0.5rem',
+            inset: '50% auto auto 50%',
+            transform: 'translate(-50%, -50%)',
+            width: '100%',
+            maxWidth: '32rem',
+          },
+          overlay: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+        }}
       >
-        <div className="bg-white rounded-2xl overflow-hidden shadow-xl max-w-md w-full">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5">
+        <div className="bg-white rounded-2xl overflow-visible shadow-xl max-w-md w-full">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 sticky top-0 z-10">
             <h2 className="text-xl font-bold text-white flex items-center">
               <FiMapPin className="mr-2" />
               {isEditing ? "Edit Address" : "Add New Address"}
             </h2>
           </div>
-          
           <div className="p-6">
             <div className="space-y-5">
+              {/* ...existing form fields... */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                   <FiUser className="mr-2 text-gray-500" /> Full Name
@@ -358,7 +379,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                 />
                 {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                   <FiPhone className="mr-2 text-gray-500" /> Phone Number
@@ -377,7 +397,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                 />
                 {errors.phone && <p className="mt-2 text-sm text-red-600">{errors.phone}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
                   <FiHome className="mr-2 text-gray-500" /> Address Line 1
@@ -396,7 +415,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                 />
                 {errors.addressLine1 && <p className="mt-2 text-sm text-red-600">{errors.addressLine1}</p>}
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Address Line 2 (Optional)</label>
                 <input 
@@ -408,7 +426,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                   placeholder="Apartment, suite, unit, building, floor, etc."
                 />
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
@@ -426,7 +443,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                   />
                   {errors.city && <p className="mt-2 text-sm text-red-600">{errors.city}</p>}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
                   <input
@@ -443,7 +459,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                   />
                   {errors.state && <p className="mt-2 text-sm text-red-600">{errors.state}</p>}
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
                   <input
@@ -461,7 +476,6 @@ const AddressSelection = ({ onAddressSelect }) => {
                   {errors.pincode && <p className="mt-2 text-sm text-red-600">{errors.pincode}</p>}
                 </div>
               </div>
-
               <div className="flex flex-col sm:flex-row justify-between gap-3 pt-4">
                 <button
                   onClick={() => {

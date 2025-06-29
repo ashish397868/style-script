@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useProductStore } from '../../store/productStore';
+import { useCartStore } from '../../store/cartStore';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import { FaStar, FaRegHeart, FaShoppingCart, FaFilter, FaTimes } from 'react-icons/fa';
 import { IoShirtOutline } from 'react-icons/io5';
 import { GiTShirt } from 'react-icons/gi';
@@ -10,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 const Products = () => {
   const navigate = useNavigate();
   const { products, fetchProducts, loading, error } = useProductStore();
+  const addToCart = useCartStore((s) => s.addToCart);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 5000]);
@@ -92,6 +96,132 @@ const Products = () => {
   const totalPages = Math.ceil(sortedProducts.length / pageSize);
   const paginatedProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  // Reset pagination on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, priceRange, sizes, colors, sortBy]);
+
+  // Product Card Component
+  const ProductCard = ({ product }) => {
+    // Fallbacks for image, name, etc.
+    const image = product.image || (Array.isArray(product.images) ? product.images[0] : null);
+    const name = product.name || product.title || 'Product';
+    const description = product.description || '';
+    const categoryLabel = categories.find(c => c.id === (product.category?.toLowerCase() || product.category))?.name || product.category || 'Fashion';
+    const slug = product.slug;
+    
+    return (
+      <div
+        className="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
+        onClick={() => {
+          setFilterOpen(false); // Close filter sidebar on navigation
+          if (slug) navigate(`/product/${slug}`);
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={`View details for ${name}`}
+        onKeyDown={e => {
+          if (e.key === 'Enter' && slug) {
+            setFilterOpen(false);
+            navigate(`/product/${slug}`);
+          }
+        }}
+      >
+        {/* Product Image */}
+        <div className="relative">
+          {image ? (
+            <img
+              src={image}
+              alt={name}
+              className="w-full h-64 object-contain md:h-72 lg:h-80 rounded-t-xl transition-transform duration-300 hover:scale-105"
+            />
+          ) : (
+            <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 flex items-center justify-center">
+              <span className="text-gray-500">No Image</span>
+            </div>
+          )}
+
+          {/* Discount Badge */}
+          {product.originalPrice && (
+            <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+              {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+            </div>
+          )}
+        </div>
+        {/* Product Info */}
+        <div className="p-4">
+          {/* Category */}
+          <div className="text-indigo-600 text-sm font-medium mb-1">
+            {categoryLabel}
+          </div>
+          {/* Product Name */}
+          <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1">
+            {name}
+          </h3>
+          {/* Description */}
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-12">
+            {description}
+          </p>
+          {/* Rating */}
+          <div className="flex items-center mb-4">
+            <div className="flex text-amber-400">
+              {[...Array(5)].map((_, i) => (
+                <FaStar
+                  key={i}
+                  className={i < (product.rating || 4) ? "w-4 h-4 fill-current" : "w-4 h-4 text-gray-300"}
+                />
+              ))}
+            </div>
+            <span className="text-gray-500 text-sm ml-1">({product.reviewCount || 24})</span>
+          </div>
+          {/* Price & Add to Cart */}
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="font-bold text-gray-900 text-xl">₹{product.price}</span>
+              {product.originalPrice && (
+                <span className="ml-2 text-gray-500 text-sm line-through">
+                  ₹{product.originalPrice}
+                </span>
+              )}
+            </div>
+            <button 
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full flex items-center transition-colors"
+              onClick={e => {
+                e.stopPropagation();
+                // Close filter sidebar when adding to cart
+                setFilterOpen(false);
+                
+                // Try to get size/color from product, fallback to first available
+                let size = product.size;
+                let color = product.color;
+                if (!size && Array.isArray(product.sizes) && product.sizes.length > 0) size = product.sizes[0];
+                if (!color && Array.isArray(product.colors) && product.colors.length > 0) color = product.colors[0];
+                if (!size || !color) {
+                  toast.error('No size or color available for this product.');
+                  return;
+                }
+                const key = `${product._id || product.id}-${size}-${color}`;
+                addToCart(key, 1, {
+                  price: product.price,
+                  name: product.name || product.title,
+                  size,
+                  color,
+                  image: product.image || (Array.isArray(product.images) ? product.images[0] : undefined),
+                  productId: product._id || product.id,
+                });
+                toast.success(`${name} added to cart!`);
+              }}
+              aria-label={`Add ${name} to cart`}
+            >
+              <FaShoppingCart className="mr-2" />
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Loading state
   if (loading) return (
     <div className="container mx-auto py-12 px-4">
@@ -111,8 +241,8 @@ const Products = () => {
         
         {/* Products grid skeleton */}
         <div className="w-full md:w-3/4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, i) => (
               <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse">
                 <div className="bg-gray-200 h-64 w-full" />
                 <div className="p-4">
@@ -121,7 +251,7 @@ const Products = () => {
                   <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
                   <div className="flex justify-between items-center">
                     <div className="h-8 bg-gray-200 rounded w-20"></div>
-                    <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                    <div className="h-10 w-32 rounded-full bg-gray-200"></div>
                   </div>
                 </div>
               </div>
@@ -150,6 +280,8 @@ const Products = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen">
+      {/* ToastContainer should be rendered only once at the top level */}
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="container mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
@@ -171,19 +303,25 @@ const Products = () => {
 
         {/* Main content */}
         <div className="flex">
-          {/* Filter Sidebar - Desktop */}
-          <div className={`hidden md:block w-1/4 pr-8 ${filterOpen ? '!block fixed inset-0 z-50 bg-white p-4 overflow-auto' : ''}`}>
-            {filterOpen && (
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold">Filters</h2>
-                <button 
-                  onClick={() => setFilterOpen(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <FaTimes className="w-5 h-5" />
-                </button>
-              </div>
-            )}
+          {/* Filter Sidebar - Desktop and Mobile Modal */}
+          <div
+            className={`${
+              filterOpen ? 'fixed inset-0 z-50 bg-white p-4 overflow-auto md:static md:block md:w-1/4 md:pr-8' : 'hidden md:block md:w-1/4 md:pr-8'
+            }`}
+            aria-modal={filterOpen ? 'true' : undefined}
+            role={filterOpen ? 'dialog' : undefined}
+          >
+            {/* Filter Header - Always show on mobile when open, conditionally on desktop */}
+            <div className={`${filterOpen ? 'flex' : 'hidden md:hidden'} justify-between items-center mb-6 md:hidden`}>
+              <h2 className="text-xl font-bold">Filters</h2>
+              <button 
+                onClick={() => setFilterOpen(false)}
+                className="text-gray-500 hover:text-gray-700 p-2"
+                aria-label="Close filters"
+              >
+                <FaTimes className="w-5 h-5" />
+              </button>
+            </div>
             
             {/* Categories */}
             <div className="mb-8">
@@ -200,6 +338,7 @@ const Products = () => {
                           ? 'bg-indigo-100 text-indigo-700 font-medium' 
                           : 'text-gray-700 hover:bg-gray-100'
                       }`}
+                      aria-pressed={selectedCategory === category.id}
                     >
                       {category.icon} {category.name}
                     </button>
@@ -251,6 +390,7 @@ const Products = () => {
                           : [...prev, size]
                       )
                     }
+                    aria-pressed={sizes.includes(size)}
                     className={`px-3 py-1 border rounded-md text-sm ${
                       sizes.includes(size)
                         ? 'bg-indigo-600 text-white border-indigo-600'
@@ -279,6 +419,7 @@ const Products = () => {
                             : [...prev, color]
                         )
                       }
+                      aria-pressed={colors.includes(color)}
                       className={`w-8 h-8 rounded-full border-2 ${
                         colorKey === 'white' ? 'border-gray-300' : 'border-transparent'
                       } ${colors.includes(color) ? 'ring-2 ring-offset-2 ring-indigo-500' : ''}`}
@@ -299,6 +440,7 @@ const Products = () => {
                 setColors([]);
               }}
               className="w-full py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50"
+              aria-label="Reset all filters"
             >
               Reset Filters
             </button>
@@ -332,93 +474,13 @@ const Products = () => {
 
             {/* Products Grid */}
             {sortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {paginatedProducts.map(product => {
-              // Fallbacks for image, name, etc.
-              const image = product.image || (Array.isArray(product.images) ? product.images[0] : null);
-              const name = product.name || product.title || 'Product';
-              const description = product.description || '';
-              const categoryLabel = categories.find(c => c.id === (product.category?.toLowerCase() || product.category))?.name || product.category || 'Fashion';
-              const slug = product.slug;
-              return (
-                <div
-                  key={product._id || product.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden transform transition-all duration-300 hover:-translate-y-1 hover:shadow-xl cursor-pointer"
-                  onClick={() => slug && navigate(`/product/${slug}`)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && slug) navigate(`/product/${slug}`);
-                  }}
-                >
-                  {/* Product Image */}
-                  <div className="relative">
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={name}
-                        className="w-full h-64 object-cover"
-                      />
-                    ) : (
-                      <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 flex items-center justify-center">
-                        <span className="text-gray-500">No Image</span>
-                      </div>
-                    )}
-                    {/* Wishlist Button */}
-                    <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-md hover:bg-red-50 hover:text-red-500 transition-colors" onClick={e => e.stopPropagation()}>
-                      <FaRegHeart className="w-5 h-5" />
-                    </button>
-                    {/* Discount Badge */}
-                    {product.originalPrice && (
-                      <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
-                        {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
-                      </div>
-                    )}
-                  </div>
-                  {/* Product Info */}
-                  <div className="p-4">
-                    {/* Category */}
-                    <div className="text-indigo-600 text-sm font-medium mb-1">
-                      {categoryLabel}
-                    </div>
-                    {/* Product Name */}
-                    <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1">
-                      {name}
-                    </h3>
-                    {/* Description */}
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2 h-12">
-                      {description}
-                    </p>
-                    {/* Rating */}
-                    <div className="flex items-center mb-4">
-                      <div className="flex text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                          <FaStar
-                            key={i}
-                            className={i < (product.rating || 4) ? "w-4 h-4 fill-current" : "w-4 h-4 text-gray-300"}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-gray-500 text-sm ml-1">({product.reviewCount || 24})</span>
-                    </div>
-                    {/* Price & Add to Cart */}
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-bold text-gray-900 text-xl">₹{product.price}</span>
-                        {product.originalPrice && (
-                          <span className="ml-2 text-gray-500 text-sm line-through">
-                            ₹{product.originalPrice}
-                          </span>
-                        )}
-                      </div>
-                      <button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full p-2 transition-colors" onClick={e => e.stopPropagation()}>
-                        <FaShoppingCart className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedProducts.map(product => (
+                  <ProductCard 
+                    key={product._id || product.id} 
+                    product={product} 
+                  />
+                ))}
               </div>
             ) : (
               <div className="text-center py-16">
@@ -482,6 +544,9 @@ const Products = () => {
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
           onClick={() => setFilterOpen(false)}
+          aria-label="Close filter overlay"
+          tabIndex={0}
+          role="button"
         />
       )}
     </div>

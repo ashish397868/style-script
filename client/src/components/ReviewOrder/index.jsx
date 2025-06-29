@@ -213,7 +213,7 @@ export default function ReviewOrder() {
                       <img
                         src={item.image || "/placeholder-image.jpg"}
                         alt={item.name}
-                        className="w-24 h-24 object-cover rounded-xl border border-gray-200"
+                        className="w-24 h-24 object-contain rounded-xl border border-gray-200"
                       />
                     </div>
                     

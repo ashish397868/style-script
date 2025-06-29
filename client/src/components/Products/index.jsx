@@ -151,7 +151,7 @@ const Products = () => {
         {/* Product Info */}
         <div className="p-4">
           {/* Category */}
-          <div className="text-indigo-600 text-sm font-medium mb-1">
+          <div className="text-pink-600 text-sm font-medium mb-1">
             {categoryLabel}
           </div>
           {/* Product Name */}
@@ -164,7 +164,7 @@ const Products = () => {
           </p>
           {/* Rating */}
           <div className="flex items-center mb-4">
-            <div className="flex text-amber-400">
+            <div className="flex text-pink-400">
               {[...Array(5)].map((_, i) => (
                 <FaStar
                   key={i}
@@ -185,7 +185,7 @@ const Products = () => {
               )}
             </div>
             <button 
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-full flex items-center transition-colors"
+              className="bg-pink-600 hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-full flex items-center transition-colors"
               onClick={e => {
                 e.stopPropagation();
                 // Close filter sidebar when adding to cart
@@ -295,7 +295,7 @@ const Products = () => {
         <div className="md:hidden flex justify-end mb-6">
           <button 
             onClick={() => setFilterOpen(true)}
-            className="flex items-center bg-indigo-600 text-white px-4 py-2 rounded-lg"
+            className="flex items-center bg-pink-600 text-white px-4 py-2 rounded-lg"
           >
             <FaFilter className="mr-2" /> Filters
           </button>
@@ -335,7 +335,7 @@ const Products = () => {
                       onClick={() => setSelectedCategory(category.id)}
                       className={`flex items-center w-full text-left p-2 rounded-md transition-colors ${
                         selectedCategory === category.id 
-                          ? 'bg-indigo-100 text-indigo-700 font-medium' 
+                          ? 'bg-pink-100 text-pink-700 font-medium' 
                           : 'text-gray-700 hover:bg-gray-100'
                       }`}
                       aria-pressed={selectedCategory === category.id}
@@ -393,7 +393,7 @@ const Products = () => {
                     aria-pressed={sizes.includes(size)}
                     className={`px-3 py-1 border rounded-md text-sm ${
                       sizes.includes(size)
-                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        ? 'bg-pink-600 text-white border-pink-600'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -407,7 +407,7 @@ const Products = () => {
             <div className="mb-8">
               <h3 className="font-bold text-gray-900 mb-4">Colors</h3>
               <div className="flex flex-wrap gap-2">
-                {['Red', 'Blue', 'Green', 'Black', 'White', 'Gray', 'Yellow', 'Purple'].map(color => {
+                {['Red', 'pink', 'Green', 'Black', 'White', 'Gray', 'Yellow', 'Purple'].map(color => {
                   const colorKey = color.toLowerCase();
                   return (
                     <button
@@ -422,7 +422,7 @@ const Products = () => {
                       aria-pressed={colors.includes(color)}
                       className={`w-8 h-8 rounded-full border-2 ${
                         colorKey === 'white' ? 'border-gray-300' : 'border-transparent'
-                      } ${colors.includes(color) ? 'ring-2 ring-offset-2 ring-indigo-500' : ''}`}
+                      } ${colors.includes(color) ? 'ring-2 ring-offset-2 ring-pink-500' : ''}`}
                       style={{ backgroundColor: colorKey }}
                       aria-label={color}
                     />
@@ -439,7 +439,7 @@ const Products = () => {
                 setSizes([]);
                 setColors([]);
               }}
-              className="w-full py-2 border border-indigo-600 text-indigo-600 rounded-md hover:bg-indigo-50"
+              className="w-full py-2 border border-pink-600 text-pink-600 rounded-md hover:bg-pink-50"
               aria-label="Reset all filters"
             >
               Reset Filters
@@ -462,7 +462,7 @@ const Products = () => {
                 <select 
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="border rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="border rounded-md px-3 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-500"
                 >
                   <option value="newest">Newest First</option>
                   <option value="price-low">Price: Low to High</option>
@@ -498,7 +498,7 @@ const Products = () => {
                     setSizes([]);
                     setColors([]);
                   }}
-                  className="mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-lg"
+                  className="mt-6 bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-lg"
                 >
                   Reset Filters
                 </button>
@@ -519,7 +519,7 @@ const Products = () => {
                   {Array.from({ length: totalPages }, (_, i) => (
                     <button
                       key={i + 1}
-                      className={`px-4 py-2 border-t border-b border-gray-300 ${currentPage === i + 1 ? 'bg-indigo-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
+                      className={`px-4 py-2 border-t border-b border-gray-300 ${currentPage === i + 1 ? 'bg-pink-600 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'}`}
                       onClick={() => setCurrentPage(i + 1)}
                     >
                       {i + 1}

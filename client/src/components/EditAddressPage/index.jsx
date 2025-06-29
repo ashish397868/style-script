@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
 import { userAPI } from '../../services/api';
 import { FiSave, FiX, FiMapPin } from 'react-icons/fi';
-import { ClipLoader } from 'react-spinners';
+import Loader from '../Loader';
 
 const EditAddressPage = () => {
   const { id } = useParams();
@@ -81,16 +81,14 @@ const EditAddressPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <ClipLoader color="#f59e42" size={40} speedMultiplier={0.8} />
-      </div>
+ <Loader />
     );
   }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
       <div className="flex items-center mb-6">
-        <FiMapPin className="text-amber-500 mr-2 text-xl" />
+        <FiMapPin className="text-pink-500 mr-2 text-xl" />
         <h1 className="text-2xl font-bold text-gray-800">Edit Address</h1>
       </div>
       
@@ -106,7 +104,7 @@ const EditAddressPage = () => {
               name="name"
               value={address.name}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -119,7 +117,7 @@ const EditAddressPage = () => {
               name="phone"
               value={address.phone}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -132,7 +130,7 @@ const EditAddressPage = () => {
               name="addressLine1"
               value={address.addressLine1}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -145,7 +143,7 @@ const EditAddressPage = () => {
               name="addressLine2"
               value={address.addressLine2}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             />
           </div>
           <div>
@@ -157,7 +155,7 @@ const EditAddressPage = () => {
               name="city"
               value={address.city}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -170,7 +168,7 @@ const EditAddressPage = () => {
               name="state"
               value={address.state}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -183,7 +181,7 @@ const EditAddressPage = () => {
               name="pincode"
               value={address.pincode}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -196,7 +194,7 @@ const EditAddressPage = () => {
               name="country"
               value={address.country}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -207,7 +205,7 @@ const EditAddressPage = () => {
             name="isDefault"
             checked={address.isDefault}
             onChange={handleChange}
-            className="h-4 w-4 text-amber-500 rounded focus:ring-amber-500"
+            className="h-4 w-4 text-pink-500 rounded focus:ring-pink-500"
           />
           <label className="ml-2 text-sm text-gray-700">
             Set as default address
@@ -223,7 +221,7 @@ const EditAddressPage = () => {
           </button>
           <button 
             type="submit"
-            className="px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+            className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600"
             disabled={loading}
           >
             Save Address

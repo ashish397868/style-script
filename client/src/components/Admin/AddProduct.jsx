@@ -137,14 +137,14 @@ const AddProduct = () => {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white">
+          <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white">
             <h1 className="text-3xl font-bold flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
               </svg>
               Add New Product
             </h1>
-            <p className="mt-2 text-indigo-200">Fill in the details below to add a new product to your inventory</p>
+            <p className="mt-2 text-pink-200">Fill in the details below to add a new product to your inventory</p>
           </div>
           
           {/* Form */}
@@ -163,7 +163,7 @@ const AddProduct = () => {
                     onChange={handleChange}
                     placeholder="e.g. Premium Cotton T-Shirt"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                   />
                 </div>
                 
@@ -182,7 +182,7 @@ const AddProduct = () => {
                       onChange={handleChange}
                       placeholder="premium-cotton-tshirt"
                       required
-                      className="w-full pl-48 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="w-full pl-48 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500">Unique URL identifier for your product</p>
@@ -200,7 +200,7 @@ const AddProduct = () => {
                     placeholder="Detailed product description..."
                     rows="4"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                   ></textarea>
                 </div>
                 
@@ -223,7 +223,7 @@ const AddProduct = () => {
                         min="0"
                         step="0.01"
                         required
-                        className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                        className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       />
                     </div>
                   </div>
@@ -239,7 +239,7 @@ const AddProduct = () => {
                       placeholder="0"
                       min="0"
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -259,7 +259,7 @@ const AddProduct = () => {
                         value={form.category}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       >
                         <option value="">Select category</option>
                         <option value="Clothing">Clothing</option>
@@ -285,7 +285,7 @@ const AddProduct = () => {
                       />
                       <button
                         type="button"
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded-lg"
+                        className="bg-pink-600 hover:bg-pink-700 text-white px-3 rounded-lg"
                         onClick={() => {
                           if (
                             form.newCategory &&
@@ -313,7 +313,7 @@ const AddProduct = () => {
                       value={form.brand}
                       onChange={handleChange}
                       placeholder="e.g. Nike, Apple"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -329,7 +329,7 @@ const AddProduct = () => {
                       value={form.size}
                       onChange={handleChange}
                       placeholder="e.g. S, M, L"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                   <div>
@@ -340,8 +340,8 @@ const AddProduct = () => {
                       name="color"
                       value={form.color}
                       onChange={handleChange}
-                      placeholder="e.g. Red, Blue"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      placeholder="e.g. Red, pink"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
@@ -355,13 +355,13 @@ const AddProduct = () => {
                     {form.tags.map((tag, index) => (
                       <span 
                         key={index} 
-                        className="inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+                        className="inline-flex items-center bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm"
                       >
                         {tag}
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-2 text-indigo-600 hover:text-indigo-900"
+                          className="ml-2 text-pink-600 hover:text-pink-900"
                         >
                           ×
                         </button>
@@ -374,12 +374,12 @@ const AddProduct = () => {
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       placeholder="Add a tag and press Enter"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       onKeyPress={(e) => e.key === 'Enter' && addTag(e)}
                     />
                     <button
                       onClick={addTag}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg transition"
+                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
                     >
                       Add
                     </button>
@@ -418,11 +418,11 @@ const AddProduct = () => {
                       value={imageInput}
                       onChange={(e) => setImageInput(e.target.value)}
                       placeholder="Paste image URL"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                     <button
                       onClick={addImage}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg transition"
+                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
                     >
                       Add
                     </button>
@@ -435,7 +435,7 @@ const AddProduct = () => {
                       disabled={uploading}
                       className="mb-2"
                     />
-                    {uploading && <span className="text-indigo-600 ml-2">Uploading...</span>}
+                    {uploading && <span className="text-pink-600 ml-2">Uploading...</span>}
                   </div>
                 </div>
                 
@@ -448,7 +448,7 @@ const AddProduct = () => {
                         type="checkbox"
                         checked={form.isFeatured}
                         onChange={handleChange}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                       />
                     </div>
                     <div className="ml-3 text-sm">
@@ -488,8 +488,8 @@ const AddProduct = () => {
                 disabled={loading}
                 className={`px-6 py-3 rounded-lg font-medium transition flex items-center ${
                   loading 
-                    ? 'bg-indigo-400 cursor-not-allowed' 
-                    : 'bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                    ? 'bg-pink-400 cursor-not-allowed' 
+                    : 'bg-pink-600 hover:bg-pink-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
                 } text-white`}
               >
                 {loading ? (
@@ -514,16 +514,16 @@ const AddProduct = () => {
         </div>
         
         {/* Info Panel */}
-        <div className="mt-8 bg-indigo-50 rounded-xl p-6 border border-indigo-100">
+        <div className="mt-8 bg-pink-50 rounded-xl p-6 border border-pink-100">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="h-5 w-5 text-pink-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-indigo-800">Product Information</h3>
-              <div className="mt-2 text-sm text-indigo-700">
+              <h3 className="text-sm font-medium text-pink-800">Product Information</h3>
+              <div className="mt-2 text-sm text-pink-700">
                 <p>All fields marked with * are required. The slug will be automatically generated from the title but can be customized.</p>
               </div>
             </div>

@@ -8,7 +8,7 @@ const FeatureCard = ({ icon, title, description }) => {
       whileHover={{ y: -5 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600 text-3xl">
+      <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full bg-pink-100 text-pink-600 text-3xl">
         {icon}
       </div>
       <h3 className="text-xl font-bold text-gray-900 mb-3 text-center">{title}</h3>

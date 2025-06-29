@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader"; 
 import { orderAPI } from "../../services/api";
 import { FiChevronLeft, FiTruck, FiShoppingBag } from "react-icons/fi";
 
@@ -28,9 +28,7 @@ export default function OrderDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <BeatLoader color="#6366f1" />
-      </div>
+ <Loader />
     );
   }
 
@@ -45,18 +43,18 @@ export default function OrderDetail() {
   const { _id, products = [], amount, deliveryStatus, estimatedDelivery, createdAt, address } = order;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-12">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12">
       <div className="max-w-3xl mx-auto px-4">
-        <Link to="/orders" className="inline-flex items-center text-indigo-600 hover:underline mb-6">
+        <Link to="/orders" className="inline-flex items-center text-pink-600 hover:underline mb-6">
           <FiChevronLeft className="mr-1" /> Back to Orders
         </Link>
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white flex items-center justify-between">
+          <div className="bg-gradient-to-r from-pink-600 to-purple-600 p-6 text-white flex items-center justify-between">
             <div className="flex items-center">
               <FiShoppingBag className="h-8 w-8 mr-3" />
               <div>
                 <h2 className="text-2xl font-bold">Order #{_id}</h2>
-                <div className="text-indigo-100 text-sm">Placed on {createdAt ? new Date(createdAt).toLocaleDateString() : "-"}</div>
+                <div className="text-pink-100 text-sm">Placed on {createdAt ? new Date(createdAt).toLocaleDateString() : "-"}</div>
               </div>
             </div>
             <div className="flex items-center">
@@ -100,12 +98,12 @@ export default function OrderDetail() {
             </div>
             <div className="flex justify-between items-center border-t pt-4">
               <div className="font-bold text-lg">Total Paid</div>
-              <div className="font-bold text-indigo-600 text-lg">₹{amount?.toLocaleString()}</div>
+              <div className="font-bold text-pink-600 text-lg">₹{amount?.toLocaleString()}</div>
             </div>
             <div className="mt-6 text-center">
               <Link
                 to="/"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
               >
                 Continue Shopping
               </Link>

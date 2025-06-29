@@ -125,9 +125,9 @@ const EditProductPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 text-white">
+          <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white">
             <h1 className="text-3xl font-bold flex items-center">Edit Product</h1>
-            <p className="mt-2 text-indigo-200">Update product details below</p>
+            <p className="mt-2 text-pink-200">Update product details below</p>
           </div>
           <form onSubmit={handleSubmit} className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -231,7 +231,7 @@ const EditProductPage = () => {
                   />
                   <button
                     type="button"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 rounded-lg"
+                    className="bg-pink-600 hover:bg-pink-700 text-white px-3 rounded-lg"
                     onClick={() => {
                       if (
                         form.newCategory &&
@@ -285,13 +285,13 @@ const EditProductPage = () => {
                   {form.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm"
+                      className="inline-flex items-center bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => removeTag(tag)}
-                        className="ml-2 text-indigo-600 hover:text-indigo-900"
+                        className="ml-2 text-pink-600 hover:text-pink-900"
                       >
                         ×
                       </button>
@@ -309,7 +309,7 @@ const EditProductPage = () => {
                   />
                   <button
                     onClick={addTag}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg transition"
+                    className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
                   >
                     Add
                   </button>
@@ -348,7 +348,7 @@ const EditProductPage = () => {
                   />
                   <button
                     onClick={addImage}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-r-lg transition"
+                    className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
                   >
                     Add
                   </button>
@@ -361,7 +361,7 @@ const EditProductPage = () => {
                     disabled={uploading}
                     className="mb-2"
                   />
-                  {uploading && <span className="text-indigo-600 ml-2">Uploading...</span>}
+                  {uploading && <span className="text-pink-600 ml-2">Uploading...</span>}
                 </div>
               </div>
               {/* Featured */}
@@ -373,7 +373,7 @@ const EditProductPage = () => {
                       type="checkbox"
                       checked={form.isFeatured}
                       onChange={handleChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -386,7 +386,7 @@ const EditProductPage = () => {
               </div>
             </div>
             <div className="flex justify-end mt-6">
-              <button type="submit" className="px-6 py-3 rounded-lg font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
+              <button type="submit" className="px-6 py-3 rounded-lg font-medium bg-pink-600 text-white hover:bg-pink-700 transition">
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>

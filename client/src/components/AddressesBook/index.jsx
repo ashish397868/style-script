@@ -3,7 +3,7 @@ import { useUserStore } from '../../store/userStore';
 import { userAPI } from '../../services/api';
 import { FiEdit, FiTrash2, FiMapPin, FiCheck, FiPlus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import { ClipLoader } from 'react-spinners';
+import Loader from '../Loader';
 
 const AddressBook = () => {
   const user = useUserStore((state) => state.user);
@@ -83,29 +83,27 @@ const AddressBook = () => {
         <h1 className="text-2xl font-bold text-gray-800">Your Addresses</h1>
         <button
           onClick={handleAddAddress}
-          className="flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-md transition-colors"
+          className="flex items-center px-4 py-2  bg-pink-600 hover:bg-pink-700 text-white rounded-md transition-colors"
         >
           <FiPlus className="mr-2" />
           Add address
         </button>
       </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
-      {loading &&       <div className="flex justify-center items-center min-h-[300px]">
-              <ClipLoader color="#f59e42" size={48} speedMultiplier={0.8} />
-            </div>}
+      {loading && <Loader />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {addresses.map((address, idx) => (
           <div 
             key={address._id || idx} 
             className={`border rounded-lg p-5 relative cursor-pointer transition-all hover:shadow-md ${
               address.isDefault 
-                ? 'border-2 border-amber-400 bg-amber-50' 
-                : 'border-gray-200 hover:border-blue-500'
+                ? 'border-2 border-pink-400 bg-pink-50' 
+                : 'border-gray-200 hover:border-pink-500'
             }`}
             onClick={() => handleAddressClick(address)}
           >
             {address.isDefault && (
-              <div className="absolute top-3 right-3 flex items-center bg-amber-100 text-amber-800 px-2 py-1 rounded text-sm">
+              <div className="absolute top-3 right-3 flex items-center bg-pink-100 text-pink-800 px-2 py-1 rounded text-sm">
                 <FiCheck className="mr-1" /> Default
               </div>
             )}
@@ -123,7 +121,7 @@ const AddressBook = () => {
             </div>
             <div className="mt-4 pt-4 border-t border-gray-100">
               <button 
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+                className="text-pink-600 hover:text-pink-800 text-sm font-medium flex items-center"
                 onClick={(e) => e.stopPropagation()}
               >
                 Add delivery instructions
@@ -145,7 +143,7 @@ const AddressBook = () => {
               </button>
               {!address.isDefault && (
                 <button 
-                  className="flex items-center text-gray-700 hover:text-amber-600 ml-auto"
+                  className="flex items-center text-gray-700 hover:text-pink-600 ml-auto"
                   onClick={(e) => setDefaultAddress(e, address._id)}
                   disabled={loading}
                 >

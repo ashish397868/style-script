@@ -20,7 +20,7 @@ const Footer = ({ shopLinks = [], customerLinks = [], policyLinks = [] }) => {
           <ul className="space-y-1">
             {shopLinks.map((item, index) => (
               <li key={index}>
-                <Link to={item.path}>{item.label}</Link>
+                <Link className="hover:text-pink-300" to={item.path}>{item.label}</Link>
               </li>
             ))}
           </ul>
@@ -32,7 +32,7 @@ const Footer = ({ shopLinks = [], customerLinks = [], policyLinks = [] }) => {
           <ul className="space-y-1">
             {customerLinks.map((item, index) => (
               <li key={index}>
-                <Link to={item.path}>{item.label}</Link>
+                <Link className="hover:text-pink-300" to={item.path}>{item.label}</Link>
               </li>
             ))}
           </ul>
@@ -44,7 +44,7 @@ const Footer = ({ shopLinks = [], customerLinks = [], policyLinks = [] }) => {
           <ul className="space-y-1 mb-4">
             {policyLinks.map((item, index) => (
               <li key={index}>
-                <Link to={item.path}>{item.label}</Link>
+                <Link className="hover:text-pink-300" to={item.path}>{item.label}</Link>
               </li>
             ))}
           </ul>

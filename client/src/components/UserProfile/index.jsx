@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { userAPI } from '../../services/api';
 import { useUserStore } from '../../store/userStore';
 import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX } from 'react-icons/fi';
-import { ClipLoader } from 'react-spinners';
+import Loader from '../Loader';
 
 
 const UserProfile = () => {
@@ -80,12 +80,12 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-pink-50 py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full mb-6">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full mb-6">
             <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center">
-              <FiUser className="h-12 w-12 text-blue-600" />
+              <FiUser className="h-12 w-12 text-pink-600" />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-800 mb-2">User Profile</h1>
@@ -96,13 +96,7 @@ const UserProfile = () => {
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {loading ? (
-            <div className="flex justify-center items-center py-20">
-              <ClipLoader 
-                color="#3b82f6" 
-                size={50}
-                speedMultiplier={0.8}
-              />
-            </div>
+ <Loader />
           ) : (
             <div className="p-6 sm:p-8">
               {error && (
@@ -126,8 +120,8 @@ const UserProfile = () => {
               {!editMode ? (
                 <div className="space-y-6">
                   <div className="flex items-start">
-                    <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <FiUser className="h-6 w-6 text-blue-600" />
+                    <div className="bg-pink-100 p-3 rounded-full mr-4">
+                      <FiUser className="h-6 w-6 text-pink-600" />
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Full Name</h3>
@@ -136,8 +130,8 @@ const UserProfile = () => {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <FiMail className="h-6 w-6 text-blue-600" />
+                    <div className="bg-pink-100 p-3 rounded-full mr-4">
+                      <FiMail className="h-6 w-6 text-pink-600" />
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Email Address</h3>
@@ -146,8 +140,8 @@ const UserProfile = () => {
                   </div>
                   
                   <div className="flex items-start">
-                    <div className="bg-blue-100 p-3 rounded-full mr-4">
-                      <FiPhone className="h-6 w-6 text-blue-600" />
+                    <div className="bg-pink-100 p-3 rounded-full mr-4">
+                      <FiPhone className="h-6 w-6 text-pink-600" />
                     </div>
                     <div>
                       <h3 className="text-sm font-medium text-gray-500">Phone Number</h3>
@@ -158,7 +152,7 @@ const UserProfile = () => {
                   <div className="pt-6 border-t border-gray-100">
                     <button
                       onClick={handleEdit}
-                      className="flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                      className="flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all duration-300"
                     >
                       <FiEdit2 className="mr-2" />
                       Edit Profile
@@ -178,7 +172,7 @@ const UserProfile = () => {
                         name="name"
                         value={form.name}
                         onChange={handleChange}
-                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         placeholder="Enter your full name"
                         required
                       />
@@ -196,7 +190,7 @@ const UserProfile = () => {
                         name="email"
                         value={form.email}
                         onChange={handleChange}
-                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         placeholder="Enter your email"
                         required
                       />
@@ -214,7 +208,7 @@ const UserProfile = () => {
                         name="phone"
                         value={form.phone}
                         onChange={handleChange}
-                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="pl-10 block w-full rounded-lg border border-gray-300 shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
                         placeholder="Enter your phone number"
                       />
                     </div>
@@ -223,15 +217,11 @@ const UserProfile = () => {
                   <div className="pt-6 border-t border-gray-100 flex space-x-3">
                     <button
                       type="submit"
-                      className="flex-1 flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300"
+                      className="flex-1 flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all duration-300"
                       disabled={loading}
                     >
                       {loading ? (
-                        <ClipLoader 
-                          color="#ffffff" 
-                          size={20}
-                          speedMultiplier={0.8}
-                        />
+ <Loader />
                       ) : (
                         <>
                           <FiSave className="mr-2" />

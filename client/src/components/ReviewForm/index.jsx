@@ -55,7 +55,7 @@ export default function ReviewForm({ productId, onSuccess }) {
       <button
         type="submit"
         disabled={submitting}
-        className="self-start bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 disabled:opacity-50"
+        className="self-start bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded disabled:opacity-50"
       >
         {submitting ? "Submitting..." : "Submit Review"}
       </button>

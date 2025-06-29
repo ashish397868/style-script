@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader";
 import { orderAPI } from "../../services/api";
 import { FiShoppingBag, FiTruck, FiChevronRight } from "react-icons/fi";
 
@@ -29,9 +29,7 @@ export default function Orders() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <BeatLoader color="#6366f1" />
-      </div>
+ <Loader />
     );
   }
 
@@ -44,10 +42,10 @@ export default function Orders() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-12">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12">
       <div className="max-w-4xl mx-auto px-4">
         <h2 className="text-3xl font-bold text-gray-900 mb-8 flex items-center">
-          <FiShoppingBag className="text-indigo-600 mr-2" />
+          <FiShoppingBag className="text-pink-600 mr-2" />
           My Orders
         </h2>
         {console.log("Orders ::-----", orders)}
@@ -56,7 +54,7 @@ export default function Orders() {
             <p className="text-lg text-gray-600 mb-4">You have not placed any orders yet.</p>
             <Link
               to="/"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
             >
               Shop Now
             </Link>
@@ -85,14 +83,14 @@ export default function Orders() {
                   </div>
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Order #</span>
-                    <span className="font-mono text-indigo-600 ml-1 break-all">{order._id}</span>
+                    <span className="font-mono text-pink-600 ml-1 break-all">{order._id}</span>
                   </div>
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Total:</span>
                     <span className="text-gray-900 ml-1">₹{order.amount?.toLocaleString()}</span>
                   </div>
                   <div className="mb-1 flex items-center">
-                    <FiTruck className="text-indigo-600 mr-1" />
+                    <FiTruck className="text-pink-600 mr-1" />
                     <span className="text-gray-700">{order.deliveryStatus || "Processing"}</span>
                   </div>
                   <div className="mb-1 text-gray-500 text-sm">
@@ -102,7 +100,7 @@ export default function Orders() {
                 <div className="flex flex-col justify-center items-center">
                   <Link
                     to={`/order/${order._id}`}
-                    className="flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium"
+                    className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
                   >
                     View Details <FiChevronRight className="ml-2" />
                   </Link>

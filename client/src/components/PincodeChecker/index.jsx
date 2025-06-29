@@ -35,7 +35,7 @@ export default function PincodeChecker({ onCheck }) {
         />
         <button
           onClick={checkServicability}
-          className="bg-indigo-500 text-white py-2 px-6 rounded hover:bg-indigo-600"
+          className=" bg-pink-600 hover:bg-pink-700 text-white py-2 px-6 rounded"
         >
           Check
         </button>

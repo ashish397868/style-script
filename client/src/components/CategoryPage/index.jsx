@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import ProductCard from "../ProductCard";
 import { useEffect, useState } from "react";
 import { productAPI } from "../../services/api";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader";
 
 const CategoryPage = () => {
   const { category } = useParams();
@@ -19,11 +19,6 @@ const CategoryPage = () => {
       .catch(() => setLoading(false));
   }, [category]);
 
-  // Capitalize category name for heading
-//   const displayCategory = category
-//     ? category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' ')
-//     : '';
-
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-12 mx-auto">
@@ -37,9 +32,7 @@ const CategoryPage = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <BeatLoader color="#6b21a8" size={18} />
-          </div>
+          <Loader />
         ) : products && products.length > 0 ? (
           <div className="flex flex-wrap -m-4">
             {/* Group products by title and show only one card per title, passing all variants */}

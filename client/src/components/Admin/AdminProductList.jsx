@@ -46,7 +46,7 @@ const AdminProductList = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-600"></div>
       </div>
     );
   }
@@ -55,11 +55,11 @@ const AdminProductList = () => {
     <div className="p-6 max-w-7xl mx-auto">
       <div className="bg-white rounded-xl shadow-md overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+        <div className="px-6 py-4 bg-gradient-to-r from-pink-600 to-purple-700 text-white">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
               <h2 className="text-2xl font-bold">Product Inventory</h2>
-              <p className="text-indigo-200 mt-1">
+              <p className="text-pink-200 mt-1">
                 {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} in your catalog
               </p>
             </div>
@@ -70,10 +70,10 @@ const AdminProductList = () => {
                   placeholder="Search products..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 w-full rounded-lg bg-indigo-700 placeholder-indigo-200 text-white focus:outline-none focus:ring-2 focus:ring-white"
+                  className="pl-10 pr-4 py-2 w-full rounded-lg bg-pink-700 placeholder-pink-200 text-white focus:outline-none focus:ring-2 focus:ring-white"
                 />
                 <svg 
-                  className="absolute left-3 top-2.5 h-5 w-5 text-indigo-200" 
+                  className="absolute left-3 top-2.5 h-5 w-5 text-pink-200" 
                   xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 20 20" 
                   fill="currentColor"
@@ -260,7 +260,7 @@ const AdminProductList = () => {
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
                         <button
-                          className="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded-lg transition-colors"
+                          className="text-pink-600 hover:text-pink-900 bg-pink-50 p-2 rounded-lg transition-colors"
                           onClick={() => navigate(`/admin/edit-product/${product._id || product.id}`)}
                         >
                           <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

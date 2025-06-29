@@ -206,10 +206,10 @@ const AddressSelection = ({ onAddressSelect }) => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6">
+      <div className="bg-gradient-to-r from-pink-50 to-pink-50 rounded-2xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-6">
           <h1 className="text-2xl font-bold text-white">Select a delivery address</h1>
-          <p className="text-blue-100 mt-2">
+          <p className="text-pink-100 mt-2">
             {address.length > 0 
               ? `You have ${address.length} saved address${address.length > 1 ? 'es' : ''}`
               : "You don't have any saved address yet"}
@@ -220,7 +220,7 @@ const AddressSelection = ({ onAddressSelect }) => {
           {address.length > 0 ? (
             <div className="space-y-6 mb-8">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                <FiMapPin className="mr-2 text-blue-600" />
+                <FiMapPin className="mr-2 text-pink-600" />
                 Delivery Addresses
               </h2>
               {/* {console.log("User : - -", user)} */}
@@ -230,23 +230,23 @@ const AddressSelection = ({ onAddressSelect }) => {
                     key={addr._id || idx} 
                     className={`border rounded-xl p-5 transition-all duration-300 cursor-pointer ${
                       selectedAddress === addr 
-                        ? "border-blue-500 bg-blue-50 shadow-md transform -translate-y-1" 
-                        : "border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                        ? "border-pink-500 bg-pink-50 shadow-md transform -translate-y-1" 
+                        : "border-gray-200 hover:border-pink-300 hover:bg-pink-50"
                     }`}
                     onClick={() => handleSelectAddress(addr)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center mb-2">
-                          <div className="bg-blue-100 p-2 rounded-full mr-3">
-                            <FiUser className="h-5 w-5 text-blue-600" />
+                          <div className="bg-pink-100 p-2 rounded-full mr-3">
+                            <FiUser className="h-5 w-5 text-pink-600" />
                           </div>
                           <h3 className="font-bold text-gray-900 text-lg capitalize">{user.name}</h3>
                         </div>
                         
                         <div className="flex items-start mt-3">
-                          <div className="bg-blue-100 p-2 rounded-full mr-3">
-                            <FiHome className="h-5 w-5 text-blue-600" />
+                          <div className="bg-pink-100 p-2 rounded-full mr-3">
+                            <FiHome className="h-5 w-5 text-pink-600" />
                           </div>
                           <div>
                             <p className="text-gray-700">
@@ -258,15 +258,15 @@ const AddressSelection = ({ onAddressSelect }) => {
                         </div>
                         
                         <div className="flex items-center mt-3">
-                          <div className="bg-blue-100 p-2 rounded-full mr-3">
-                            <FiPhone className="h-5 w-5 text-blue-600" />
+                          <div className="bg-pink-100 p-2 rounded-full mr-3">
+                            <FiPhone className="h-5 w-5 text-pink-600" />
                           </div>
                           <p className="text-gray-700">{user.phone}</p>
                         </div>
                       </div>
                       
                       {selectedAddress === addr && (
-                        <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                        <div className="bg-pink-500 text-white text-xs px-2 py-1 rounded-full">
                           Selected
                         </div>
                       )}
@@ -278,7 +278,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                           e.stopPropagation();
                           handleEditAddress(addr);
                         }} 
-                        className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                        className="text-pink-600 hover:text-pink-800 flex items-center text-sm"
                       >
                         <FiEdit2 className="mr-1" /> Edit address
                       </button>
@@ -289,8 +289,8 @@ const AddressSelection = ({ onAddressSelect }) => {
             </div>
           ) : (
             <div className="text-center py-8 mb-6">
-              <div className="bg-blue-100 p-5 rounded-full inline-block mb-4">
-                <FiMapPin className="h-12 w-12 text-blue-600" />
+              <div className="bg-pink-100 p-5 rounded-full inline-block mb-4">
+                <FiMapPin className="h-12 w-12 text-pink-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-2">No Addresses Found</h3>
               <p className="text-gray-600 max-w-md mx-auto">
@@ -302,7 +302,7 @@ const AddressSelection = ({ onAddressSelect }) => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-gray-200">
             <button 
               onClick={handleAddNewAddress} 
-              className="flex items-center px-5 py-3 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+              className="flex items-center px-5 py-3 bg-white border border-pink-600 text-pink-600 rounded-lg hover:bg-pink-50 transition-colors font-medium"
             >
               <FiPlus className="mr-2" /> Add a new delivery address
             </button>
@@ -310,7 +310,7 @@ const AddressSelection = ({ onAddressSelect }) => {
             {address.length > 0 && selectedAddress && (
               <button 
                 onClick={handleDeliverToAddress}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg hover:from-blue-700 hover:to-indigo-800 transition-all shadow-lg font-medium"
+                className="px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all shadow-lg font-medium"
               >
                 Deliver to this address
               </button>
@@ -352,7 +352,7 @@ const AddressSelection = ({ onAddressSelect }) => {
         }}
       >
         <div className="bg-white rounded-2xl overflow-visible shadow-xl max-w-md w-full">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 sticky top-0 z-10">
+          <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-5 sticky top-0 z-10">
             <h2 className="text-xl font-bold text-white flex items-center">
               <FiMapPin className="mr-2" />
               {isEditing ? "Edit Address" : "Add New Address"}
@@ -373,7 +373,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                   className={`w-full px-4 py-3 rounded-lg border ${
                     errors.name 
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                      : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                      : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                   } focus:outline-none`}
                   placeholder="John Doe"
                 />
@@ -391,7 +391,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                   className={`w-full px-4 py-3 rounded-lg border ${
                     errors.phone 
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                      : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                      : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                   } focus:outline-none`}
                   placeholder="+91 9876543210"
                 />
@@ -409,7 +409,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                   className={`w-full px-4 py-3 rounded-lg border ${
                     errors.addressLine1 
                       ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                      : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                      : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                   } focus:outline-none`}
                   placeholder="Street address, P.O. box"
                 />
@@ -422,7 +422,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                   name="addressLine2" 
                   value={currentAddress.addressLine2} 
                   onChange={handleInputChange} 
-                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 focus:outline-none" 
+                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-pink-500 focus:border-pink-500 focus:outline-none" 
                   placeholder="Apartment, suite, unit, building, floor, etc."
                 />
               </div>
@@ -437,7 +437,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                     className={`w-full px-4 py-3 rounded-lg border ${
                       errors.city 
                         ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                     } focus:outline-none`}
                     placeholder="City"
                   />
@@ -453,7 +453,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                     className={`w-full px-4 py-3 rounded-lg border ${
                       errors.state 
                         ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                     } focus:outline-none`}
                     placeholder="State"
                   />
@@ -469,7 +469,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                     className={`w-full px-4 py-3 rounded-lg border ${
                       errors.pincode 
                         ? "border-red-300 focus:ring-red-500 focus:border-red-500" 
-                        : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        : "border-gray-300 focus:ring-pink-500 focus:border-pink-500"
                     } focus:outline-none`}
                     placeholder="Postal code"
                   />
@@ -488,7 +488,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                 </button>
                 <button 
                   onClick={handleSubmitAddress} 
-                  className="px-5 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg hover:from-blue-700 hover:to-indigo-800 font-medium flex items-center justify-center"
+                  className="px-5 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 font-medium flex items-center justify-center"
                 >
                   <FiCheck className="mr-2" /> {isEditing ? "Update Address" : "Save Address"}
                 </button>

@@ -110,7 +110,7 @@ const ForgotPassword = () => {
                 onChange={handleChange}
                 className={`appearance-none rounded relative block w-full px-3 py-2 border ${
                   formErrors.email ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
                 placeholder="Email address"
               />
               {formErrors.email && (
@@ -122,7 +122,7 @@ const ForgotPassword = () => {
               <Button
                 type="submit"
                 isLoading={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
               >
                 Send Reset Instructions
               </Button>
@@ -141,7 +141,7 @@ const ForgotPassword = () => {
                 onChange={handleChange}
                 className={`appearance-none rounded-t relative block w-full px-3 py-2 border ${
                   formErrors.resetCode ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
                 placeholder="Reset Code"
               />
               {formErrors.resetCode && (
@@ -160,7 +160,7 @@ const ForgotPassword = () => {
                 onChange={handleChange}
                 className={`appearance-none rounded relative block w-full px-3 py-2 border ${
                   formErrors.newPassword ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
                 placeholder="New Password"
               />
               <button
@@ -190,7 +190,7 @@ const ForgotPassword = () => {
                 onChange={handleChange}
                 className={`appearance-none rounded relative block w-full px-3 py-2 border ${
                   formErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
                 placeholder="Confirm Password"
               />
               {formErrors.confirmPassword && (
@@ -202,7 +202,7 @@ const ForgotPassword = () => {
               <Button
                 type="submit"
                 isLoading={isLoading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500"
               >
                 Reset Password
               </Button>
@@ -211,7 +211,7 @@ const ForgotPassword = () => {
         )}
 
         <div className="text-sm text-center">
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+          <Link to="/login" className="font-medium text-pink-600 hover:text-pink-500">
             Back to Login
           </Link>
         </div>

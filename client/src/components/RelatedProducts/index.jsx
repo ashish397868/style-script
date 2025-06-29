@@ -3,7 +3,7 @@ import { useProductStore } from "../../store/productStore";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../ProductCard";
 import { FiArrowRight } from "react-icons/fi";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader";
 
 // Related Products Component
 function RelatedProducts({ excludeIds, categories = [] }) {
@@ -61,15 +61,13 @@ function RelatedProducts({ excludeIds, categories = [] }) {
     <section className="mt-16">
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-2xl font-bold text-gray-900">You May Also Like</h3>
-        <button onClick={() => navigate("/products")} className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+        <button onClick={() => navigate("/products")} className="text-pink-600 hover:text-pink-800 font-medium flex items-center">
           View All <FiArrowRight className="ml-1" />
         </button>
       </div>
 
       {loading || productsLoading ? (
-        <div className="flex justify-center items-center py-12">
-          <BeatLoader color="#6366f1" size={18} />
-        </div>
+ <Loader />
       ) : (
         <div className="flex flex-wrap -m-4">
           {related.map((product) => (

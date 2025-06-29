@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader";
 import { FaStar, FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
 import { productAPI, reviewAPI } from "../../services/api";
 import { useProductStore } from "../../store/productStore";
@@ -196,9 +196,7 @@ export default function ProductDetailPage() {
 
   if (isLoading || productsLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <BeatLoader height={80} width={80} color="#4fa94d" radius={9} />
-      </div>
+ <Loader />
     );
   }
 
@@ -214,7 +212,7 @@ export default function ProductDetailPage() {
         <nav className="flex mb-8" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
             <li className="inline-flex items-center">
-              <Link to="/" className="text-gray-600 hover:text-indigo-600 text-sm">
+              <Link to="/" className="text-gray-600 hover:text-pink-600 text-sm">
                 Home
               </Link>
             </li>
@@ -223,7 +221,7 @@ export default function ProductDetailPage() {
                 <svg className="w-3 h-3 text-gray-400 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-                <Link to="/products" className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">
+                <Link to="/products" className="ml-1 text-sm text-gray-600 hover:text-pink-600 md:ml-2">
                   Products
                 </Link>
               </div>
@@ -235,7 +233,7 @@ export default function ProductDetailPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
                 {product?.category ? (
-                  <Link to={`/category/${product.category.toLowerCase().replace(/\s+/g, "-")}`} className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">
+                  <Link to={`/category/${product.category.toLowerCase().replace(/\s+/g, "-")}`} className="ml-1 text-sm text-gray-600 hover:text-pink-600 md:ml-2">
                     {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
                   </Link>
                 ) : (
@@ -269,7 +267,7 @@ export default function ProductDetailPage() {
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${selectedImageIndex === index ? "border-indigo-600 scale-105" : "border-gray-200 hover:border-gray-400"}`}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${selectedImageIndex === index ? "border-pink-600 scale-105" : "border-gray-200 hover:border-gray-400"}`}
                   >
                     <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
                   </button>
@@ -289,7 +287,7 @@ export default function ProductDetailPage() {
 
             {/* Rating */}
             <div className="flex items-center mb-4">
-              <div className="flex text-amber-400">
+              <div className="flex text-pink-400">
                 {[...Array(5)].map((_, i) => (
                   <FaStar key={i} className={i < Math.round(avgRating) ? "w-4 h-4 fill-current" : "w-4 h-4 text-gray-300"} />
                 ))}
@@ -330,14 +328,14 @@ export default function ProductDetailPage() {
                 <button
                   disabled={product.availableQty <= 0}
                   onClick={handleAddToCart}
-                  className="flex-1 min-w-[140px] text-white bg-indigo-600 hover:bg-indigo-700 py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add to Cart
+                  Add to Cart 
                 </button>
                 <button
                   disabled={product.availableQty <= 0}
                   onClick={handleBuyNow}
-                  className="flex-1 min-w-[140px] text-white bg-gray-900 hover:bg-black py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Buy Now
                 </button>
@@ -348,17 +346,17 @@ export default function ProductDetailPage() {
             <div className="border border-gray-200 rounded-lg p-4 mb-8 bg-gray-50">
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="flex flex-col items-center">
-                  <FaTruck className="w-6 h-6 text-indigo-600 mb-2" />
+                  <FaTruck className="w-6 h-6 text-pink-600 mb-2" />
                   <p className="text-sm font-medium">Free Shipping</p>
                   <p className="text-xs text-gray-500">Over ₹999</p>
                 </div>
                 <div className="flex flex-col items-center">
-                  <FaExchangeAlt className="w-6 h-6 text-indigo-600 mb-2" />
+                  <FaExchangeAlt className="w-6 h-6 text-pink-600 mb-2" />
                   <p className="text-sm font-medium">Easy Returns</p>
                   <p className="text-xs text-gray-500">30 Days Policy</p>
                 </div>
                 <div className="flex flex-col items-center">
-                  <FaShieldAlt className="w-6 h-6 text-indigo-600 mb-2" />
+                  <FaShieldAlt className="w-6 h-6 text-pink-600 mb-2" />
                   <p className="text-sm font-medium">Secure Payment</p>
                   <p className="text-xs text-gray-500">100% Secure</p>
                 </div>
@@ -377,10 +375,10 @@ export default function ProductDetailPage() {
         <div className="mt-16 max-w-4xl mx-auto">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8">
-              <button className={`py-4 px-1 border-b-2 text-sm font-medium ${activeTab === "description" ? "border-indigo-500 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"}`} onClick={() => setActiveTab("description")}>
+              <button className={`py-4 px-1 border-b-2 text-sm font-medium ${activeTab === "description" ? "border-pink-500 text-pink-600" : "border-transparent text-gray-500 hover:text-pink-700"}`} onClick={() => setActiveTab("description")}>
                 Description
               </button>
-              <button className={`py-4 px-1 border-b-2 text-sm font-medium ${activeTab === "reviews" ? "border-indigo-500 text-indigo-600" : "border-transparent text-gray-500 hover:text-gray-700"}`} onClick={() => setActiveTab("reviews")}>
+              <button className={`py-4 px-1 border-b-2 text-sm font-medium ${activeTab === "reviews" ? "border-pink-500 text-pink-600" : "border-transparent text-gray-500 hover:text-pink-700"}`} onClick={() => setActiveTab("reviews")}>
                 Reviews ({reviews.length})
               </button>
             </nav>
@@ -411,10 +409,10 @@ export default function ProductDetailPage() {
                 <div className="bg-gray-50 rounded-lg p-6 mb-8">
                   <div className="flex flex-col md:flex-row items-center">
                     <div className="text-center mb-4 md:mb-0 md:mr-8">
-                      <div className="text-5xl font-bold text-indigo-600">{avgRating}</div>
+                      <div className="text-5xl font-bold text-pink-600">{avgRating}</div>
                       <div className="flex justify-center mt-2">
                         {[...Array(5)].map((_, i) => (
-                          <FaStar key={i} className={i < Math.round(avgRating) ? "w-5 h-5 text-amber-400 fill-current" : "w-5 h-5 text-gray-300"} />
+                          <FaStar key={i} className={i < Math.round(avgRating) ? "w-5 h-5 text-pink-400 fill-current" : "w-5 h-5 text-gray-300"} />
                         ))}
                       </div>
                       <p className="text-gray-600 mt-1">{reviews.length} reviews</p>
@@ -429,7 +427,7 @@ export default function ProductDetailPage() {
                           <div key={star} className="flex items-center mb-2">
                             <span className="text-sm w-16">{star} star</span>
                             <div className="flex-1 h-2 bg-gray-200 rounded-full mx-2">
-                              <div className="h-full bg-amber-400 rounded-full" style={{ width: `${percentage}%` }}></div>
+                              <div className="h-full bg-pink-400 rounded-full" style={{ width: `${percentage}%` }}></div>
                             </div>
                             <span className="text-sm w-10 text-gray-600">{count}</span>
                           </div>

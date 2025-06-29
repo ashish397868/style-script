@@ -172,7 +172,7 @@ const AdminDashboard = () => {
                 title="Total Orders"
                 value={stats.totalOrders}
                 icon={FiShoppingCart}
-                color="bg-blue-500"
+                color="bg-pink-500"
               />
               <StatCard
                 title="Total Products"

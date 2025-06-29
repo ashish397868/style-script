@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../store/userStore';
 import { userAPI } from '../../services/api';
 import { FiSave, FiX, FiMapPin, FiPlus } from 'react-icons/fi';
-import { ClipLoader } from 'react-spinners';
+import Loader from '../Loader';
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
@@ -56,15 +56,13 @@ const NewAddressPage = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[300px]">
-        <ClipLoader color="#f59e42" size={48} speedMultiplier={0.8} />
-      </div>
+ <Loader />
     );
   }
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
       <div className="flex items-center mb-6">
-        <FiPlus className="text-amber-500 mr-2 text-xl" />
+        <FiPlus className="text-pink-500 mr-2 text-xl" />
         <h1 className="text-2xl font-bold text-gray-800">Add New Address</h1>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -79,7 +77,7 @@ const NewAddressPage = () => {
               name="name"
               value={address.name}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -92,7 +90,7 @@ const NewAddressPage = () => {
               name="phone"
               value={address.phone}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -105,7 +103,7 @@ const NewAddressPage = () => {
               name="addressLine1"
               value={address.addressLine1}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -118,7 +116,7 @@ const NewAddressPage = () => {
               name="addressLine2"
               value={address.addressLine2}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
             />
           </div>
           <div>
@@ -130,7 +128,7 @@ const NewAddressPage = () => {
               name="city"
               value={address.city}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -143,7 +141,7 @@ const NewAddressPage = () => {
               name="state"
               value={address.state}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -156,7 +154,7 @@ const NewAddressPage = () => {
               name="pincode"
               value={address.pincode}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -169,7 +167,7 @@ const NewAddressPage = () => {
               name="country"
               value={address.country}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
               required
             />
           </div>
@@ -180,7 +178,7 @@ const NewAddressPage = () => {
             name="isDefault"
             checked={address.isDefault}
             onChange={handleChange}
-            className="h-4 w-4 text-amber-500 rounded focus:ring-amber-500"
+            className="h-4 w-4 text-pink-500 rounded focus:ring-pink-500"
           />
           <label className="ml-2 text-sm text-gray-700">
             Set as default address
@@ -196,7 +194,7 @@ const NewAddressPage = () => {
           </button>
           <button 
             type="submit"
-            className="px-4 py-2 bg-amber-500 text-white rounded-md hover:bg-amber-600"
+            className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600"
             disabled={loading}
           >
             Add Address

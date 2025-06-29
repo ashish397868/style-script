@@ -144,7 +144,7 @@ export default function ReviewOrder() {
       <div className="flex items-center mb-6">
         <button 
           onClick={() => navigate('/checkout')}
-          className="flex items-center text-indigo-600 hover:text-indigo-800"
+          className="flex items-center text-pink-600 hover:text-pink-800"
         >
           <FiArrowLeft className="mr-2" /> Back to Checkout
         </button>
@@ -158,18 +158,18 @@ export default function ReviewOrder() {
           <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold flex items-center">
-                <FiTruck className="text-indigo-600 mr-2" />
+                <FiTruck className="text-pink-600 mr-2" />
                 Delivery Address
               </h2>
               <button
                 onClick={() => navigate('/checkout')}
-                className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                className="text-pink-600 hover:text-pink-800 text-sm font-medium"
               >
                 Change Address
               </button>
             </div>
             
-            <div className="bg-indigo-50 rounded-lg p-5 border border-indigo-100">
+            <div className="bg-pink-50 rounded-lg p-5 border border-pink-100">
               <p className="font-bold text-gray-900">{selectedAddress.name}</p>
               <p className="text-gray-700 mt-2">
                 {selectedAddress.addressLine1}
@@ -197,7 +197,7 @@ export default function ReviewOrder() {
                 <p className="text-gray-600 mt-2">Add items to your cart to proceed</p>
                 <button
                   onClick={() => navigate('/')}
-                  className="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700"
+                  className="mt-4 bg-pink-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-pink-700"
                 >
                   Continue Shopping
                 </button>
@@ -295,13 +295,13 @@ export default function ReviewOrder() {
             
             <div className="mt-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center">
-                <FiCreditCard className="text-indigo-600 mr-2" />
+                <FiCreditCard className="text-pink-600 mr-2" />
                 Payment Method
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div className="flex items-center">
-                  <div className="bg-indigo-100 p-2 rounded mr-3">
-                    <FiCreditCard className="text-indigo-600" />
+                  <div className="bg-pink-100 p-2 rounded mr-3">
+                    <FiCreditCard className="text-pink-600" />
                   </div>
                   <div>
                     <p className="font-medium">Credit/Debit Card</p>
@@ -317,7 +317,7 @@ export default function ReviewOrder() {
               className={`w-full mt-8 py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
                 Object.keys(cart).length === 0 || isPaying
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 shadow-lg"
+                  : "bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-700 hover:to-purple-700 shadow-lg"
               }`}
             >
               {isPaying ? (

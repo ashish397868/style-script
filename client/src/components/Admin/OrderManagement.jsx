@@ -289,7 +289,7 @@ const OrderManagement = () => {
                       order.deliveryStatus === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.deliveryStatus === 'returned' ? 'bg-red-100 text-red-800' :
                       order.deliveryStatus === 'unshipped' ? 'bg-gray-100 text-gray-800' :
-                      'bg-blue-100 text-blue-800'
+                      'bg-pink-100 text-pink-800'
                     }`}>
                       {order.deliveryStatus}
                     </span>
@@ -304,7 +304,7 @@ const OrderManagement = () => {
                       <>
                         <button
                           onClick={() => openShippingModal(order)}
-                          className="text-blue-600 hover:text-blue-900 flex items-center"
+                          className="text-pink-600 hover:text-pink-900 flex items-center"
                         >
                           <FiTruck className="inline mr-1" /> Ship
                         </button>
@@ -502,7 +502,7 @@ const OrderManagement = () => {
                 </button>
                 <button
                   onClick={handleUpdateShipping}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700"
                 >
                   Update Shipping
                 </button>

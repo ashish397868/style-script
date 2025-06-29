@@ -11,7 +11,7 @@ const ReviewCard = ({ review }) => {
         <div>
           <h4 className="font-medium">{review.userId.name}</h4>
           <div className="flex items-center">
-            <div className="flex text-amber-400 mr-2">
+            <div className="flex text-pink-400 mr-2">
               {[...Array(5)].map((_, i) => (
                 <FaStar 
                   key={i} 

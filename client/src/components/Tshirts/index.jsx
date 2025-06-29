@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BeatLoader } from "react-spinners";
+import Loader from "../Loader";
 import { useProductStore } from "../../store/productStore";
 import ProductCard from "../ProductCard";
 
@@ -29,16 +29,7 @@ const Tshirts = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center min-h-[200px]">
-            <BeatLoader
-              // visible={true}
-              height="80"
-              width="80"
-              color="#4fa94d"
-              radius="9"
-              aria-label="three-dots-loading"
-            />
-          </div>
+ <Loader />
         ) : error ? (
           <div className="text-center text-red-600 py-8">{error}</div>
         ) : tshirtProducts && tshirtProducts.length > 0 ? (

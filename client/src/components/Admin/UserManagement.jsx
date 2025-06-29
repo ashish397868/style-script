@@ -54,19 +54,11 @@ const UserManagement = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
-        <h1 className="text-3xl font-bold flex items-center">
-          <FiUserCheck className="h-8 w-8 mr-3" />
-          User Management
-        </h1>
-        <p className="mt-2 text-pink-200">Manage all users and their roles</p>
-      </div>
-      <div className="p-6">
-        <div className="mb-6">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">User Management</h2>
+      <div className="mb-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />
           </div>
           <input
@@ -146,7 +138,7 @@ const UserManagement = () => {
         </table>
       </div>
     </div>
-  </div>);
+  );
 };
 
 export default UserManagement;

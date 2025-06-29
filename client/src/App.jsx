@@ -8,7 +8,6 @@ import Login from "../src/components/Login";
 import Signup from "../src/components/Signup";
 import Admin from "../src/components/Admin/AdminDashboard";
 import AddProductPage from "../src/components/Admin/AddProductPage";
-import AdminLayout from "../src/components/Admin/AdminLayout";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import ForgotPassword from "../src/components/ForgotPassword";
 import ProductPage from "../src/components/ProductPage";
@@ -95,16 +94,14 @@ function App() {
         <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
         <Route path="/success/:id" element={<ProtectedRoute><Success /></ProtectedRoute>} />
 
-        {/* Admin Routes - nested under AdminLayout */}
-        <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminLayout /></ProtectedRoute>}>
-          <Route index element={<Admin />} />
-          <Route path="users" element={<UserManagement />} />
-          <Route path="reviews" element={<ReviewManagement />} />
-          <Route path="orders" element={<OrderManagement />} />
-          <Route path="add-product" element={<AddProductPage />} />
-          <Route path="all-products" element={<AdminProductList />} />
-          <Route path="edit-product/:id" element={<EditProductPage />} />
-        </Route>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagement /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><OrderManagement /></ProtectedRoute>} />
+        <Route path="/admin/add-product" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
+        <Route path="/admin/all-products" element={<ProtectedRoute requireAdmin><AdminProductList /></ProtectedRoute>} />
+        <Route path="/admin/edit-product/:id" element={<ProtectedRoute requireAdmin><EditProductPage /></ProtectedRoute>} />
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>

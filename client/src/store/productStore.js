@@ -89,20 +89,6 @@ export const useProductStore = create((set, get) => ({
     get().fetchProducts();
   },
 
-  // Delete a product by ID
-  deleteProduct: async (productId) => {
-    set({ loading: true });
-    try {
-      await productAPI.deleteProduct(productId);
-      set({
-        products: get().products.filter((p) => p._id !== productId && p.id !== productId),
-        loading: false
-      });
-    } catch (error) {
-      set({ error: error.response?.data?.message || 'Failed to delete product', loading: false });
-      throw error;
-    }
-  },
   // Clear errors
   clearError: () => set({ error: null }),
 }));

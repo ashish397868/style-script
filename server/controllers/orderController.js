@@ -135,11 +135,6 @@ exports.updateOrder = async (req, res) => {
     if (shippingProvider) order.shippingProvider = shippingProvider;
     if (trackingId) order.trackingId = trackingId;
 
-    // Safeguard: If paymentInfo is missing, set it to an empty object to allow update
-    if (order.paymentInfo === undefined || order.paymentInfo === null) {
-      order.paymentInfo = {};
-    }
-
     await order.save();
     return res.json({ message: "Order updated.", order });
   } catch (err) {
@@ -156,10 +151,7 @@ exports.cancelOrder = async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
     }
-    // Allow admin to cancel any order, or user to cancel their own order
-    const isAdmin = req.user && req.user.role === 'admin';
-    const isOwner = order.userId && order.userId.equals(req.user._id);
-    if (!isAdmin && !isOwner) {
+    if (!order.userId.equals(req.user._id)) {
       return res.status(403).json({ message: "Not authorized." });
     }
     if (["shipped", "out for delivery", "delivered"].includes(order.deliveryStatus)) {
@@ -167,10 +159,6 @@ exports.cancelOrder = async (req, res) => {
     }
     order.status = "Cancelled";
     order.deliveryStatus = "returned";
-    // Safeguard: If paymentInfo is missing, set it to an empty object to allow cancel
-    if (order.paymentInfo === undefined || order.paymentInfo === null) {
-      order.paymentInfo = {};
-    }
     await order.save();
     return res.json({ message: "Order cancelled.", order });
   } catch (err) {

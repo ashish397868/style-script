@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productAPI, mediaAPI } from '../../services/api';
-import Loader from '../Loader';
 
 const EditProductPage = () => {
   const { id } = useParams();
@@ -120,7 +119,7 @@ const EditProductPage = () => {
     setLoading(false);
   };
 
-  if (loading || !form) return <Loader />;
+  if (loading || !form) return <div className="p-8">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -209,15 +208,13 @@ const EditProductPage = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                   >
                     <option value="">Select category</option>
-                    <option value="Sweatshirts">Sweatshirts</option>
-                    <option value="Hoodies">Hoodies</option>
-                    <option value="Zipper Hoodies">Zipper Hoodies</option>
-                    <option value="Polo TShirts">Polo TShirts</option>
-                    <option value="Oversized Tshirts">Oversized Tshirts</option>
-                    {form.category && !["T-Shirts","Sweatshirts","Hoodies","Zipper Hoodies","Polo TShirts","Oversized Tshirts"].includes(form.category) && (
-                      <option value={form.category}>
-                        {form.category.charAt(0).toUpperCase() + form.category.slice(1)}
-                      </option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Home & Kitchen">Home & Kitchen</option>
+                    <option value="Beauty">Beauty</option>
+                    <option value="Sports">Sports</option>
+                    {form.category && !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.category) && (
+                      <option value={form.category}>{form.category}</option>
                     )}
                   </select>
                   <input

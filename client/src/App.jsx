@@ -4,7 +4,6 @@ import "./App.css";
 import Navbar from "../src/screen/Navbar";
 import { Routes, Route } from "react-router-dom";
 import Home from "../src/components/HomePage";
-import About from "../src/screen/About";
 import Login from "../src/components/Login";
 import Signup from "../src/components/Signup";
 import Admin from "../src/components/Admin/AdminDashboard";
@@ -31,7 +30,12 @@ import AddressesBook from "./components/AddressesBook";
 import EditAddressPage from './components/EditAddressPage';
 import NewAddressPage from './components/NewAddressPage';
 import CategoryPage from "./components/CategoryPage";
-
+import PrivacyPolicy from "./components/PrivacyPolicy";
+import TermsAndConditions from "./components/TermsAndConditions"; 
+import ContactUs from "./components/ContactUs";
+import ShippingPolicy from "./components/ShippingPolicy";
+import ReturnPolicy from "./components/ReturnPolicy";
+import AboutUs from "./components/AboutUs";
 
 
 // import {useNavigate} from "react-router-dom";
@@ -60,7 +64,13 @@ function App() {
       {!location.pathname.startsWith('/admin') && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/shipping-policy" element={<ShippingPolicy />} />
+        <Route path="/return-policy" element={<ReturnPolicy />} />
+        <Route path="/about-us" element={<AboutUs />} />
         <Route path="/login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path="/products" element={<Products />} />

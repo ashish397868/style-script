@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { productAPI, mediaAPI } from '../../services/api';
+import Loader from '../Loader';
 
 const EditProductPage = () => {
   const { id } = useParams();
@@ -119,7 +120,7 @@ const EditProductPage = () => {
     setLoading(false);
   };
 
-  if (loading || !form) return <div className="p-8">Loading...</div>;
+  if (loading || !form) return <Loader />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
@@ -170,7 +171,7 @@ const EditProductPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
-                    $
+                    ₹
                   </div>
                   <input
                     name="price"
@@ -208,13 +209,15 @@ const EditProductPage = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
                   >
                     <option value="">Select category</option>
-                    <option value="Clothing">Clothing</option>
-                    <option value="Electronics">Electronics</option>
-                    <option value="Home & Kitchen">Home & Kitchen</option>
-                    <option value="Beauty">Beauty</option>
-                    <option value="Sports">Sports</option>
-                    {form.category && !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.category) && (
-                      <option value={form.category}>{form.category}</option>
+                    <option value="Sweatshirts">Sweatshirts</option>
+                    <option value="Hoodies">Hoodies</option>
+                    <option value="Zipper Hoodies">Zipper Hoodies</option>
+                    <option value="Polo TShirts">Polo TShirts</option>
+                    <option value="Oversized Tshirts">Oversized Tshirts</option>
+                    {form.category && !["T-Shirts","Sweatshirts","Hoodies","Zipper Hoodies","Polo TShirts","Oversized Tshirts"].includes(form.category) && (
+                      <option value={form.category}>
+                        {form.category.charAt(0).toUpperCase() + form.category.slice(1)}
+                      </option>
                     )}
                   </select>
                   <input
@@ -322,7 +325,7 @@ const EditProductPage = () => {
                   {form.images.map((img, index) => (
                     <div key={index} className="relative">
                       {img.match(/^https?:\/\//) ? (
-                        <img src={img} alt="preview" className="w-16 h-16 object-cover rounded-xl border-2 border-dashed" />
+                        <img src={img} alt="preview" className="w-16 h-16 object-contain rounded-xl border-2 border-dashed" />
                       ) : (
                         <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center">
                           <span className="text-xs text-gray-500">Image</span>

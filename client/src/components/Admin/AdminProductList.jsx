@@ -5,7 +5,7 @@ import { useProductStore } from '../../store/productStore';
 import Loader from '../Loader';
 
 const AdminProductList = () => {
-  const { products, fetchProducts, loading, error } = useProductStore();
+  const { products, fetchProducts, loading, error, deleteProduct } = useProductStore();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -16,8 +16,17 @@ const AdminProductList = () => {
     // eslint-disable-next-line
   }, []);
 
-  // For delete, you may still want to call the API and update the store (not handled here)
-  // You can add a store method to remove product from products if needed
+
+  // Handle product deletion
+  const handleDelete = async (productId) => {
+    try {
+      await deleteProduct(productId);
+      setDeleteConfirm(null);
+    } catch (err) {
+      // Optionally show error toast here
+      setDeleteConfirm(null);
+    }
+  };
 
   const handleSort = (key) => {
     let direction = 'ascending';

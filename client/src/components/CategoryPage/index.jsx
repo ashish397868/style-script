@@ -20,19 +20,19 @@ const CategoryPage = () => {
   }, [category]);
 
   // Capitalize category name for heading
-  const displayCategory = category
-    ? category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' ')
-    : '';
+//   const displayCategory = category
+//     ? category.charAt(0).toUpperCase() + category.slice(1).replace(/-/g, ' ')
+//     : '';
 
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-12 mx-auto">
         <div className="flex flex-col text-center w-full mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            {displayCategory} Collection
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 capitalize">
+            {category} Collection
           </h1>
           <p className="lg:w-2/3 mx-auto text-gray-600">
-            Browse our latest collection of {displayCategory.toLowerCase()}.
+            Browse our latest collection of {category.toLowerCase()}.
           </p>
         </div>
 
@@ -56,7 +56,7 @@ const CategoryPage = () => {
         ) : (
           <div className="text-center py-8">
             <p className="text-xl text-gray-700 mb-4">
-              No {displayCategory.toLowerCase()} available at the moment.
+              No {category.toLowerCase()} available at the moment.
             </p>
             <p className="text-gray-600">
               Please check back later for new arrivals.

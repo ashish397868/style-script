@@ -9,7 +9,7 @@ const ProductSchema = new Schema(
     images: { type: [String], default: [] },
     category: { type: String, required: true, index: true , lowercase: true },
     brand: { type: String, index: true, lowercase: true },
-    size: { type: String, index: true, lowercase: true },
+    size: { type: String, index: true, uppercase: true },
     color: { type: String, index: true, lowercase: true },
     tags: [String],
     availableQty: { type: Number, required: true },

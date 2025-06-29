@@ -1,17 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
-const sizeList = ["S", "M", "L", "XL", "XXL"];
-const colorMap = [
-  { name: "Red", className: "bg-red-700" },
-  { name: "Black", className: "bg-black" },
-  { name: "Maroon", className: "bg-red-900" },
-  { name: "Blue", className: "bg-blue-700" },
-  { name: "Purple", className: "bg-purple-950" },
-  { name: "Forest Green", className: "bg-green-700" },
-  { name: "Sea Green", className: "bg-teal-400" },
-  { name: "Green", className: "bg-green-800" },
-  {name: "White", className: "bg-white border border-gray-300" },
-];
+import colorMap from "../../constants/colorMap";
 
 const ProductCard = ({ product, variants }) => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import Navbar from "../../components/Navbar";
-import { menuItems, productItems,adminItems } from "../../constants/menuItems";
+import { menuItems, tshirtItems,adminItems } from "../../constants/menuItems";
 import { TbShirtOff } from "react-icons/tb";
 function App() {
   
@@ -7,7 +7,7 @@ function App() {
   return (
       <Navbar
         menuItems={menuItems}
-        productItems={productItems}
+        productItems={tshirtItems}
         adminItems={adminItems}
         brandName="StyleScript"
         logoSrc="https://www.svgrepo.com/show/42638/clothes.svg"

@@ -235,7 +235,7 @@ export default function ProductDetailPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
                 {product?.category ? (
-                  <Link to={`/products/${product.category.toLowerCase().replace(/\s+/g, "-")}`} className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">
+                  <Link to={`/category/${product.category.toLowerCase().replace(/\s+/g, "-")}`} className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">
                     {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
                   </Link>
                 ) : (

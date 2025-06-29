@@ -11,7 +11,6 @@ import Admin from "../src/components/Admin/AdminDashboard";
 import AddProductPage from "../src/components/Admin/AddProductPage";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import ForgotPassword from "../src/components/ForgotPassword";
-import Tshirts from "../src/components/Tshirts";
 import ProductPage from "../src/components/ProductPage"
 import Checkout from "../src/components/Checkout";
 import ReviewOrder from "../src/components/ReviewOrder";
@@ -31,6 +30,7 @@ import Products from "../src/components/Products";
 import AddressesBook from "./components/AddressesBook";
 import EditAddressPage from './components/EditAddressPage';
 import NewAddressPage from './components/NewAddressPage';
+import CategoryPage from "./components/CategoryPage";
 
 
 
@@ -64,7 +64,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
         <Route path="/products" element={<Products />} />
-        <Route path="/products/tshirts" element={<Tshirts />} />
+        {/* Removed hardcoded Tshirts route, use dynamic category route below */}
         <Route path="/product/:slug" element={<ProductPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/review-order" element={<ReviewOrder />} />
@@ -73,6 +73,7 @@ function App() {
         <Route path="/addresses/edit/:id" element={<EditAddressPage />} />
         <Route path="/addresses/new" element={<NewAddressPage />} />
         <Route path="/order/:id" element={<OrderDetail />} />
+        <Route path="/category/:category" element={<CategoryPage />} />
         <Route path="/success/:id" element={<Success />} />
         <Route path="/admin" element={
           <ProtectedRoute requireAdmin>

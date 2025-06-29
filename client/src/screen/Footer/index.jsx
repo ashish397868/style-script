@@ -1,10 +1,10 @@
 import Footer from "../../components/Footer";
 
 const shopLinks = [
-  { label: "T-Shirts", path: "/products/t-shirts" },
-  { label: "Sweatshirts", path: "/products/sweatshirts" },
-  { label: "Hoodies", path: "/products/hoodies" },
-  { label: "Zipper Hoodies", path: "/products/zipper-hoodies" },
+  { label: "T-Shirts", path: "/category/tshirts" },
+  { label: "Sweatshirts", path: "/category/sweatshirts" },
+  { label: "Hoodies", path: "/category/hoodies" },
+  { label: "Zipper Hoodies", path: "/category/zipperhoodies" },
 ];
 
 const customerLinks = [

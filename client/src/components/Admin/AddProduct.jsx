@@ -263,13 +263,14 @@ const AddProduct = () => {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       >
                         <option value="">Select category</option>
-                        <option value="Clothing">Clothing</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Home & Kitchen">Home & Kitchen</option>
-                        <option value="Beauty">Beauty</option>
-                        <option value="Sports">Sports</option>
-                        {form.category && !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.category) && (
-                          <option value={form.category}>{form.category}</option>
+                        <option value="Sweatshirts">Sweatshirts</option>
+                        <option value="Hoodies">Hoodies</option>
+                        <option value="Zipper Hoodies">Zipper Hoodies</option>
+                        <option value="TShirts">TShirts</option>
+                        <option value="Polo TShirts">Polo TShirts</option>
+                        <option value="Oversized Tshirts">Oversized Tshirts</option>
+                        {form.category && !["Sweatshirts","Hoodies","Zipper Hoodies","TShirts","Polo TShirts","Oversized Tshirts"].includes(form.category) && (
+                          <option value={form.category}>{form.category.charAt(0).toUpperCase() + form.category.slice(1)}</option>
                         )}
                       </select>
                       <input

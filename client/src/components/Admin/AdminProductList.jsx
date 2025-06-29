@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '../../store/productStore';
 import Loader from '../Loader';
+import api from '../../services/api';
 
 const AdminProductList = () => {
   const { products, fetchProducts, loading, error } = useProductStore();
@@ -18,6 +19,19 @@ const AdminProductList = () => {
 
   // For delete, you may still want to call the API and update the store (not handled here)
   // You can add a store method to remove product from products if needed
+
+  // Delete handler
+  const handleDelete = async (productId) => {
+    if (!productId) return;
+    try {
+      // Optionally show a loading state here
+      await api.delete(`/products/${productId}`);
+      fetchProducts();
+      setDeleteConfirm(null);
+    } catch (err) {
+      alert('Failed to delete product.');
+    }
+  };
 
   const handleSort = (key) => {
     let direction = 'ascending';

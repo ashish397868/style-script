@@ -152,9 +152,16 @@ const AdminDashboard = () => {
       </div>
       {/* Main Content */}
       <div className="flex-1 overflow-auto">
-        <header className="bg-white shadow-sm p-4">
-          <h2 className="text-xl font-semibold text-gray-800">Dashboard Overview</h2>
-        </header>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
+          <h1 className="text-3xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11.93V14a1 1 0 11-2 0v-.07A6.002 6.002 0 014 10a6 6 0 1112 0 6.002 6.002 0 01-5 5.93zM10 4a6 6 0 100 12A6 6 0 0010 4z" clipRule="evenodd" />
+            </svg>
+            Dashboard Overview
+          </h1>
+          <p className="mt-2 text-pink-200">Quick stats and insights for your store</p>
+        </div>
         {loading ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>

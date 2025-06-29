@@ -174,8 +174,20 @@ const OrderManagement = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Order Management</h2>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white">
+            <h1 className="text-3xl font-bold flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 3a1 1 0 011-1h2a1 1 0 011 1v1h6V3a1 1 0 011-1h2a1 1 0 011 1v1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7H2a1 1 0 01-1-1V4a1 1 0 011-1h1V3zm2 2V4H4v1h1zm10 0V4h-1v1h1zM4 7v8a1 1 0 001 1h10a1 1 0 001-1V7H4z" clipRule="evenodd" />
+              </svg>
+              Order Management
+            </h1>
+            <p className="mt-2 text-pink-200">View, filter, and manage all customer orders</p>
+          </div>
+          <div className="p-6">
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Search Input */}
@@ -511,6 +523,9 @@ const OrderManagement = () => {
         </div>
       )}
     </div>
+          </div>
+        </div>
+      </div>
   );
 };
 

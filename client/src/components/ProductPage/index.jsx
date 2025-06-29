@@ -15,7 +15,6 @@ import ColorButton from "../ColorButton";
 import SizeSelect from "../SelectSize";
 import "react-toastify/dist/ReactToastify.css";
 
-
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -236,10 +235,7 @@ export default function ProductDetailPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
                 {product?.category ? (
-                  <Link
-                    to={`/products/${product.category.toLowerCase().replace(/\s+/g, '-')}`}
-                    className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2"
-                  >
+                  <Link to={`/products/${product.category.toLowerCase().replace(/\s+/g, "-")}`} className="ml-1 text-sm text-gray-600 hover:text-indigo-600 md:ml-2">
                     {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
                   </Link>
                 ) : (
@@ -263,8 +259,8 @@ export default function ProductDetailPage() {
           {/* Image Gallery */}
           <div className="lg:w-1/2 w-full">
             <div className="sticky top-24">
-              <div className="mb-4 rounded-lg overflow-hidden shadow-md bg-white p-4">
-                <img src={product.images?.[selectedImageIndex] || "/placeholder-image.jpg"} alt={product.title} className="w-full h-auto max-h-[500px] object-contain mx-auto" />
+              <div className="mb-4 rounded-lg overflow-hidden shadow-md bg-white p-4 flex items-center justify-center" style={{ minHeight: 400, minWidth: 400, maxHeight: 400, maxWidth: 400 }}>
+                <img src={product.images?.[selectedImageIndex] || "/placeholder-image.jpg"} alt={product.title} className="w-full h-full object-contain" style={{ maxWidth: 400, maxHeight: 400, minWidth: 400, minHeight: 400, background: "#fff" }} />
               </div>
 
               {/* Thumbnail Gallery */}

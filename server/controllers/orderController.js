@@ -97,7 +97,7 @@ exports.getMyOrders = async (req, res) => {
     const orders = await Order.find({ userId: req.user._id })
       .populate('products.productId', 'images title slug')
       .sort({ createdAt: -1 });
-    console.log("getMyOrders orders:", orders);
+    // console.log("getMyOrders orders:", orders);
     return res.json(orders);
     
   } catch (err) {

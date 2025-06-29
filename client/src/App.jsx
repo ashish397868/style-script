@@ -10,13 +10,13 @@ import Admin from "../src/components/Admin/AdminDashboard";
 import AddProductPage from "../src/components/Admin/AddProductPage";
 import ProtectedRoute from "../src/components/ProtectedRoute";
 import ForgotPassword from "../src/components/ForgotPassword";
-import ProductPage from "../src/components/ProductPage"
+import ProductPage from "../src/components/ProductPage";
 import Checkout from "../src/components/Checkout";
 import ReviewOrder from "../src/components/ReviewOrder";
 import Success from "../src/components/Success";
-import UserManagement from "../src/components/Admin/UserManagement";  
+import UserManagement from "../src/components/Admin/UserManagement";
 import UserProfile from "./components/UserProfile";
-import Footer from "../src/screen/Footer"
+import Footer from "../src/screen/Footer";
 import Orders from "./components/Orders";
 import OrderDetail from "./components/OrderDetail";
 
@@ -27,22 +27,22 @@ import AdminProductList from "../src/components/Admin/AdminProductList";
 import EditProductPage from "../src/components/Admin/EditProductPage";
 import Products from "../src/components/Products";
 import AddressesBook from "./components/AddressesBook";
-import EditAddressPage from './components/EditAddressPage';
-import NewAddressPage from './components/NewAddressPage';
+import EditAddressPage from "./components/EditAddressPage";
+import NewAddressPage from "./components/NewAddressPage";
 import CategoryPage from "./components/CategoryPage";
 import PrivacyPolicy from "./components/PrivacyPolicy";
-import TermsAndConditions from "./components/TermsAndConditions"; 
+import TermsAndConditions from "./components/TermsAndConditions";
 import ContactUs from "./components/ContactUs";
 import ShippingPolicy from "./components/ShippingPolicy";
 import ReturnPolicy from "./components/ReturnPolicy";
 import AboutUs from "./components/AboutUs";
-
+import NotFound from "../src/components/NotFound";
 
 // import {useNavigate} from "react-router-dom";
 function App() {
   // const navigate = useNavigate();
   // const { initAuth, user } = useUserStore();
-  // const location = useLocation();
+  const location = useLocation();
 
   // useEffect(() => {
   //   initAuth();
@@ -61,46 +61,51 @@ function App() {
 
   return (
     <>
-      {!location.pathname.startsWith('/admin') && <Navbar />}
+      {!location.pathname.startsWith("/admin") && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
+
+        {/* Auth Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* Static Pages */}
         <Route path="/about" element={<AboutUs />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/shipping-policy" element={<ShippingPolicy />} />
         <Route path="/return-policy" element={<ReturnPolicy />} />
-        <Route path="/about-us" element={<AboutUs />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
+
+        {/* Product and Category Routes */}
         <Route path="/products" element={<Products />} />
-        {/* Removed hardcoded Tshirts route, use dynamic category route below */}
-        <Route path="/product/:slug" element={<ProductPage />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/review-order" element={<ReviewOrder />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/addresses" element={<AddressesBook />} />
-        <Route path="/addresses/edit/:id" element={<EditAddressPage />} />
-        <Route path="/addresses/new" element={<NewAddressPage />} />
-        <Route path="/order/:id" element={<OrderDetail />} />
         <Route path="/category/:category" element={<CategoryPage />} />
-        <Route path="/success/:id" element={<Success />} />
-        <Route path="/admin" element={
-          <ProtectedRoute requireAdmin>
-            <Admin />
-          </ProtectedRoute>
-        }>
-          <Route path="users" element={<UserManagement />} />
-          <Route path="reviews" element={<ReviewManagement />} />
-          <Route path="orders" element={<OrderManagement />} />
-          <Route path="add-product" element={<AddProductPage />} />
-          <Route path="all-products" element={<AdminProductList />} />
-          <Route path="edit-product/:id" element={<EditProductPage />} />
-        </Route>
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/profile" element={<UserProfile />} />
+        <Route path="/product/:slug" element={<ProductPage />} />
+
+        {/* User Protected Routes */}
+        <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+        <Route path="/review-order" element={<ProtectedRoute><ReviewOrder /></ProtectedRoute>} />
+        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+        <Route path="/addresses" element={<ProtectedRoute><AddressesBook /></ProtectedRoute>} />
+        <Route path="/addresses/edit/:id" element={<ProtectedRoute><EditAddressPage /></ProtectedRoute>} />
+        <Route path="/addresses/new" element={<ProtectedRoute><NewAddressPage /></ProtectedRoute>} />
+        <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+        <Route path="/success/:id" element={<ProtectedRoute><Success /></ProtectedRoute>} />
+
+        {/* Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagement /></ProtectedRoute>} />
+        <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><OrderManagement /></ProtectedRoute>} />
+        <Route path="/admin/add-product" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
+        <Route path="/admin/all-products" element={<ProtectedRoute requireAdmin><AdminProductList /></ProtectedRoute>} />
+        <Route path="/admin/edit-product/:id" element={<ProtectedRoute requireAdmin><EditProductPage /></ProtectedRoute>} />
+        {/* 404 Not Found Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      {!location.pathname.startsWith('/admin') && <Footer />}
+      {!location.pathname.startsWith("/admin") && <Footer />}
     </>
   );
 }

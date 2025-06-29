@@ -3,6 +3,7 @@ import api from '../../services/api';
 import { FiTrash2, FiSearch, FiAlertTriangle, FiTruck } from 'react-icons/fi';
 import { format } from 'date-fns';
 import showToast from "../..//utils/toastUtils";
+import Loader from '../Loader';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -168,17 +169,22 @@ const OrderManagement = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-      </div>
+      <Loader />
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Order Management</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
+        <h1 className="text-3xl font-bold flex items-center">
+          <FiTruck className="h-8 w-8 mr-3" />
+          Order Management
+        </h1>
+        <p className="mt-2 text-pink-200">View, filter, and manage all orders</p>
+      </div>
+      <div className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Search Input */}
         <div className="flex flex-col">
           <label className="block text-sm font-medium text-gray-700 mb-1">Search Orders</label>
@@ -512,6 +518,7 @@ const OrderManagement = () => {
         </div>
       )}
     </div>
+  </div>
   );
 };
 

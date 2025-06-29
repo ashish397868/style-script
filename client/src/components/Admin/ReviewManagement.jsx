@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiTrash2, FiStar } from 'react-icons/fi';
 import api from '../../services/api';
+import Loader from '../Loader';
 
 const ReviewManagement = () => {
   const [reviews, setReviews] = useState([]);
@@ -32,13 +33,21 @@ const ReviewManagement = () => {
     }
   };
 
-  if (loading) return <div className="text-center py-4">Loading...</div>;
+  if (loading) return <Loader />;
   if (error) return <div className="text-red-500 text-center py-4">{error}</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Review Management</h1>
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
+        <h1 className="text-3xl font-bold flex items-center">
+          <FiStar className="h-8 w-8 mr-3" />
+          Review Management
+        </h1>
+        <p className="mt-2 text-pink-200">View and moderate product reviews</p>
+      </div>
+      <div className="p-6">
+        <div className="bg-white rounded-lg shadow overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -85,7 +94,7 @@ const ReviewManagement = () => {
         </table>
       </div>
     </div>
-  );
+  </div>);
 };
 
 export default ReviewManagement;

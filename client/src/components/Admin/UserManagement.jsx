@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { FiSearch, FiTrash2, FiUserCheck, FiUserX } from 'react-icons/fi';
 import showToast from "../../utils/toastUtils"; 
+import Loader from '../Loader';
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,11 +54,19 @@ const UserManagement = () => {
   );
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6">User Management</h2>
-      <div className="mb-6">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+    <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden mt-8">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
+        <h1 className="text-3xl font-bold flex items-center">
+          <FiUserCheck className="h-8 w-8 mr-3" />
+          User Management
+        </h1>
+        <p className="mt-2 text-pink-200">Manage all users and their roles</p>
+      </div>
+      <div className="p-6">
+        <div className="mb-6">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FiSearch className="text-gray-400" />
           </div>
           <input
@@ -83,7 +92,7 @@ const UserManagement = () => {
           <tbody className="divide-y divide-gray-200">
             {loading ? (
               <tr>
-                <td colSpan="5" className="px-6 py-4 text-center">Loading...</td>
+                <td colSpan="5" className="px-6 py-4 text-center"><Loader /></td>
               </tr>
             ) : filteredUsers.length > 0 ? (
               filteredUsers.map((user) => (
@@ -137,7 +146,7 @@ const UserManagement = () => {
         </table>
       </div>
     </div>
-  );
+  </div>);
 };
 
 export default UserManagement;

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProductStore } from '../../store/productStore';
+import Loader from '../Loader';
 
 const AdminProductList = () => {
   const { products, fetchProducts, loading, error } = useProductStore();
@@ -45,9 +46,7 @@ const AdminProductList = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-600"></div>
-      </div>
+      <Loader/>
     );
   }
 
@@ -193,7 +192,7 @@ const AdminProductList = () => {
                             <img 
                               src={product.images[0]} 
                               alt={product.title} 
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-contain"
                             />
                           ) : (
                             <svg 

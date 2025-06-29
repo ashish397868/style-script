@@ -50,6 +50,7 @@ export default function Orders() {
           <FiShoppingBag className="text-indigo-600 mr-2" />
           My Orders
         </h2>
+        {console.log("Orders ::-----", orders)}
         {orders.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-8 text-center">
             <p className="text-lg text-gray-600 mb-4">You have not placed any orders yet.</p>
@@ -72,9 +73,9 @@ export default function Orders() {
                     {order.products?.slice(0, 3).map((product) => (
                       <img
                         key={product._id}
-                        src={product.image || product.images?.[0] || "/placeholder.png"}
+                        src={product.image || "/placeholder.png"}
                         alt={product.name || "Product image"}
-                        className="w-16 h-16 object-cover rounded-lg border bg-gray-100"
+                        className="w-16 h-16 object-contain rounded-lg border bg-gray-100"
                         onError={e => { e.target.onerror = null; e.target.src = "/placeholder.png"; }}
                       />
                     ))}

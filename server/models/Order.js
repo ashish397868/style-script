@@ -10,6 +10,7 @@ const OrderSchema = new Schema(
     products: [
       {
         productId: { type: Schema.Types.ObjectId, ref: "Product" },
+        image: { type: String }, // Store first image of product at order time
         name: { type: String, required: true },
         price: { type: Number, required: true },
         quantity: { type: Number, required: true },

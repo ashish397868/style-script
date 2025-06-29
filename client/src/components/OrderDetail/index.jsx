@@ -70,17 +70,21 @@ export default function OrderDetail() {
               {products.map((product) => (
                 <div key={product._id} className="flex items-center py-4 gap-4">
                   <img
-                    src={product.image || product.images?.[0] || "/placeholder.png"}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg border"
+                    src={product.image || "/placeholder.png"}
+                    alt={product.name || "Product image"}
+                    className="w-16 h-16 object-contain rounded-lg border"
                   />
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{product.name}</div>
-                    <div className="text-gray-500 text-sm">Qty: {product.qty || 1}</div>
+                    <div className="font-medium text-gray-900">{product.name || "Product"}</div>
+                    <div className="text-gray-500 text-sm">Qty: {product.quantity || 1}</div>
                   </div>
                   <div className="font-semibold text-gray-900">₹{product.price?.toLocaleString()}</div>
                 </div>
               ))}
+            </div>
+            <div className="mb-2 flex justify-between items-center">
+              <span className="font-medium text-gray-700">Delivery Charges</span>
+              <span className="text-gray-900 font-semibold">₹99</span>
             </div>
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-1">Shipping Address</h4>

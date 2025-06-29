@@ -70,7 +70,8 @@ export default function ReviewOrder() {
         price: item.price,
         quantity: item.qty,
         size: item.size,
-        color: item.color
+        color: item.color,
+        image: item.image // send image to backend for order snapshot
       }));
       if (!productsArr.length) {
         alert("No products in cart.");
@@ -111,7 +112,7 @@ export default function ReviewOrder() {
 
     const options = {
       key: "rzp_test_rcDlQK0nZIkMpa", // 🔁 Replace with your Razorpay key
-      amount: subTotal * 100,
+      amount: orderTotal * 100,
       currency: "INR",
       name: "StyleScript Store",
       description: "Order Payment",

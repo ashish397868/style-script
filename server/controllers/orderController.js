@@ -1,11 +1,12 @@
 // controllers/orderController.js
 const Order = require("../models/Order");
+const Product = require("../models/Product");
 
 
 // Create a new order (customer)
 exports.createOrder = async (req, res) => {
   try {
-    const { email, name, orderId, paymentInfo, products, phone, address, amount } = req.body;
+    let { email, name, orderId, paymentInfo, products, phone, address, amount } = req.body;
 
 
     // Basic validation
@@ -20,9 +21,27 @@ exports.createOrder = async (req, res) => {
 
 
 
-    // Use address directly from request
+    // Store productId reference for each product
+    // For each product, fetch the first image and store it in the order
+    products = await Promise.all(products.map(async (product) => {
+      let productId = product._id || product.productId;
+      let image = product.image || "";
+      if (!image && productId) {
+        const dbProduct = await Product.findById(productId).select("images");
+        image = dbProduct?.images?.[0] || "";
+      }
+      return {
+        productId,
+        image,
+        quantity: product.quantity || 1,
+        price: product.price,
+        size: product.size,
+        color: product.color,
+        name: product.name
+      };
+    }));
+
     const userId = req.user?._id || null;
-    // Create order with address snapshot
     const order = await Order.create({
       userId,
       email,
@@ -57,12 +76,12 @@ exports.getOrderById = async (req, res) => {
     const { id } = req.params;
     const order = await Order.findById(id)
       .populate("userId", "name email")
-      .populate("products.productId", "title slug");
+      .populate("products.productId", "images title slug");
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
     }
-    // if not admin, only owner can view
-    if (!req.user.role === "admin" && !order.userId?._id.equals(req.user._id)) {
+    // Only owner can view
+    if (!order.userId?._id.equals(req.user._id)) {
       return res.status(403).json({ message: "Not authorized." });
     }
     return res.json(order);
@@ -72,11 +91,15 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
-// Get all orders for the logged‑in user
+// Get all orders for the logged-in user - Using Populate
 exports.getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ userId: req.user._id })
+      .populate('products.productId', 'images title slug')
+      .sort({ createdAt: -1 });
+    console.log("getMyOrders orders:", orders);
     return res.json(orders);
+    
   } catch (err) {
     console.error("getMyOrders error:", err);
     return res.status(500).json({ message: "Server error" });

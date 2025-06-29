@@ -76,6 +76,8 @@ const handleSignup = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        addresses: user.addresses,
         role: user.role,
       },
     });
@@ -115,6 +117,8 @@ const handleLogin = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        addresses: user.addresses,
         role: user.role,
       },
     });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { FiHome, FiUsers, FiSettings, FiLogOut, FiBox, FiShoppingCart, FiCheckCircle, FiXCircle, FiMessageSquare, FiDollarSign, FiList } from 'react-icons/fi';
+import Loader from '../Loader';
 
 import api from '../../services/api';
 
@@ -173,14 +174,15 @@ const AdminDashboard = () => {
                 </svg>
                 Dashboard Overview
               </h1>
+              <Link to ="/" className="text-2xl text-pink-200 hover:underline decoration-none">
+                Go to Store
+              </Link>
               <p className="mt-2 text-pink-200">Quick stats and insights for your store</p>
             </div>
             
             {/* Stats */}
             {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
-              </div>
+              <Loader/>
             ) : (
               <div className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

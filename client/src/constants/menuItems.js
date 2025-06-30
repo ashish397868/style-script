@@ -11,10 +11,3 @@ export const tshirtItems = [
   { label: 'Polo TShirts', href: '/category/polotshirts', component: Link },
   { label: 'Oversized Tshirts', href: '/category/oversizedtshirts', component: Link },
 ];
-
-export const adminItems = [
-  { label: 'Dashboard', href: '/admin', component: Link },
-  { label: 'Products', href: '/admin/products', component: Link },
-  { label: 'Orders', href: '/admin/orders', component: Link },
-  { label: 'Users', href: '/admin/users', component: Link },
-];

@@ -20,6 +20,7 @@ const Navbar = ({
   hoverColor = "hover:text-gray-800",
   cartIconColor = "text-pink-600",
   cartIconHover = "hover:text-pink-700",
+
 }) => {
   const navigate = useNavigate();
   const { cart, addToCart, removeFromCart, subTotal, clearCart } = useCartStore();
@@ -62,6 +63,12 @@ const Navbar = ({
                   {item.label}
                 </Link>
               ))}
+
+              {isAuthenticated && user.role === "admin" && (
+                <Link to="/admin" className={`py-4 px-2 ${textColor} ${hoverColor} font-semibold`}>
+                  Admin 
+                </Link>
+              )}
 
               <Dropdown label="Tshirts" items={productItems.map((item) => ({ ...item, component: Link }))} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${""} ${hoverColor}`} />
 

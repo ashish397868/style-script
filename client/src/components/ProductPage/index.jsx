@@ -46,9 +46,12 @@ export default function ProductDetailPage() {
       setSize(foundProduct.size || "");
       setError(null);
       setIsLoading(false);
-      // Find all variants with the same title
-      const filteredVariants = products.filter((v) => v.title === foundProduct.title);
-      setVariants(filteredVariants);
+      // Use variants from backend if present, else fallback to global products
+      if (Array.isArray(foundProduct.variants) && foundProduct.variants.length > 0) {
+        setVariants(foundProduct.variants);
+      } else {
+        setVariants(products.filter((v) => v.title === foundProduct.title));
+      }
     } else {
       // If not found in global products, fetch from API
       setIsLoading(true);
@@ -59,20 +62,23 @@ export default function ProductDetailPage() {
           setColor(prod.color || "");
           setSize(prod.size || "");
           setError(null);
-          // Try to get variants from global products if possible
-          let filteredVariants = [];
-          if (products && products.length > 0) {
-            filteredVariants = products.filter((v) => v.title === prod.title);
+          // Use variants from backend if present
+          if (Array.isArray(prod.variants) && prod.variants.length > 0) {
+            setVariants(prod.variants);
           } else {
-            // fallback: fetch all variants from API
-            try {
-              const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
-              filteredVariants = allVariantsRaw.filter((v) => v.title === prod.title);
-            } catch {
-              filteredVariants = [];
+            // fallback: try to get variants from global products
+            if (products && products.length > 0) {
+              setVariants(products.filter((v) => v.title === prod.title));
+            } else {
+              // fallback: fetch all variants from API
+              try {
+                const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
+                setVariants(allVariantsRaw.filter((v) => v.title === prod.title));
+              } catch {
+                setVariants([]);
+              }
             }
           }
-          setVariants(filteredVariants);
         } catch {
           setError("Product not found.");
           setProduct(null);
@@ -91,44 +97,139 @@ export default function ProductDetailPage() {
     }
   }, [color, variants, product?.title]);
 
-  // Filter options - FIXED: Only show options for this specific product
-  // Always include the current product's color and size if not present in variants
-  // Only show colors and sizes for variants with the same title as the current product
-  // Show all unique colors and sizes for the current product title
-  let colorOptions = Array.from(
-    new Set(
-      variants
-        .filter((v) => v.title === product?.title && v.availableQty > 0)
-        .map((v) => v.color)
-        .filter(Boolean)
-    )
+ // Define standard sizes - show all of these regardless of availability
+const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+
+// Get all available variants (including current product)
+const allVariants = [...variants];
+if (product && !allVariants.find(v => v._id === product._id)) {
+  allVariants.push(product);
+}
+
+// For colors: Only show colors that actually exist in variants
+const colorOptions = Array.from(new Set(allVariants.map(v => v.color).filter(Boolean)));
+
+// For sizes: Show all standard sizes
+const sizeOptions = STANDARD_SIZES;
+
+// Function to check if a color-size combination is available
+const isVariantAvailable = (selectedColor, selectedSize) => {
+  const variant = allVariants.find(v => 
+    v.color === selectedColor && 
+    v.size === selectedSize && 
+    v.availableQty > 0
   );
-  if (product && product.color && !colorOptions.includes(product.color)) {
-    colorOptions = [product.color, ...colorOptions];
-  }
+  return !!variant;
+};
 
-  let sizeOptions = Array.from(
-    new Set(
-      variants
-        .filter((v) => v.title === product?.title && v.availableQty > 0)
-        .map((v) => v.size)
-        .filter(Boolean)
-    )
+// Function to get variant for a specific color-size combination
+const getVariant = (selectedColor, selectedSize) => {
+  return allVariants.find(v => 
+    v.color === selectedColor && 
+    v.size === selectedSize
   );
-  if (product && product.size && !sizeOptions.includes(product.size)) {
-    sizeOptions = [product.size, ...sizeOptions];
+};
+
+// Check current selection availability
+const currentSelectionAvailable = color && size ? isVariantAvailable(color, size) : false;
+const currentSelectionExists = color && size ? getVariant(color, size) : false;
+
+// Color button component - only shows available colors
+const ColorButtonWithAvailability = ({ color: buttonColor, isActive, onClick, selectedSize }) => {
+  const available = selectedSize ? isVariantAvailable(buttonColor, selectedSize) : true;
+  
+  return (
+    <button
+      onClick={() => available && onClick()}
+      disabled={selectedSize && !available}
+      className={`
+        px-4 py-2 rounded-md border-2 text-sm font-medium transition-all
+        ${isActive 
+          ? 'border-pink-500 bg-pink-50 text-pink-700' 
+          : available 
+            ? 'border-gray-300 hover:border-pink-300 text-gray-700' 
+            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
+        }
+      `}
+      title={selectedSize && !available ? 'Currently unavailable in this size' : ''}
+    >
+      {buttonColor}
+      {selectedSize && !available && <span className="text-xs block">Unavailable</span>}
+    </button>
+  );
+};
+
+// Size select component - shows all sizes with availability info
+const SizeSelectWithAvailability = ({ sizes, value, onChange, selectedColor }) => {
+  return (
+    <select 
+      value={value} 
+      onChange={onChange}
+      className="border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+    >
+      <option value="">Select Size</option>
+      {sizes.map(s => {
+        const available = selectedColor ? isVariantAvailable(selectedColor, s) : 
+                         allVariants.some(v => v.size === s); // Check if size exists in any variant
+        const exists = selectedColor ? getVariant(selectedColor, s) : 
+                      allVariants.some(v => v.size === s);
+        
+        let label = s;
+        if (selectedColor && exists && !available) {
+          label += ' - Out of Stock';
+        } else if (selectedColor && !exists) {
+          label += ' - Currently Unavailable';
+        }
+        
+        return (
+          <option key={s} value={s}>
+            {label}
+          </option>
+        );
+      })}
+    </select>
+  );
+};
+
+// Availability message component
+const AvailabilityMessage = ({ color, size }) => {
+  if (!color || !size) return null;
+  
+  const available = isVariantAvailable(color, size);
+  const exists = getVariant(color, size);
+  
+  if (available) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-4">
+        <p className="text-green-800 text-sm font-medium">✓ In Stock - Ready to ship</p>
+      </div>
+    );
+  } else if (exists) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-3 mt-4">
+        <p className="text-red-800 text-sm font-medium">Currently out of stock</p>
+        <p className="text-red-600 text-xs mt-1">We don't know when or if this item will be back in stock</p>
+      </div>
+    );
+  } else {
+    return (
+      <div className="bg-gray-50 border border-gray-200 rounded-md p-3 mt-4">
+        <p className="text-gray-700 text-sm font-medium">Currently unavailable</p>
+        <p className="text-gray-600 text-xs mt-1">We don't know when or if this item will be back in stock</p>
+      </div>
+    );
   }
+};
 
-  // Update product when color/size changes - FIXED: Only show variants of this product
-
+  // Update product when color/size changes - Only consider available variants
   useEffect(() => {
     if (!color || !size) return;
-    // Always update product to the selected variant (even if _id is the same)
-    const match = variants.find((v) => v.color === color && v.size === size);
+    // Only select a variant if availableQty > 0
+    const match = allVariants.find((v) => v.color === color && v.size === size && v.availableQty > 0);
     if (match) {
       setProduct(match);
     }
-  }, [color, size, variants]);
+  }, [color, size, allVariants]);
 
   // Reset image index to 0 whenever product changes (for color/size switch)
   useEffect(() => {
@@ -306,14 +407,32 @@ export default function ProductDetailPage() {
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Color</h3>
                 <div className="flex flex-wrap gap-2">
-                  {colorOptions.length > 0 ? colorOptions.map((c) => <ColorButton key={c} color={c} isActive={color === c} onClick={() => setColor(c)} />) : <p className="text-gray-500 text-sm">No color options available</p>}
+                  {colorOptions.map((c) => (
+                    <ColorButtonWithAvailability 
+                      key={c} 
+                      color={c} 
+                      isActive={color === c} 
+                      onClick={() => setColor(c)}
+                      selectedSize={size}
+                    />
+                  ))}
                 </div>
               </div>
 
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-3">Size</h3>
-                <div className="flex flex-wrap gap-2">{sizeOptions.length > 0 ? <SizeSelect sizes={sizeOptions} value={size} onChange={(e) => setSize(e.target.value)} /> : <p className="text-gray-500 text-sm">No size options available</p>}</div>
+                <div className="flex flex-wrap gap-2">
+                  <SizeSelectWithAvailability 
+                    sizes={sizeOptions} 
+                    value={size} 
+                    onChange={(e) => setSize(e.target.value)}
+                    selectedColor={color}
+                  />
+                </div>
               </div>
+
+              {/* Availability Message */}
+              <AvailabilityMessage color={color} size={size} />
             </div>
 
             {/* Price & Buttons */}
@@ -326,18 +445,18 @@ export default function ProductDetailPage() {
 
               <div className="flex flex-wrap gap-3">
                 <button
-                  disabled={product.availableQty <= 0}
+                  disabled={!currentSelectionAvailable || !color || !size}
                   onClick={handleAddToCart}
                   className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add to Cart 
+                  {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Add to Cart'}
                 </button>
                 <button
-                  disabled={product.availableQty <= 0}
+                  disabled={!currentSelectionAvailable || !color || !size}
                   onClick={handleBuyNow}
                   className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Buy Now
+                  {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Buy Now'}
                 </button>
               </div>
             </div>

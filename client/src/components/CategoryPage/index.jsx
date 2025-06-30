@@ -8,16 +8,55 @@ const CategoryPage = () => {
   const { category } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
+    
     productAPI.getProductsByCategory(category)
       .then(res => {
+        console.log("Category products received:", res.data);
         setProducts(res.data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(err => {
+        console.error("Error fetching category products:", err);
+        setError(err.message || "Failed to load products");
+        setLoading(false);
+      });
   }, [category]);
+
+  if (loading) {
+    return (
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-12 mx-auto">
+          <Loader />
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-12 mx-auto">
+          <div className="text-center py-8">
+            <p className="text-xl text-red-600 mb-4">
+              Error loading {category.toLowerCase()}
+            </p>
+            <p className="text-gray-600">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="text-gray-600 body-font">
@@ -31,29 +70,44 @@ const CategoryPage = () => {
           </p>
         </div>
 
-        {loading ? (
-          <Loader />
-        ) : products && products.length > 0 ? (
-          <div className="flex flex-wrap -m-4">
-            {/* Group products by title and show only one card per title, passing all variants */}
-            {Object.entries(
-              products.reduce((acc, prod) => {
-                if (!acc[prod.title]) acc[prod.title] = [];
-                acc[prod.title].push(prod);
-                return acc;
-              }, {})
-            ).map(([title, variants]) => (
-              <ProductCard key={variants[0]._id} product={variants[0]} variants={variants} />
-            ))}
-          </div>
+        {products && products.length > 0 ? (
+          <>
+            <div className="text-center mb-6">
+              <p className="text-gray-600">
+                Showing {products.length} {products.length === 1 ? 'product' : 'products'} in {category.toLowerCase()}
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap -m-4">
+              {products.map(product => {
+                // Each product already has its variants grouped by the backend
+                return (
+                  <ProductCard 
+                    key={product._id} 
+                    product={product}
+                    // variants are already included in product.variants from backend
+                  />
+                );
+              })}
+            </div>
+          </>
         ) : (
           <div className="text-center py-8">
-            <p className="text-xl text-gray-700 mb-4">
-              No {category.toLowerCase()} available at the moment.
-            </p>
-            <p className="text-gray-600">
-              Please check back later for new arrivals.
-            </p>
+            <div className="max-w-md mx-auto">
+              <div className="text-6xl mb-4">📦</div>
+              <p className="text-xl text-gray-700 mb-4">
+                No {category.toLowerCase()} available at the moment.
+              </p>
+              <p className="text-gray-600 mb-6">
+                Please check back later for new arrivals, or browse other categories.
+              </p>
+              <button 
+                onClick={() => window.history.back()} 
+                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+              >
+                Go Back
+              </button>
+            </div>
           </div>
         )}
       </div>

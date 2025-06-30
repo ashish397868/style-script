@@ -6,7 +6,7 @@ const { importCSV } = require("../controllers/bulkUploadController");
 const router = express.Router();
 const {
     getAllProducts,getFeaturedProducts,getProductBySlug,getProductById,
-    createProduct, updateProduct, deleteProduct,getRelatedProducts,getProducts,getProductsByCategory,createMultipleProducts
+    createProduct, updateProduct, deleteProduct,getRelatedProducts,getProducts,getProductsByCategory,createMultipleProducts,getProductVariants,getSpecificVariant
 } = require("../controllers/productController");
 const { authenticateUser, isAdmin } = require("../middlewares/authMiddleware");
 
@@ -18,6 +18,8 @@ router.get("/slug/:slug", getProductBySlug);
 router.get("/:id", getProductById);
 router.get("/:id/related", getRelatedProducts);
 router.get("/search", getProducts);
+router.get("/:id/variants", getProductVariants);
+router.get("/:id/variants/:variantId", getSpecificVariant);
 
 
 // ADMIN

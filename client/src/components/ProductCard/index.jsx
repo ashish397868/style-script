@@ -8,17 +8,30 @@ const ProductCard = ({ product, variants }) => {
     navigate(`/product/${product.slug}`);
   };
 
-  // Use variants prop if provided, else fallback to product.variants or just product
+  // Use variants prop if provided, else use product.variants from backend
   const variantList = Array.isArray(variants) && variants.length > 0
     ? variants
     : Array.isArray(product.variants) && product.variants.length > 0
       ? product.variants
       : [product];
 
-  // Only show variants with the same title and availableQty > 0
-  const filteredVariants = variantList.filter(v => v.title === product.title && v.availableQty > 0);
-  const uniqueColors = [...new Set(filteredVariants.map(v => v.color).filter(Boolean))];
-  const uniqueSizes = [...new Set(filteredVariants.map(v => v.size).filter(Boolean))];
+  // Only show variants that are actually available (availableQty > 0)
+  const availableVariants = variantList.filter(v => v.availableQty > 0);
+  
+  // If no variants are available, don't render the card
+  if (availableVariants.length === 0) {
+    return null;
+  }
+
+  // Get unique colors and sizes from available variants only
+  const uniqueColors = [...new Set(availableVariants.map(v => v.color).filter(Boolean))];
+  const uniqueSizes = [...new Set(availableVariants.map(v => v.size).filter(Boolean))];
+
+  // Calculate total available quantity across all variants
+  const totalAvailableQty = availableVariants.reduce((total, variant) => total + variant.availableQty, 0);
+
+  // Use the first available variant for display data
+  const displayVariant = availableVariants[0];
 
   return (
     <div
@@ -27,25 +40,26 @@ const ProductCard = ({ product, variants }) => {
     >
       <div className="block relative rounded overflow-hidden bg-white">
         <img
-          alt={product.title}
+          alt={displayVariant.title}
           className="block m-auto max-h-56 object-contain"
-          src={product.images && product.images.length > 0 ? product.images[0] : "/placeholder-image.jpg"}
+          src={displayVariant.images && displayVariant.images.length > 0 ? displayVariant.images[0] : "/placeholder-image.jpg"}
         />
       </div>
 
       <div className="mt-4 text-center md:text-left">
         <h3 className="text-gray-500 text-xs tracking-widest title-font mb-1 capitalize">
-          {product.category} {product.brand && `| ${product.brand}`}
+          {displayVariant.category} {displayVariant.brand && `| ${displayVariant.brand}`}
         </h3>
         <h2 className="text-gray-900 title-font text-lg font-medium">
-          {product.title.substring(0, 45)}...
+          {displayVariant.title.substring(0, 45)}...
         </h2>
-        <p className="mt-1 font-semibold">₹{product.price}</p>
-        <p className="text-gray-600 text-xs mb-1">{product.description.substring(0, 100)}...</p>
+        <p className="mt-1 font-semibold">₹{displayVariant.price}</p>
+        <p className="text-gray-600 text-xs mb-1">{displayVariant.description.substring(0, 100)}...</p>
 
-        {/* Color swatches */}
+        {/* Color swatches - only show available colors */}
         {uniqueColors.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2 items-center">
+            <span className="text-xs text-gray-600 mr-1">Colors:</span>
             {uniqueColors.map((color) => {
               const colorObj = colorMap.find(c => c.name.toLowerCase() === color.toLowerCase());
               return (
@@ -55,7 +69,9 @@ const ProductCard = ({ product, variants }) => {
                   title={color}
                 >
                   {!colorObj && (
-                    <span className="text-xs text-gray-700">{color[0]}</span>
+                    <span className="text-xs text-gray-700 flex items-center justify-center h-full">
+                      {color[0].toUpperCase()}
+                    </span>
                   )}
                 </span>
               );
@@ -63,13 +79,14 @@ const ProductCard = ({ product, variants }) => {
           </div>
         )}
 
-        {/* Size chips */}
+        {/* Size chips - only show available sizes */}
         {uniqueSizes.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2 items-center">
+            <span className="text-xs text-gray-600 mr-1">Sizes:</span>
             {uniqueSizes.map(size => (
               <span
                 key={size}
-                className="border border-gray-300 px-2 py-0.5 text-xs rounded"
+                className="border border-gray-300 px-2 py-0.5 text-xs rounded bg-gray-50"
               >
                 {size}
               </span>
@@ -78,15 +95,15 @@ const ProductCard = ({ product, variants }) => {
         )}
 
         <div className="mt-2">
-          {product.availableQty > 0 ? (
-            <span className="text-green-600 font-medium">
-              In Stock ({product.availableQty})
+          <span className="text-green-600 font-medium">
+            In Stock ({totalAvailableQty} {availableVariants.length > 1 ? 'total' : 'available'})
+          </span>
+          {availableVariants.length > 1 && (
+            <span className="text-gray-500 text-xs block">
+              {availableVariants.length} variants available
             </span>
-          ) : (
-            <span className="text-red-600 font-medium">Out of Stock</span>
           )}
         </div>
-
       </div>
     </div>
   );

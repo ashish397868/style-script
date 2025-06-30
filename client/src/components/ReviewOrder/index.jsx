@@ -1,5 +1,6 @@
 import { useCartStore } from "../../store/cartStore";
 import { useCheckoutStore } from "../../store/checkoutStore";
+import { paymentAPI, orderAPI } from "../../services/api";
 
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -18,7 +19,7 @@ export default function ReviewOrder() {
 
   // Redirect if no address is selected
   if (!selectedAddress) {
-    navigate('/checkout');
+    navigate("/checkout");
     return null;
   }
 
@@ -49,91 +50,125 @@ export default function ReviewOrder() {
     });
   };
 
-  const handleBuy = async () => {
-    setIsPaying(true);
+ const handleBuy = async () => {
+  setIsPaying(true);
 
-    const res = await loadRazorpayScript();
-    if (!res) {
-      alert("Failed to load Razorpay SDK. Please try again.");
-      setIsPaying(false);
-      return;
-    }
-
-    // Send order creation request to server
-    let orderId = null;
-    try {
-      const user = JSON.parse(localStorage.getItem('user-storage'))?.state?.user;
-      const orderIdStr = `ORD-${Date.now()}-${Math.floor(Math.random()*1000)}`;
-      const productsArr = Object.values(cart).map(item => ({
-        productId: item._id,
-        name: item.name,
-        price: item.price,
-        quantity: item.qty,
-        size: item.size,
-        color: item.color,
-        image: item.image // send image to backend for order snapshot
-      }));
-      if (!productsArr.length) {
-        alert("No products in cart.");
-        setIsPaying(false);
-        return;
-      }
-      const phone = selectedAddress.phone || user?.phone;
-      if (!phone) {
-        alert("No phone number found in address or user profile.");
-        setIsPaying(false);
-        return;
-      }
-      const orderPayload = {
-        email: user?.email,
-        name: user?.name,
-        phone,
-        orderId: orderIdStr,
-        products: productsArr,
-        address: {
-          name: selectedAddress.name,
-          phone: selectedAddress.phone,
-          addressLine1: selectedAddress.addressLine1,
-          addressLine2: selectedAddress.addressLine2,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          pincode: selectedAddress.pincode,
-          country: selectedAddress.country,
-        },
-        amount: orderTotal,
-      };
-      const orderRes = await import("../../services/api").then(m => m.orderAPI.createOrder(orderPayload));
-      orderId = orderRes.data.order._id;
-    } catch (e) {
-      alert("Failed to create order. Please try again.");
-      setIsPaying(false);
-      return;
-    }
-
-    const options = {
-      key: "rzp_test_rcDlQK0nZIkMpa", // 🔁 Replace with your Razorpay key
-      amount: orderTotal * 100,
-      currency: "INR",
-      name: "StyleScript Store",
-      description: "Order Payment",
-      handler: function (response) {
-        clearCart();
-        navigate(`/success/${orderId}`);
-      },
-      prefill: {
-        name: "", // Optional: prefill user name
-        email: "", // Optional: prefill user email
-        contact: "", // Optional: prefill phone
-      },
-      theme: {
-        color: "#6366f1",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+  // 1️⃣ Load SDK
+  const res = await loadRazorpayScript();
+  if (!res) {
+    alert("Failed to load Razorpay SDK. Please try again.");
     setIsPaying(false);
+    return;
+  }
+
+  // 2️⃣ Prepare to call your APIs
+  let orderRes;
+  let paymentOrderRes;
+  let user;
+  let receiptId;
+  try {
+    // grab user & generate your own receipt string (use for both DB and Razorpay)
+    user = JSON.parse(localStorage.getItem("user-storage"))?.state?.user;
+    receiptId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+
+    // build products array from cart
+    const productsArr = Object.values(cart).map((item) => ({
+      productId: item._id,
+      name: item.name,
+      price: item.price,
+      quantity: item.qty,
+      size: item.size,
+      color: item.color,
+      image: item.image,
+    }));
+    if (!productsArr.length) {
+      throw new Error("No products in cart");
+    }
+
+    // ensure phone exists
+    const phone = selectedAddress.phone || user?.phone;
+    if (!phone) {
+      throw new Error("No phone number found");
+    }
+
+    // 2a️⃣ – create your internal order record (orderId: receiptId)
+    orderRes = await orderAPI.createOrder({
+      email: user.email,
+      name: user.name,
+      phone,
+      orderId: receiptId,
+      products: productsArr,
+      address: {
+        name: selectedAddress.name,
+        phone: selectedAddress.phone,
+        addressLine1: selectedAddress.addressLine1,
+        addressLine2: selectedAddress.addressLine2,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        pincode: selectedAddress.pincode,
+        country: selectedAddress.country,
+      },
+      amount: orderTotal,
+    });
+
+    // 2b️⃣ – ask your backend to create the Razorpay order (receipt: receiptId)
+    paymentOrderRes = await paymentAPI.createPaymentIntent({
+      amount: orderTotal,
+      currency: "INR",
+      receipt: receiptId,
+    });
+
+    console.log("Order created:", orderRes.data);
+    console.log("Razorpay Order:", paymentOrderRes.data.order);
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to create order. Please try again.");
+    setIsPaying(false);
+    return;
+  }
+
+  // 3️⃣ Build Razorpay checkout options
+  const { order: rzOrder } = paymentOrderRes.data;
+  const options = {
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    amount: rzOrder.amount,
+    currency: rzOrder.currency,
+    order_id: rzOrder.id,      // razorpay_order_id
+    name: "StyleScript Store",
+    description: "Order Payment",
+    prefill: {
+      name: user?.name || "",
+      email: user?.email || "",
+      contact: selectedAddress.phone || user?.phone || "",
+    },
+    theme: { color: "#6366f1" },
+    handler: async (response) => {
+      try {
+        await paymentAPI.verifyPayment({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          receipt: receiptId, // always use the original receiptId
+          email: user.email,
+        });
+        clearCart();
+        navigate(`/success/${orderRes.data.order._id}`);
+      } catch (verifyErr) {
+        console.error(verifyErr);
+        alert("Payment verification failed. Please contact support.");
+        setIsPaying(false);
+      }
+    },
   };
+
+  // 4️⃣ Open checkout
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+
+  // you can leave setIsPaying(false) in the handler or
+  // hook into rzp.on('payment.failed', () => setIsPaying(false))
+};
+
 
   // Calculate shipping cost (free for orders over ₹999)
   const shippingCost = subTotal >= 999 ? 0 : 99;
@@ -142,10 +177,7 @@ export default function ReviewOrder() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
-        <button 
-          onClick={() => navigate('/checkout')}
-          className="flex items-center text-pink-600 hover:text-pink-800"
-        >
+        <button onClick={() => navigate("/checkout")} className="flex items-center text-pink-600 hover:text-pink-800">
           <FiArrowLeft className="mr-2" /> Back to Checkout
         </button>
         <h1 className="text-3xl font-bold ml-4">Review Your Order</h1>
@@ -161,14 +193,11 @@ export default function ReviewOrder() {
                 <FiTruck className="text-pink-600 mr-2" />
                 Delivery Address
               </h2>
-              <button
-                onClick={() => navigate('/checkout')}
-                className="text-pink-600 hover:text-pink-800 text-sm font-medium"
-              >
+              <button onClick={() => navigate("/checkout")} className="text-pink-600 hover:text-pink-800 text-sm font-medium">
                 Change Address
               </button>
             </div>
-            
+
             <div className="bg-pink-50 rounded-lg p-5 border border-pink-100">
               <p className="font-bold text-gray-900">{selectedAddress.name}</p>
               <p className="text-gray-700 mt-2">
@@ -187,7 +216,7 @@ export default function ReviewOrder() {
           {/* Order Summary Card */}
           <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4">Order Summary</h2>
-            
+
             {Object.keys(cart).length === 0 ? (
               <div className="text-center py-12">
                 <div className="bg-gray-100 p-6 rounded-full inline-block mb-4">
@@ -195,28 +224,18 @@ export default function ReviewOrder() {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900">Your cart is empty</h3>
                 <p className="text-gray-600 mt-2">Add items to your cart to proceed</p>
-                <button
-                  onClick={() => navigate('/')}
-                  className="mt-4 bg-pink-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-pink-700"
-                >
+                <button onClick={() => navigate("/")} className="mt-4 bg-pink-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-pink-700">
                   Continue Shopping
                 </button>
               </div>
             ) : (
               <div className="space-y-6">
                 {Object.entries(cart).map(([key, item]) => (
-                  <div 
-                    key={key} 
-                    className="flex flex-col sm:flex-row items-start sm:items-center border-b border-gray-100 pb-6 last:border-0"
-                  >
+                  <div key={key} className="flex flex-col sm:flex-row items-start sm:items-center border-b border-gray-100 pb-6 last:border-0">
                     <div className="flex-shrink-0 mb-4 sm:mb-0">
-                      <img
-                        src={item.image || "/placeholder-image.jpg"}
-                        alt={item.name}
-                        className="w-24 h-24 object-contain rounded-xl border border-gray-200"
-                      />
+                      <img src={item.image || "/placeholder-image.jpg"} alt={item.name} className="w-24 h-24 object-contain rounded-xl border border-gray-200" />
                     </div>
-                    
+
                     <div className="flex-1 sm:ml-6">
                       <div className="flex justify-between">
                         <div>
@@ -226,32 +245,23 @@ export default function ReviewOrder() {
                           </p>
                           <p className="font-medium text-gray-900 mt-2">₹{item.price}</p>
                         </div>
-                        
+
                         <div className="flex flex-col items-end">
                           <div className="flex items-center border border-gray-200 rounded-lg">
-                            <button
-                              onClick={() => handleDecrease(key)}
-                              className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg"
-                            >
+                            <button onClick={() => handleDecrease(key)} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg">
                               <FiMinus />
                             </button>
                             <span className="px-3 py-1">{item.qty}</span>
-                            <button
-                              onClick={() => handleIncrease(key, item)}
-                              className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg"
-                            >
+                            <button onClick={() => handleIncrease(key, item)} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg">
                               <FiPlus />
                             </button>
                           </div>
                           <p className="font-medium text-gray-900 mt-2">₹{(item.price * item.qty).toFixed(2)}</p>
                         </div>
                       </div>
-                      
+
                       <div className="mt-4">
-                        <button
-                          onClick={() => handleRemove(key)}
-                          className="text-red-600 hover:text-red-800 flex items-center text-sm"
-                        >
+                        <button onClick={() => handleRemove(key)} className="text-red-600 hover:text-red-800 flex items-center text-sm">
                           <FiTrash2 className="mr-1" /> Remove
                         </button>
                       </div>
@@ -262,29 +272,23 @@ export default function ReviewOrder() {
             )}
           </div>
         </div>
-        
+
         {/* Right Column - Order Summary */}
         <div>
           <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 sticky top-6">
             <h2 className="text-xl font-bold mb-6">Order Total</h2>
-            
+
             <div className="space-y-4">
               <div className="flex justify-between">
                 <span className="text-gray-600">Subtotal</span>
                 <span className="font-medium">₹{subTotal.toFixed(2)}</span>
               </div>
-              
+
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
-                <span className="font-medium">
-                  {shippingCost === 0 ? (
-                    <span className="text-green-600">Free</span>
-                  ) : (
-                    `₹${shippingCost.toFixed(2)}`
-                  )}
-                </span>
+                <span className="font-medium">{shippingCost === 0 ? <span className="text-green-600">Free</span> : `₹${shippingCost.toFixed(2)}`}</span>
               </div>
-              
+
               <div className="border-t border-gray-200 pt-4 mt-2">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
@@ -292,7 +296,7 @@ export default function ReviewOrder() {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-8">
               <h3 className="text-lg font-semibold mb-3 flex items-center">
                 <FiCreditCard className="text-pink-600 mr-2" />
@@ -310,30 +314,25 @@ export default function ReviewOrder() {
                 </div>
               </div>
             </div>
-            
+
             <button
               onClick={handleBuy}
               disabled={Object.keys(cart).length === 0 || isPaying}
               className={`w-full mt-8 py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
-                Object.keys(cart).length === 0 || isPaying
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-700 hover:to-purple-700 shadow-lg"
+                Object.keys(cart).length === 0 || isPaying ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-700 hover:to-purple-700 shadow-lg"
               }`}
             >
               {isPaying ? (
                 <span>Processing Payment...</span>
               ) : (
                 <>
-                  <FiCheck className="mr-2" /> 
+                  <FiCheck className="mr-2" />
                   <span>Pay ₹{orderTotal.toFixed(2)}</span>
                 </>
               )}
             </button>
-            
-            <p className="text-center text-gray-500 text-sm mt-4">
-              Your personal data will be used to process your order, support your experience throughout this website, 
-              and for other purposes described in our privacy policy.
-            </p>
+
+            <p className="text-center text-gray-500 text-sm mt-4">Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our privacy policy.</p>
           </div>
         </div>
       </div>

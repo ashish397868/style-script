@@ -6,7 +6,11 @@ const OrderSchema = new Schema(
     email: { type: String, required: true },
     name: { type: String, required: true },
     orderId: { type: String, required: true },
-    paymentInfo: { type: Object, required: true },// reference to the Address, for live updates if needed
+    paymentInfo: {
+    razorpay_order_id: String,
+    razorpay_payment_id: String,
+    razorpay_signature: String,
+  },
     products: [
       {
         productId: { type: Schema.Types.ObjectId, ref: "Product" },

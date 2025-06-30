@@ -1,4 +1,3 @@
-// controllers/paymentController.js
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Order = require("../models/Order");
@@ -13,23 +12,43 @@ const razorpay = new Razorpay({
 // POST /api/payments/create
 exports.createPaymentOrder = async (req, res) => {
   try {
-    const { amount, currency = "INR", receipt } = req.body;
-    if (!amount || !receipt) {
-      return res.status(400).json({ message: "Amount and receipt are required" });
+    const { amount, currency = "INR" } = req.body;
+    if (!amount) {
+      return res.status(400).json({ message: "Amount is required" });
     }
 
-    // Razorpay expects amount in paise (1 INR = 100 paise)
+    // generate your own internal order ID (receipt)
+    const receiptId = "order_" + Date.now();
+
+    // save to DB before calling Razorpay
+    // const newOrder = await Order.create({
+    //   orderId: receiptId,
+    //   amount,
+    //   currency,
+    // });
+
+    // Razorpay expects amount in paise
     const options = {
       amount: amount * 100,
       currency,
-      receipt, // your internal orderId, e.g. "order_ABC123"
+      receipt: receiptId,
     };
 
     const razorOrder = await razorpay.orders.create(options);
-    return res.json(razorOrder);
+
+    // return both DB order and Razorpay order
+    res.json({
+      success: true,
+      order: {
+        id: razorOrder.id,
+        amount: razorOrder.amount,
+        currency: razorOrder.currency,
+      },
+      receipt: receiptId,
+    });
   } catch (error) {
     console.error("Create Payment Order Error:", error);
-    return res.status(500).json({ message: "Failed to create Razorpay order" });
+    res.status(500).json({ message: "Failed to create Razorpay order" });
   }
 };
 
@@ -41,9 +60,13 @@ exports.verifyPayment = async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      orderId, // your internal orderId (receipt)
-      email, // to send payment confirmation
+      receipt, // your internal orderId
+      email,
     } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !receipt) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
     // 1. Recompute signature
     const generatedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
@@ -52,8 +75,8 @@ exports.verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Invalid payment signature" });
     }
 
-    // 2. Mark your Order as paid
-    const order = await Order.findOne({ orderId });
+    // 2. Find & update your Order
+    const order = await Order.findOne({ orderId: receipt });
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -66,23 +89,24 @@ exports.verifyPayment = async (req, res) => {
     };
     await order.save();
 
-    // 3. Send confirmation email
-    await sendEmail({
-      to: email,
-      subject: `Payment Received for Order ${orderId}`,
-      html: `
-        <h2>Thank you for your purchase!</h2>
-        <p>Your payment for <strong>Order ${orderId}</strong> of amount <strong>₹${order.amount}</strong> has been received successfully.</p>
-        <p>We’re now processing your order and will notify you once it’s shipped.</p>
-        <p>You can view your order details in your account dashboard.</p>
-        <br/>
-        <p>Happy Shopping,<br/><strong>ScriptStyle Team</strong></p>
-      `,
-    });
+    // 3. Send confirmation email (optional)
+    if (email) {
+      await sendEmail({
+        to: email,
+        subject: `Payment Received for ${receipt}`,
+        html: `
+          <h2>Thank you for your purchase!</h2>
+          <p>Your payment for <strong>Order ${receipt}</strong> of amount <strong>₹${order.amount}</strong> has been received successfully.</p>
+          <p>We’re now processing your order and will notify you once it’s shipped.</p>
+          <br/>
+          <p>Happy Shopping,<br/><strong>ScriptStyle Team</strong></p>
+        `,
+      });
+    }
 
-    return res.json({ success: true, message: "Payment verified and order updated", order });
+    res.json({ success: true, message: "Payment verified and order updated", order });
   } catch (error) {
     console.error("Verify Payment Error:", error);
-    return res.status(500).json({ message: "Payment verification failed" });
+    res.status(500).json({ message: "Payment verification failed" });
   }
 };

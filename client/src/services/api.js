@@ -116,10 +116,8 @@ export const reviewAPI = {
 
 // Payment Routes
 export const paymentAPI = {
-  createPaymentIntent: (orderData) => api.post('/payments/create-payment-intent', orderData),
-  verifyPayment: (paymentId, paymentData) => api.post(`/payments/verify/${paymentId}`, paymentData),
-  getPaymentStatus: (paymentId) => api.get(`/payments/status/${paymentId}`),
-  refundPayment: (paymentId) => api.post(`/payments/refund/${paymentId}`),
+  createPaymentIntent: (orderData) => api.post('/payments/create', orderData),
+  verifyPayment: (paymentData) => api.post('/payments/verify', paymentData)
 };
 
 // Media Routes

@@ -38,6 +38,11 @@ import ReturnPolicy from "./components/ReturnPolicy";
 import AboutUs from "./components/AboutUs";
 import NotFound from "../src/components/NotFound";
 
+// Create a simple Dashboard content component
+const DashboardContent = () => {
+  return null; // The AdminDashboard component handles the dashboard content internally
+};
+
 // import {useNavigate} from "react-router-dom";
 function App() {
   // const navigate = useNavigate();
@@ -94,14 +99,19 @@ function App() {
         <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
         <Route path="/success/:id" element={<ProtectedRoute><Success /></ProtectedRoute>} />
 
-        {/* Admin Routes */}
-        <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>} />
-        <Route path="/admin/users" element={<ProtectedRoute requireAdmin><UserManagement /></ProtectedRoute>} />
-        <Route path="/admin/reviews" element={<ProtectedRoute requireAdmin><ReviewManagement /></ProtectedRoute>} />
-        <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><OrderManagement /></ProtectedRoute>} />
-        <Route path="/admin/add-product" element={<ProtectedRoute requireAdmin><AddProductPage /></ProtectedRoute>} />
-        <Route path="/admin/all-products" element={<ProtectedRoute requireAdmin><AdminProductList /></ProtectedRoute>} />
-        <Route path="/admin/edit-product/:id" element={<ProtectedRoute requireAdmin><EditProductPage /></ProtectedRoute>} />
+        {/* Admin Routes - Nested under AdminDashboard */}
+        <Route path="/admin" element={<ProtectedRoute requireAdmin><Admin /></ProtectedRoute>}>
+          {/* Index route for dashboard */}
+          <Route index element={<DashboardContent />} />
+          {/* Nested admin routes */}
+          <Route path="users" element={<UserManagement />} />
+          <Route path="reviews" element={<ReviewManagement />} />
+          <Route path="orders" element={<OrderManagement />} />
+          <Route path="add-product" element={<AddProductPage />} />
+          <Route path="all-products" element={<AdminProductList />} />
+          <Route path="edit-product/:id" element={<EditProductPage />} />
+        </Route>
+
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />
       </Routes>

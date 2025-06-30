@@ -42,6 +42,7 @@ const OrderSchema = new Schema(
     },
     shippingProvider: { type: String, default: "" }, // e.g., Shiprocket, Delhivery
     trackingId: { type: String, default: "" }, // for tracking deliveries
+    cancellationReason: { type: String, default: "" }, // reason for cancellation
   },
   { timestamps: true }
 );

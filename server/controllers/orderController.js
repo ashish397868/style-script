@@ -2,12 +2,10 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
-
 // Create a new order (customer)
 exports.createOrder = async (req, res) => {
   try {
     let { email, name, orderId, paymentInfo, products, phone, address, amount } = req.body;
-
 
     // Basic validation
     if (!email || !name || !orderId || !products || products.length === 0 || !phone || !amount || !address) {
@@ -18,8 +16,6 @@ exports.createOrder = async (req, res) => {
     if (exists) {
       return res.status(400).json({ message: "Duplicate orderId." });
     }
-
-
 
     // Store productId reference for each product
     // For each product, fetch the first image and store it in the order
@@ -97,9 +93,7 @@ exports.getMyOrders = async (req, res) => {
     const orders = await Order.find({ userId: req.user._id })
       .populate('products.productId', 'images title slug')
       .sort({ createdAt: -1 });
-    // console.log("getMyOrders orders:", orders);
     return res.json(orders);
-    
   } catch (err) {
     console.error("getMyOrders error:", err);
     return res.status(500).json({ message: "Server error" });
@@ -122,24 +116,73 @@ exports.getAllOrders = async (req, res) => {
 // Update order status or deliveryStatus (admin)
 exports.updateOrder = async (req, res) => {
   try {
+    console.log("updateOrder called with ID:", req.params.id);
+    console.log("updateOrder body:", req.body);
+    
     const { id } = req.params;
-    const { status, deliveryStatus, shippingProvider, trackingId } = req.body;
+    const { status, deliveryStatus, shippingProvider, trackingId, cancellationReason } = req.body;
+
+    // Validate ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ message: "Invalid order ID format." });
+    }
 
     const order = await Order.findById(id);
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
     }
 
-    if (status) order.status = status;
-    if (deliveryStatus) order.deliveryStatus = deliveryStatus;
-    if (shippingProvider) order.shippingProvider = shippingProvider;
-    if (trackingId) order.trackingId = trackingId;
+    console.log("Current order found:", order.orderId);
 
-    await order.save();
-    return res.json({ message: "Order updated.", order });
+    // Create update object
+    const updateData = {};
+    if (status) {
+      // Validate status enum
+      const validStatuses = ["Initiated", "Processing", "Paid", "Failed", "Cancelled"];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid status value." });
+      }
+      updateData.status = status;
+    }
+    if (deliveryStatus) {
+      const validDeliveryStatuses = ["unshipped", "shipped", "out for delivery", "delivered", "returned"];
+      if (!validDeliveryStatuses.includes(deliveryStatus)) {
+        return res.status(400).json({ message: "Invalid delivery status value." });
+      }
+      updateData.deliveryStatus = deliveryStatus;
+    }
+    if (shippingProvider) updateData.shippingProvider = shippingProvider;
+    if (trackingId) updateData.trackingId = trackingId;
+    if (cancellationReason) updateData.cancellationReason = cancellationReason;
+
+    console.log("Update data:", updateData);
+
+    // Use findByIdAndUpdate without runValidators for partial updates
+    const updatedOrder = await Order.findByIdAndUpdate(
+      id, 
+      updateData, 
+      { new: true }
+    );
+
+    console.log("Order updated successfully");
+    return res.json({ message: "Order updated.", order: updatedOrder });
   } catch (err) {
-    console.error("updateOrder error:", err);
-    return res.status(500).json({ message: "Server error" });
+    console.error("updateOrder error details:", err);
+    
+    // Handle specific mongoose errors
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: "Validation error", errors });
+    }
+    
+    if (err.name === 'CastError') {
+      return res.status(400).json({ message: "Invalid data format." });
+    }
+    
+    return res.status(500).json({ 
+      message: "Server error", 
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined 
+    });
   }
 };
 
@@ -147,6 +190,8 @@ exports.updateOrder = async (req, res) => {
 exports.cancelOrder = async (req, res) => {
   try {
     const { id } = req.params;
+    const { cancellationReason } = req.body;
+    
     const order = await Order.findById(id);
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
@@ -157,8 +202,13 @@ exports.cancelOrder = async (req, res) => {
     if (["shipped", "out for delivery", "delivered"].includes(order.deliveryStatus)) {
       return res.status(400).json({ message: "Cannot cancel at this stage." });
     }
+    
     order.status = "Cancelled";
     order.deliveryStatus = "returned";
+    if (cancellationReason) {
+      order.cancellationReason = cancellationReason;
+    }
+    
     await order.save();
     return res.json({ message: "Order cancelled.", order });
   } catch (err) {

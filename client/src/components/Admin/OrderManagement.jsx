@@ -275,7 +275,7 @@ const OrderManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-gray-900 capitalize">
                       {order.name}
                     </div>
                     <div className="text-sm text-gray-500">
@@ -295,7 +295,7 @@ const OrderManagement = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
+                    <span className={`px-2 py-1 text-xs rounded-full capitalize  ${
                       order.deliveryStatus === 'delivered' ? 'bg-green-100 text-green-800' :
                       order.deliveryStatus === 'returned' ? 'bg-red-100 text-red-800' :
                       order.deliveryStatus === 'unshipped' ? 'bg-gray-100 text-gray-800' :
@@ -496,6 +496,7 @@ const OrderManagement = () => {
                   value={shippingData.deliveryStatus}
                   onChange={(e) => setShippingData({...shippingData, deliveryStatus: e.target.value})}
                 >
+                  <option value="unshipped">Unshipped</option>
                   <option value="shipped">Shipped</option>
                   <option value="out for delivery">Out for Delivery</option>
                   <option value="delivered">Delivered</option>

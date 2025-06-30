@@ -116,7 +116,7 @@ const AddressBook = () => {
                 <p className="text-gray-600">{address.city}</p>
                 <p className="text-gray-600">{address.state}, {address.pincode}</p>
                 <p className="text-gray-600">{address.country}</p>
-                <p className="mt-2 text-gray-600">Phone number: {address.phone}</p>
+                <p className="mt-2 text-gray-600">Phone number: {address.phone || user?.phone}</p>
               </div>
             </div>
             <div className="mt-4 pt-4 border-t border-gray-100">

@@ -241,7 +241,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                           <div className="bg-pink-100 p-2 rounded-full mr-3">
                             <FiUser className="h-5 w-5 text-pink-600" />
                           </div>
-                          <h3 className="font-bold text-gray-900 text-lg capitalize">{user.name}</h3>
+                          <h3 className="font-bold text-gray-900 text-lg capitalize">{addr.name || user.name}</h3>
                         </div>
                         
                         <div className="flex items-start mt-3">
@@ -261,7 +261,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                           <div className="bg-pink-100 p-2 rounded-full mr-3">
                             <FiPhone className="h-5 w-5 text-pink-600" />
                           </div>
-                          <p className="text-gray-700">{user.phone}</p>
+                          <p className="text-gray-700">{addr.phone || user.phone}</p>
                         </div>
                       </div>
                       

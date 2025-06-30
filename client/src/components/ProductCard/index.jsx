@@ -25,7 +25,25 @@ const ProductCard = ({ product, variants }) => {
 
   // Get unique colors and sizes from available variants only
   const uniqueColors = [...new Set(availableVariants.map(v => v.color).filter(Boolean))];
-  const uniqueSizes = [...new Set(availableVariants.map(v => v.size).filter(Boolean))];
+  // Sort sizes in standard order: XS, S, M, L, XL, XXL, etc.
+  const sizeOrder = [
+    'XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL',
+    '2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL',
+    '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50',
+    'Free', 'One Size'
+  ];
+  const uniqueSizes = [...new Set(availableVariants.map(v => v.size).filter(Boolean))]
+    .sort((a, b) => {
+      const aIndex = sizeOrder.findIndex(size => size.toUpperCase() === String(a).toUpperCase());
+      const bIndex = sizeOrder.findIndex(size => size.toUpperCase() === String(b).toUpperCase());
+      if (aIndex === -1 && bIndex === -1) {
+        // If both are not found, sort alphabetically
+        return String(a).localeCompare(String(b));
+      }
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
 
   // Calculate total available quantity across all variants
   const totalAvailableQty = availableVariants.reduce((total, variant) => total + variant.availableQty, 0);

@@ -260,7 +260,7 @@ const AddProduct = () => {
                         value={form.category}
                         onChange={handleChange}
                         required
-                        className="w-full px-2 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                        className="w-full px-1 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       >
                         <option value="">Select category</option>
                         <option value="Sweatshirts">Sweatshirts</option>

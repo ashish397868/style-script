@@ -28,6 +28,7 @@ const OrderDetail         = lazy(() => import("./components/OrderDetail"));
 const AddressesBook       = lazy(() => import("./components/AddressesBook"));
 const EditAddressPage     = lazy(() => import("./components/EditAddressPage"));
 const NewAddressPage      = lazy(() => import("./components/NewAddressPage"));
+const ThemesPage         = lazy(() => import("./components/ThemePage"));
 
 // Static pages
 const AboutUs             = lazy(() => import("./screens/AboutUs"));
@@ -68,6 +69,7 @@ function AppContent() {
           {/* Products & categories */}
           <Route path="/products"               element={<Products />} />
           <Route path="/category/:category"     element={<CategoryPage />} />
+          <Route path="/theme/:theme"           element={<ThemesPage />} />
           <Route path="/product/:slug"          element={<ProductPage />} />
 
           {/* User‑protected */}

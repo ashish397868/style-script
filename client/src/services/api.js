@@ -88,6 +88,7 @@ export const productAPI = {
   getProductBySlug: (slug) => api.get(`/products/slug/${slug}`),
   getFeaturedProducts: () => api.get('/products/featured'),
   getProductsByCategory: (category) => api.get(`/products/category/${category}`),
+  getProductsByTheme: (theme) => api.get(`/products/theme/${theme}`),
   searchProducts: (query) => api.get('/products/search', { params: { q: query } }),
   getProductReviews: (productId) => api.get(`/products/${productId}/reviews`),
   createProduct: (productData) => api.post('/products', productData),

@@ -1,3 +1,18 @@
+// get product by theme (from route param)
+exports.getProductsByTheme = async (req, res) => {
+  try {
+    const { theme } = req.params;
+    // Assuming you store theme as a field in Product, e.g. product.theme or product.themes (array)
+    // Adjust the query below if your schema is different
+    const products = await Product.find({ themes: theme }).sort({ createdAt: -1 });
+    // If you use a single theme field, use: { theme }
+    const groupedProducts = groupProductsByTitle(products);
+    return res.json(groupedProducts);
+  } catch (error) {
+    console.error("Get Products By Theme Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 // controllers/productController.js
 const Product = require("../models/Product");
 

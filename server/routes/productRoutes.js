@@ -13,6 +13,7 @@ const { authenticateUser, isAdmin } = require("../middlewares/authMiddleware");
 // PUBLIC
 router.get("/", getAllProducts);
 router.get("/category/:category", getProductsByCategory);
+router.get("/theme/:theme", require("../controllers/productController").getProductsByTheme);
 router.get("/featured", getFeaturedProducts);
 router.get("/slug/:slug", getProductBySlug);
 router.get("/:id", getProductById);

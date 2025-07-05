@@ -1,8 +1,9 @@
 // components/UserDropdown.js
 import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
-const UserDropdown = ({ user, actions = [] }) => {
+const UserDropdown = ({ user, adminLinks = [] }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
@@ -12,8 +13,8 @@ const UserDropdown = ({ user, actions = [] }) => {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   return (
@@ -24,22 +25,24 @@ const UserDropdown = ({ user, actions = [] }) => {
         style={{ borderRadius: '50%', padding: 0, border: 'none', background: 'none' }}
         aria-label="User menu"
       >
-        <FaUserCircle className="w-8 h-8 text-pink-600" />
+        {user && user.profilePicture ? (
+          <img src={user.profilePicture} alt="Profile" className="w-8 h-8 rounded-full" />
+        ) : (
+          <FaUserCircle className="w-8 h-8 text-pink-600" />
+        )}
       </button>
 
       {open && (
         <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50">
-          {actions.map((action, index) => (
-            <button
+          {adminLinks.map((item, index) => (
+            <Link
               key={index}
-              onClick={() => {
-                action.onClick();
-                setOpen(false);
-              }}
+              to={item.path}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              onClick={() => setOpen(false)}
             >
-              {action.label}
-            </button>
+              {item.label}
+            </Link>
           ))}
         </div>
       )}
@@ -47,4 +50,4 @@ const UserDropdown = ({ user, actions = [] }) => {
   );
 };
 
-export default UserDropdown;
+export default UserDropdown;  

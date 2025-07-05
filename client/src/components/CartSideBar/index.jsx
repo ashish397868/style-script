@@ -7,7 +7,7 @@ import { RxCrossCircled } from "react-icons/rx";
 const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCart, subTotal }) => {
   if (!isOpen) return null;
 
-  const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
+  // const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">

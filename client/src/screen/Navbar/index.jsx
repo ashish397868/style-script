@@ -1,19 +1,22 @@
 import Navbar from "../../components/Navbar";
-import { menuItems, tshirtItems } from "../../constants/menuItems";
+import { shopLinks, tshirtItems,adminLinks } from "../../constants/menuItems";
 import { TbShirtOff } from "react-icons/tb";
 function App() {
   
 
   return (
       <Navbar
-        menuItems={menuItems}
-        productItems={tshirtItems}
+        shopLinks={shopLinks}
+        tshirtItems={tshirtItems}
         brandName="StyleScript"
-        logoSrc="https://www.svgrepo.com/show/42638/clothes.svg"
+        logo="https://www.svgrepo.com/show/42638/clothes.svg"
         // logoSrc={TbShirtOff}
         backgroundColor="bg-white"
         textColor="text-black"
         hoverColor="hover:text-pink-300"
+        cartIconColor = "text-pink-600"
+        cartIconHover = "hover:text-pink-700"
+        adminLinks={adminLinks}
       />
 
   );

@@ -1,25 +1,24 @@
-// Updated Navbar.js using reusable SideCart, UserDropdown, and Dropdown components
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { useCartStore } from "../../store/cartStore";
 import { useUserStore } from "../../store/userStore";
-
 import Dropdown from "../DropDown";
 import UserDropdown from "../UserDropDown";
 import CartButton from "../CartSidebar/CartButton";
 import CartSidebar from "../CartSidebar";
 
 const Navbar = ({
-  menuItems = [],
-  productItems = [],
+  shopLinks = [],
+  tshirtItems = [],
   brandName = "FitnessStore",
-  logoSrc = null,
+  logo = null,
   backgroundColor = "bg-white",
   textColor = "text-white",
   hoverColor = "hover:text-gray-800",
   cartIconColor = "text-pink-600",
   cartIconHover = "hover:text-pink-700",
+  adminLinks = []
 
 }) => {
   const navigate = useNavigate();
@@ -32,15 +31,12 @@ const Navbar = ({
 
   useEffect(() => {
     useCartStore.getState().loadCart();
+    useUserStore.getState().initAuth();
   }, []);
 
   useEffect(() => {
     useCartStore.getState().saveCart();
   }, [cart]);
-
-  useEffect(() => {
-    useUserStore.getState().initAuth();
-  }, []);
 
   const handleLogout = () => {
     logout();
@@ -53,13 +49,13 @@ const Navbar = ({
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center py-4 px-2">
-              {logoSrc && <img src={logoSrc} alt="Logo" className="h-8 w-8 mr-2 rounded " />}
+              {logo && <img src={logo} alt="Logo" className="h-8 w-8 mr-2 rounded " />}
               <span className={`font-bold text-lg text-pink-600 `}>{brandName}</span>
             </Link>
 
             <div className="hidden md:flex items-center space-x-4">
-              {menuItems.map((item, index) => (
-                <Link key={index} to={item.href} className={`py-4 px-2 ${textColor} ${hoverColor} font-semibold`}>
+              {shopLinks.map((item, index) => (
+                <Link key={index} to={item.path} className={`py-4 px-2 ${textColor} ${hoverColor} font-semibold`}>
                   {item.label}
                 </Link>
               ))}
@@ -70,17 +66,12 @@ const Navbar = ({
                 </Link>
               )}
 
-              <Dropdown label="Tshirts" items={productItems.map((item) => ({ ...item, component: Link }))} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${""} ${hoverColor}`} />
+              <Dropdown label="Tshirts" items={tshirtItems} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${hoverColor}`} />
 
               {isAuthenticated ? (
                 <UserDropdown
                   user={user}
-                  actions={[
-                    { label: "Profile", onClick: () => navigate("/profile") },
-                    { label: "Orders", onClick: () => navigate("/orders") },
-                    { label: "Addresses", onClick: () => navigate("/addresses") },
-                    { label: "Logout", onClick: handleLogout }
-                  ]}
+                  adminLinks={adminLinks}
                 />
               ) : (
                 <div className="flex items-center">
@@ -103,17 +94,16 @@ const Navbar = ({
         </div>
 
         <div className={`${menuOpen ? "block" : "hidden"} md:hidden`}>
-          {" "}
           {/* Mobile Menu */}
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {menuItems.map((item, index) => (
-              <Link key={index} to={item.href} className={`block px-3 py-2 rounded-md text-base font-medium ${textColor} ${hoverColor}`} onClick={() => setMenuOpen(false)}>
+            {shopLinks.map((item, index) => (
+              <Link key={index} to={item.path} className={`block px-3 py-2 rounded-md text-base font-medium ${textColor} ${hoverColor}`} onClick={() => setMenuOpen(false)}>
                 {item.label}
               </Link>
             ))}
             <Dropdown
               label="Products"
-              items={productItems.map((item) => ({ ...item, component: Link }))}
+              items={tshirtItems}
               buttonClass={`w-full text-left px-3 py-2 text-base font-medium ${textColor} ${hoverColor}`}
               itemClass={`pl-6 px-3 py-2 text-base font-medium ${textColor} ${hoverColor}`}
             />

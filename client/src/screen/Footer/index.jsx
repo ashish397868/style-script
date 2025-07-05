@@ -1,11 +1,5 @@
 import Footer from "../../components/Footer";
-
-const shopLinks = [
-  { label: "T-Shirts", path: "/category/tshirts" },
-  { label: "Sweatshirts", path: "/category/sweatshirts" },
-  { label: "Hoodies", path: "/category/hoodies" },
-  { label: "Zipper Hoodies", path: "/category/zipperhoodies" },
-];
+import { shopLinks } from "../../constants/menuItems";
 
 const customerLinks = [
   { label: "Contact Us", path: "/contact" },
@@ -22,11 +16,12 @@ const policyLinks = [
 function App() {
   return (
     <>
-      {/* your main content */}
       <Footer
         shopLinks={shopLinks}
         customerLinks={customerLinks}
         policyLinks={policyLinks}
+        title="StyleScript"
+        logo="https://www.svgrepo.com/show/42638/clothes.svg"
       />
     </>
   );

@@ -11,3 +11,9 @@ export const tshirtItems = [
   { label: 'Polo TShirts', href: '/category/polotshirts', component: Link },
   { label: 'Oversized Tshirts', href: '/category/oversizedtshirts', component: Link },
 ];
+
+export const shopLinks = [
+  { label: "Sweatshirts", path: "/category/sweatshirts" },
+  { label: "Hoodies", path: "/category/hoodies" },
+  { label: "Zipper Hoodies", path: "/category/zipperhoodies" },
+];

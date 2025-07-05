@@ -1,7 +1,7 @@
-import React from "react";
+import Container from "../Container";
 
 const ShippingPolicy = () => (
-  <section className="container mx-auto px-4 py-12 max-w-3xl">
+  <Container>
     <h1 className="text-3xl font-bold mb-6">Shipping Policy</h1>
     <p className="mb-4">We offer fast and reliable shipping across India. Orders are typically processed within 1-2 business days.</p>
     <ul className="list-disc pl-6 mb-4">
@@ -10,7 +10,7 @@ const ShippingPolicy = () => (
       <li>Tracking information will be provided once your order is shipped.</li>
     </ul>
     <p>If you have any questions about shipping, please contact us at support@stylescript.com.</p>
-  </section>
+  </Container>
 );
 
 export default ShippingPolicy;

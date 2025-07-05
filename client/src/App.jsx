@@ -1,8 +1,8 @@
 // App.jsx
-import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./screen/Navbar";
-import Footer from "./screen/Footer";
+import { Suspense, lazy } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
+import Navbar from "./screens/Navbar";
+import Footer from "./screens/Footer";
 import Home from "./components/HomePage";           // eagerly loaded
 
 // Lazy‑load all other route components:
@@ -28,14 +28,16 @@ const OrderDetail         = lazy(() => import("./components/OrderDetail"));
 const AddressesBook       = lazy(() => import("./components/AddressesBook"));
 const EditAddressPage     = lazy(() => import("./components/EditAddressPage"));
 const NewAddressPage      = lazy(() => import("./components/NewAddressPage"));
-const AboutUs             = lazy(() => import("./components/AboutUs"));
-const PrivacyPolicy       = lazy(() => import("./components/PrivacyPolicy"));
-const TermsAndConditions  = lazy(() => import("./components/TermsAndConditions"));
-const ContactUs           = lazy(() => import("./components/ContactUs"));
-const ShippingPolicy      = lazy(() => import("./components/ShippingPolicy"));
-const ReturnPolicy        = lazy(() => import("./components/ReturnPolicy"));
-const NotFound            = lazy(() => import("./components/NotFound"));
-const ProtectedRoute      = lazy(() => import("./components/ProtectedRoute"));
+
+// Static pages
+const AboutUs             = lazy(() => import("./screens/AboutUs"));
+const PrivacyPolicy       = lazy(() => import("./screens/PrivacyPolicy"));
+const TermsAndConditions  = lazy(() => import("./screens/TermsAndConditions"));
+const ContactUs           = lazy(() => import("./screens/ContactUs"));
+const ShippingPolicy      = lazy(() => import("./screens/ShippingPolicy"));
+const ReturnPolicy        = lazy(() => import("./screens/ReturnPolicy"));
+const NotFound            = lazy(() => import("./screens/NotFound"));
+const ProtectedRoute      = lazy(() => import("./screens/ProtectedRoute"));
 
 function AppContent() {
   const location = useLocation();

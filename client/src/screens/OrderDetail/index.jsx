@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Loader from "../Loader"; 
+import Loader from "../../components/Loader"; 
 import { orderAPI } from "../../services/api";
 import { FiChevronLeft, FiTruck, FiShoppingBag } from "react-icons/fi";
 

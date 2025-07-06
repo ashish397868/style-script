@@ -13,10 +13,22 @@ const ForgotPassword      = lazy(() => import("./screens/ForgotPassword"));
 const UserProfile         = lazy(() => import("./screens/UserProfile"));
 
 
+// user orders
+const Orders              = lazy(() => import("./screens/Orders"));
+const OrderDetail         = lazy(() => import("./screens/OrderDetail"));
+
 const ProductPage         = lazy(() => import("./components/ProductPage"));
 const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));
 const Success             = lazy(() => import("./components/Success"));
+
+const Products            = lazy(() => import("./components/Products"));
+const CategoryPage        = lazy(() => import("./components/CategoryPage"));
+
+const AddressesBook       = lazy(() => import("./components/AddressesBook"));
+const EditAddressPage     = lazy(() => import("./components/EditAddressPage"));
+const NewAddressPage      = lazy(() => import("./components/NewAddressPage"));
+const ThemesPage         = lazy(() => import("./components/ThemePage"));
 
 
 // Admin routes
@@ -27,15 +39,6 @@ const AdminDashboard      = lazy(() => import("./components/Admin/AdminDashboard
 const AddProductPage      = lazy(() => import("./components/Admin/AddProductPage"));
 const AdminProductList    = lazy(() => import("./components/Admin/AdminProductList"));
 const EditProductPage     = lazy(() => import("./components/Admin/EditProductPage"));
-const Products            = lazy(() => import("./components/Products"));
-const CategoryPage        = lazy(() => import("./components/CategoryPage"));
-
-const Orders              = lazy(() => import("./components/Orders"));
-const OrderDetail         = lazy(() => import("./components/OrderDetail"));
-const AddressesBook       = lazy(() => import("./components/AddressesBook"));
-const EditAddressPage     = lazy(() => import("./components/EditAddressPage"));
-const NewAddressPage      = lazy(() => import("./components/NewAddressPage"));
-const ThemesPage         = lazy(() => import("./components/ThemePage"));
 
 // Static pages
 const AboutUs             = lazy(() => import("./screens/AboutUs"));

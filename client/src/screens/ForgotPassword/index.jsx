@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useUserHook from '../../redux/features/user/useUserHook';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import Button from '../Button';
+import Button from '../../components/Button';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

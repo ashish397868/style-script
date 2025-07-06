@@ -6,9 +6,12 @@ import Footer from "./screens/Footer";
 import Home from "./components/HomePage";           // eagerly loaded
 
 // Lazy‑load all other route components:
-const Login               = lazy(() => import("./components/Login"));
-const Signup              = lazy(() => import("./components/Signup"));
-const ForgotPassword      = lazy(() => import("./components/ForgotPassword"));
+// Authentication
+const Login               = lazy(() => import("./screens/Login"));
+const Signup              = lazy(() => import("./screens/Signup"));
+const ForgotPassword      = lazy(() => import("./screens/ForgotPassword"));
+
+
 const ProductPage         = lazy(() => import("./components/ProductPage"));
 const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));

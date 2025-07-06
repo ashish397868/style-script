@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import useUserHook from '../../redux/features/user/useUserHook';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-import Button from '../Button';
+import Button from '../../components/Button';
+import useUserHook from '../../redux/features/user/useUserHook'
 
-const Signup = () => {
+const Login = () => {
   const navigate = useNavigate();
-  const { signup, isLoading, error, clearUserError } = useUserHook();
+  const { login, isLoading, error, clearUserError } = useUserHook();
+
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
-    name: '',
     password: ''
   });
   const [formErrors, setFormErrors] = useState({});
@@ -22,32 +22,27 @@ const Signup = () => {
 
     if (!formData.email.trim()) errors.email = 'Email is required';
     else if (!emailRegex.test(formData.email)) errors.email = 'Invalid email format';
-    
-    if (!formData.name.trim()) errors.name = 'Name is required';
-    else if (formData.name.trim().length < 3) errors.name = 'Name must be at least 3 characters';
-    
     if (!formData.password) errors.password = 'Password is required';
-    else if (formData.password.length < 8) errors.password = 'Password must be at least 8 characters';
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     if (!validateForm()) return;
 
     try {
-      const resultAction = await signup(formData);
+      const resultAction = await login(formData);
       if (resultAction.payload?.success) {
-        setMessage(resultAction.payload?.message || 'Signup successful! Redirecting to home...');
-        setTimeout(() => navigate('/'), 1500);
+        setMessage(resultAction.payload?.message || 'Login successful! Redirecting to home...');
+        navigate("/");
       } else {
-        setMessage(resultAction.payload?.message || 'Signup failed. Please try again.');
+        setMessage(resultAction.payload?.message || 'Login failed. Please try again.');
       }
     } catch (err) {
-      setMessage('Signup failed. Please try again.');
+      setMessage('Login failed. Please try again.');
     }
   };
 
@@ -64,42 +59,20 @@ const Signup = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:px-6">
       <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 md:p-8 space-y-6">
         <h2 className="text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
-          Create your account
+          Sign in to your account
         </h2>
 
         {(error || message) && (
-          <div className={`p-3 rounded-md ${message.includes('successful') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          <div className={`p-3 rounded-md ${message.includes('success') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
             {error || message}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
           <div className="space-y-4">
-            {/* Name Input */}
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                value={formData.name}
-                onChange={handleChange}
-                className={`appearance-none relative block w-full px-3 py-2.5 border ${
-                  formErrors.name ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
-                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm`}
-                placeholder="Full Name"
-              />
-              {formErrors.name && <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>}
-            </div>
-
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email address
-              </label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
               <input
                 id="email"
                 name="email"
@@ -117,15 +90,13 @@ const Signup = () => {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <div className="relative">
                 <input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
+                  autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
                   className={`appearance-none relative block w-full px-3 py-2.5 border ${
@@ -135,35 +106,44 @@ const Signup = () => {
                 />
                 <button
                   type="button"
-                  onClick={togglePasswordVisibility}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={togglePasswordVisibility}
                 >
-                  {showPassword ? (
-                    <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                  ) : (
-                    <AiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-500" />
-                  )}
+                  {showPassword
+                    ? <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    : <AiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-500" />}
                 </button>
               </div>
               {formErrors.password && <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>}
             </div>
           </div>
 
+          {/* Forgot Password Link */}
+          <div className="flex justify-end">
+            <Link to="/forgot-password" className="text-sm font-medium text-pink-600 hover:text-pink-500">
+              Forgot your password?
+            </Link>
+          </div>
+
+          {/* Submit Button */}
           <div>
-            <Button
-              type="submit"
+            <Button 
+              type="submit" 
               loading={isLoading}
               className="w-full justify-center py-2.5"
             >
-              {isLoading ? 'Creating account...' : 'Sign up'}
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
           </div>
 
-          <div className="text-sm text-center pt-2">
-            Already have an account?{' '}
-            <Link to="/login" className="font-medium text-pink-600 hover:text-pink-500">
-              Sign in
-            </Link>
+          {/* Signup Link */}
+          <div className="text-center">
+            <p className="text-sm text-gray-600">
+              Don't have an account?{' '}
+              <Link to="/signup" className="font-medium text-pink-600 hover:text-pink-500">
+                Sign up
+              </Link>
+            </p>
           </div>
         </form>
       </div>
@@ -171,4 +151,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

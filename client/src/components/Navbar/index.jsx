@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
-import { useSelector, useDispatch } from "react-redux";
-import { logout as logoutAction, initAuth } from "../../redux/features/user/userSlice";
-import { loadCart, addToCart, removeFromCart, clearCart } from "../../redux/features/cart/cartSlice";
+import useUserHook from '../../redux/features/user/useUserHook';
+import useCartHook from '../../redux/features/cart/useCartHook';
 import Dropdown from "../DropDown";
 import UserDropdown from "../UserDropDown";
 import CartButton from "../CartSidebar/CartButton";
@@ -19,29 +18,36 @@ const Navbar = ({
   hoverColor = "hover:text-gray-800",
   cartIconColor = "text-pink-600",
   cartIconHover = "hover:text-pink-700",
-  userLinks = [],
+  userLinks = []
 }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart.cart);
-  const subTotal = useSelector((state) => state.cart.subTotal);
-  const user = useSelector((state) => state.user.user);
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+
+  const {
+    user,
+    isAuthenticated,
+    logout: logoutUser,
+    initializeAuth
+  } = useUserHook();
+  
+  useEffect(() => {
+    initializeAuth();
+    // eslint-disable-next-line
+  }, []);
+
+  const {
+    cart,
+    subTotal,
+    addItem,
+    removeItem,
+    clearItems
+  } = useCartHook();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
 
-  useEffect(() => {
-    dispatch(loadCart());
-    dispatch(initAuth());
-    // eslint-disable-next-line
-  }, [dispatch]);
-
-  // No need to dispatch saveCart; cart is saved in localStorage by the reducer
-
   const handleLogout = () => {
-    dispatch(logoutAction());
+    logoutUser();
     navigate("/login");
   };
 
@@ -136,9 +142,9 @@ const Navbar = ({
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         cart={cart}
-        addToCart={(key, qty, itemDetails) => dispatch(addToCart({ key, qty, itemDetails }))}
-        removeFromCart={(key, qty) => dispatch(removeFromCart({ key, qty }))}
-        clearCart={() => dispatch(clearCart())}
+        addToCart={addItem}
+        removeFromCart={removeItem}
+        clearCart={clearItems}
         subTotal={subTotal}
       />
     </>

@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
-const mongoose = require("mongoose");
 
 const handleSignup = async (req, res) => {
   try {
@@ -269,31 +268,23 @@ const forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "No account found with this email!" });
 
-    // Generate reset token
-    const token = crypto.randomBytes(20).toString("hex");
+    // Generate 6 digit reset code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    user.resetPasswordToken = token;
+    user.resetPasswordToken = resetCode;
     user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15m
     await user.save();
 
-    // send mail token
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${email}`;
-    const emailContent = `
-      <h2>Reset Your Password</h2>
-      <p>Click the link below to reset your password:</p>
-      <a href="${resetUrl}">${resetUrl}</a>
-      <p>Token :-  ${token} </p>
-      <p>This link will expire in 15 minutes.</p>
-    `;
     await sendEmail({
       to: email,
       subject: "Password Reset Request",
-      html: emailContent,
+      html: `<p>Your password reset code is: <strong>${resetCode}</strong></p>
+             <p>This code will expire in 15 minutes.</p>`
     });
 
     return res.json({
-      message: "Password reset token sent to email",
-      ...(process.env.NODE_ENV === "development" && { token }),
+      success: true,
+      message: "Password reset code sent to email"
     });
   } catch (error) {
     console.error("Forgot Password Error:", error);
@@ -304,16 +295,16 @@ const forgotPassword = async (req, res) => {
 // RESET PASSWORD
 const resetPassword = async (req, res) => {
   try {
-    const { email, token, newPassword } = req.body;
-    console.log("Reset Password Data:", { email, token, newPassword });
-    console.log("Reset Password Body:", req.body);
-    if (!email || !token || !newPassword) return res.status(400).json({ message: "All fields are required!" });
+    const { email, otp, newPassword } = req.body;
+    // console.log("Reset Password Data:", { email, otp, newPassword });
+    // console.log("Reset Password Body:", req.body);
+    if (!email || !otp || !newPassword) return res.status(400).json({ message: "All fields are required!" });
 
     if (newPassword.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters long" });
 
     const user = await User.findOne({
       email,
-      resetPasswordToken: token,
+      resetPasswordToken: otp,
       resetPasswordExpires: { $gt: Date.now() },
     });
 
@@ -324,7 +315,7 @@ const resetPassword = async (req, res) => {
     user.resetPasswordExpires = null;
     await user.save();
 
-    return res.json({ message: "Password has been reset successfully" });
+    return res.json({ success: true, message: "Password has been reset successfully" });
   } catch (error) {
     console.error("Reset Password Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

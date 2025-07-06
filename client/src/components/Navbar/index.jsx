@@ -19,7 +19,7 @@ const Navbar = ({
   hoverColor = "hover:text-gray-800",
   cartIconColor = "text-pink-600",
   cartIconHover = "hover:text-pink-700",
-  adminLinks = [],
+  userLinks = [],
 }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -72,7 +72,7 @@ const Navbar = ({
               <Dropdown label="Tshirts" items={tshirtItems} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${hoverColor}`} />
 
               {isAuthenticated ? (
-                <UserDropdown user={user} adminLinks={adminLinks} />
+                <UserDropdown user={user} userLinks={userLinks} />
               ) : (
                 <div className="flex items-center">
                   <Link to="/login" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out mx-2">
@@ -91,7 +91,7 @@ const Navbar = ({
             <div className="md:hidden flex items-center space-x-2">
               {/* User dropdown for mobile */}
               {isAuthenticated ? (
-                <UserDropdown user={user} adminLinks={adminLinks} />
+                <UserDropdown user={user} userLinks={userLinks} />
               ) : (
                 <div className="flex items-center space-x-1">
                   <Link to="/login" className="px-2 py-1 text-xs rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">

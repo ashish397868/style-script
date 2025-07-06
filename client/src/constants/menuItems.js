@@ -16,3 +16,9 @@ export const adminLinks = [
   { label: "Orders", path: "/admin/orders" },
   { label: "Users", path: "/admin/users" },
 ];
+
+export const userLinks=[
+  { label: "Profile", path: "/profile" },
+  { label: "Orders", path: "/orders" },
+  { label: "Addresses", path: "/addresses" }
+];

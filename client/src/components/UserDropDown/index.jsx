@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const UserDropdown = ({ user, adminLinks = [] }) => {
+const UserDropdown = ({ user, userLinks = [] }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
@@ -34,7 +34,7 @@ const UserDropdown = ({ user, adminLinks = [] }) => {
 
       {open && (
         <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-50">
-          {adminLinks.map((item, index) => (
+          {userLinks.map((item, index) => (
             <Link
               key={index}
               to={item.path}
@@ -44,6 +44,19 @@ const UserDropdown = ({ user, adminLinks = [] }) => {
               {item.label}
             </Link>
           ))}
+          {/* Logout User on click make it a button*/}
+          <div>
+            <button
+              onClick={() => {
+                // Handle logout logic here
+                setOpen(false);
+              }}
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              Logout
+            </button>          
+          </div>
+
         </div>
       )}
     </div>

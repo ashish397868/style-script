@@ -12,10 +12,14 @@ const Signup              = lazy(() => import("./screens/Signup"));
 const ForgotPassword      = lazy(() => import("./screens/ForgotPassword"));
 const UserProfile         = lazy(() => import("./screens/UserProfile"));
 
-
 // user orders
 const Orders              = lazy(() => import("./screens/Orders"));
 const OrderDetail         = lazy(() => import("./screens/OrderDetail"));
+
+// address pages
+const AddressesBook       = lazy(() => import("./screens/AddressesBook"));
+const EditAddressPage     = lazy(() => import("./screens/EditAddressPage"));
+const NewAddressPage      = lazy(() => import("./screens/NewAddressPage"));
 
 const ProductPage         = lazy(() => import("./components/ProductPage"));
 const Checkout            = lazy(() => import("./components/Checkout"));
@@ -25,9 +29,6 @@ const Success             = lazy(() => import("./components/Success"));
 const Products            = lazy(() => import("./components/Products"));
 const CategoryPage        = lazy(() => import("./components/CategoryPage"));
 
-const AddressesBook       = lazy(() => import("./components/AddressesBook"));
-const EditAddressPage     = lazy(() => import("./components/EditAddressPage"));
-const NewAddressPage      = lazy(() => import("./components/NewAddressPage"));
 const ThemesPage         = lazy(() => import("./components/ThemePage"));
 
 

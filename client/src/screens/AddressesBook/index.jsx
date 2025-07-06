@@ -1,35 +1,41 @@
-import { useEffect, useState, useCallback } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { userAPI } from '../../services/api';
+import { useEffect, useState } from 'react';
 import { FiEdit, FiTrash2, FiMapPin, FiCheck, FiPlus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-import Loader from '../Loader';
+import useUserProfile from "../../redux/features/user/userProfileHook";
+import Loader from '../../components/Loader';
 
 const AddressBook = () => {
-  const user = useSelector((state) => state.user.user);
-  const dispatch = useDispatch();
+  const { user, fetchProfile, updateProfile } = useUserProfile();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
-  // Always fetch latest user profile from backend on mount and after address changes
-  const fetchProfile = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await userAPI.getProfile();
-      dispatch({ type: 'user/setUser', payload: res.data });
-      setAddresses(res.data.addresses || []);
-    } catch (err) {
-      setAddresses([]);
-      setError('Failed to load addresses');
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch]);
+  // const fetchProfile = useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     const res = await userAPI.getProfile();
+  //     dispatch({ type: 'user/setUser', payload: res.data });
+  //     setAddresses(res.data.addresses || []);
+  //   } catch (err) {
+  //     setAddresses([]);
+  //     setError('Failed to load addresses');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, [dispatch]);
 
   useEffect(() => {
-    fetchProfile();
+    setLoading(true);
+    fetchProfile()
+      .then((res) => {
+        setAddresses(res.addresses || []);
+        setError('');
+      })
+      .catch(() => {
+        setAddresses([]);
+        setError('Failed to load addresses');
+      })
+      .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, []);
 
@@ -53,8 +59,8 @@ const AddressBook = () => {
     setError('');
     try {
       const updatedAddresses = addresses.map(addr => ({ ...addr, isDefault: addr._id === id }));
-      await userAPI.setDefaultAddress(updatedAddresses);
-      await fetchProfile();
+      await updateProfile({ addresses: updatedAddresses });
+      setAddresses(updatedAddresses);
     } catch (err) {
       setError('Failed to set default address');
     } finally {
@@ -68,8 +74,8 @@ const AddressBook = () => {
     setError('');
     try {
       const updatedAddresses = addresses.filter(addr => addr._id !== id);
-      await userAPI.removeAddress(updatedAddresses);
-      await fetchProfile();
+      await updateProfile({ addresses: updatedAddresses });
+      setAddresses(updatedAddresses);
     } catch (err) {
       setError('Failed to remove address');
     } finally {

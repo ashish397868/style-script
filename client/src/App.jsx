@@ -28,10 +28,12 @@ const ThemesPage         = lazy(() => import("./screens/ThemePage"));
 // product page
 const ProductPage         = lazy(() => import("./components/ProductPage"));
 
+// Checkout and order review
+const Success             = lazy(() => import("./screens/Success"));
+
+
 const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));
-const Success             = lazy(() => import("./components/Success"));
-
 const Products            = lazy(() => import("./components/Products"));
 
 // Admin routes

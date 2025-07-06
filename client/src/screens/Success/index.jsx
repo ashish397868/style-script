@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { FiCheckCircle, FiShoppingBag, FiTruck } from "react-icons/fi";
-import Loader from "../Loader";
+import Loader from "../../components/Loader";
 import { orderAPI } from "../../services/api";
-import RelatedProducts from "../RelatedProducts";
+import RelatedProducts from "../../components/RelatedProducts";
 
 export function Success() {
   const { id } = useParams();

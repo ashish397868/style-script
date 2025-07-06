@@ -21,16 +21,18 @@ const AddressesBook       = lazy(() => import("./screens/AddressesBook"));
 const EditAddressPage     = lazy(() => import("./screens/EditAddressPage"));
 const NewAddressPage      = lazy(() => import("./screens/NewAddressPage"));
 
+// category and theme pages
+const CategoryPage        = lazy(() => import("./screens/CategoryPage"));
+const ThemesPage         = lazy(() => import("./screens/ThemePage"));
+
+// product page
 const ProductPage         = lazy(() => import("./components/ProductPage"));
+
 const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));
 const Success             = lazy(() => import("./components/Success"));
 
 const Products            = lazy(() => import("./components/Products"));
-const CategoryPage        = lazy(() => import("./components/CategoryPage"));
-
-const ThemesPage         = lazy(() => import("./components/ThemePage"));
-
 
 // Admin routes
 const UserManagement      = lazy(() => import("./components/Admin/UserManagement"));

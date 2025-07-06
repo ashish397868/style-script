@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
-import ProductCard from "../ProductCard";
+import ProductCard from "../../components/ProductCard";
 import { useEffect, useState } from "react";
 import { productAPI } from "../../services/api";
-import Loader from "../Loader";
+import Loader from "../../components/Loader";
 
-const ThemePage = () => {
-  const { theme } = useParams();
+const CategoryPage = () => {
+  const { category } = useParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,18 +14,18 @@ const ThemePage = () => {
     setLoading(true);
     setError(null);
     
-    productAPI.getProductsByTheme(theme)
+    productAPI.getProductsByCategory(category)
       .then(res => {
-        console.log("Theme products received:", res.data);
+        console.log("Category products received:", res.data);
         setProducts(res.data);
         setLoading(false);
       })
       .catch(err => {
-        console.error("Error fetching theme products:", err);
+        console.error("Error fetching category products:", err);
         setError(err.message || "Failed to load products");
         setLoading(false);
       });
-  }, [theme]);
+  }, [category]);
 
   if (loading) {
     return (
@@ -43,7 +43,7 @@ const ThemePage = () => {
         <div className="container px-5 py-12 mx-auto">
           <div className="text-center py-8">
             <p className="text-xl text-red-600 mb-4">
-              Error loading {theme.toLowerCase()}
+              Error loading {category.toLowerCase()}
             </p>
             <p className="text-gray-600">{error}</p>
             <button 
@@ -63,10 +63,10 @@ const ThemePage = () => {
       <div className="container px-5 py-12 mx-auto">
         <div className="flex flex-col text-center w-full mb-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-4 capitalize">
-            {theme} Theme
+            {category} Collection
           </h1>
           <p className="lg:w-2/3 mx-auto text-gray-600">
-            Browse our latest collection of {theme.toLowerCase()} themed products.
+            Browse our latest collection of {category.toLowerCase()}.
           </p>
         </div>
 
@@ -74,17 +74,21 @@ const ThemePage = () => {
           <>
             <div className="text-center mb-6">
               <p className="text-gray-600">
-                Showing {products.length} {products.length === 1 ? 'product' : 'products'} in {theme.toLowerCase()}
+                Showing {products.length} {products.length === 1 ? 'product' : 'products'} in {category.toLowerCase()}
               </p>
             </div>
             
             <div className="flex flex-wrap -m-4">
-              {products.map(product => (
-                <ProductCard 
-                  key={product._id} 
-                  product={product}
-                />
-              ))}
+              {products.map(product => {
+                // Each product already has its variants grouped by the backend
+                return (
+                  <ProductCard 
+                    key={product._id} 
+                    product={product}
+                    // variants are already included in product.variants from backend
+                  />
+                );
+              })}
             </div>
           </>
         ) : (
@@ -92,10 +96,10 @@ const ThemePage = () => {
             <div className="max-w-md mx-auto">
               <div className="text-6xl mb-4">📦</div>
               <p className="text-xl text-gray-700 mb-4">
-                No {theme.toLowerCase()} themed products available at the moment.
+                No {category.toLowerCase()} available at the moment.
               </p>
               <p className="text-gray-600 mb-6">
-                Please check back later for new arrivals, or browse other themes.
+                Please check back later for new arrivals, or browse other categories.
               </p>
               <button 
                 onClick={() => window.history.back()} 
@@ -111,4 +115,4 @@ const ThemePage = () => {
   );
 };
 
-export default ThemePage;
+export default CategoryPage;

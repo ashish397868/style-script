@@ -10,12 +10,16 @@ import Home from "./components/HomePage";           // eagerly loaded
 const Login               = lazy(() => import("./screens/Login"));
 const Signup              = lazy(() => import("./screens/Signup"));
 const ForgotPassword      = lazy(() => import("./screens/ForgotPassword"));
+const UserProfile         = lazy(() => import("./screens/UserProfile"));
 
 
 const ProductPage         = lazy(() => import("./components/ProductPage"));
 const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));
 const Success             = lazy(() => import("./components/Success"));
+
+
+// Admin routes
 const UserManagement      = lazy(() => import("./components/Admin/UserManagement"));
 const ReviewManagement    = lazy(() => import("./components/Admin/ReviewManagement"));
 const OrderManagement     = lazy(() => import("./components/Admin/OrderManagement"));
@@ -25,7 +29,7 @@ const AdminProductList    = lazy(() => import("./components/Admin/AdminProductLi
 const EditProductPage     = lazy(() => import("./components/Admin/EditProductPage"));
 const Products            = lazy(() => import("./components/Products"));
 const CategoryPage        = lazy(() => import("./components/CategoryPage"));
-const UserProfile         = lazy(() => import("./components/UserProfile"));
+
 const Orders              = lazy(() => import("./components/Orders"));
 const OrderDetail         = lazy(() => import("./components/OrderDetail"));
 const AddressesBook       = lazy(() => import("./components/AddressesBook"));
@@ -41,6 +45,8 @@ const ContactUs           = lazy(() => import("./screens/ContactUs"));
 const ShippingPolicy      = lazy(() => import("./screens/ShippingPolicy"));
 const ReturnPolicy        = lazy(() => import("./screens/ReturnPolicy"));
 const NotFound            = lazy(() => import("./screens/NotFound"));
+
+// Protected route wrapper
 const ProtectedRoute      = lazy(() => import("./screens/ProtectedRoute"));
 
 function AppContent() {

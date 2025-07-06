@@ -1,15 +1,21 @@
 import { useEffect } from "react";
 import Loader from "../Loader";
-import { useProductStore } from "../../store/productStore";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchProductsAsync } from "../../redux/features/productSlice";
 import ProductCard from "../ProductCard";
 
 const Tshirts = () => {
-  const { products, fetchProducts, loading, error } = useProductStore();
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.product.products);
+  const loading = useSelector((state) => state.product.loading);
+  const error = useSelector((state) => state.product.error);
 
   useEffect(() => {
-    fetchProducts();
+    if (!products || products.length === 0) {
+      dispatch(fetchProductsAsync());
+    }
     // eslint-disable-next-line
-  }, []);
+  }, [dispatch, products]);
 
   // Filter t-shirts category (assuming category is 'tshirts' or similar)
   const tshirtProducts = products.filter(

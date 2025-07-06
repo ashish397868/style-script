@@ -1,10 +1,12 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
+import { useSelector } from 'react-redux';
 import AccessDenied from '../AccessDenied';
 
 // ProtectedRoute component that checks both authentication and role
 const ProtectedRoute = ({ children, requireAdmin }) => {
-  const { isAuthenticated, user } = useUserStore();
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  const user = useSelector((state) => state.user.user);
+
   const location = useLocation();
 
 

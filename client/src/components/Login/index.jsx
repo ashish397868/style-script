@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, clearError } from '../../redux/features/user/userSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Button from '../Button';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error, clearError } = useUserStore();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const error = useSelector((state) => state.user.error);
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,13 +37,15 @@ const Login = () => {
     if (!validateForm()) return;
 
     try {
-      const response = await login(formData);
-      console.log('Login successful:', response);
-      const redirectTo = location.state?.from || '/';
-      navigate(redirectTo, { replace: true });
+      const resultAction = await dispatch(loginUser(formData));
+      if (loginUser.fulfilled.match(resultAction)) {
+        const redirectTo = location.state?.from || '/';
+        navigate(redirectTo, { replace: true });
+      } else {
+        setMessage(resultAction.payload || 'Login failed. Please try again.');
+      }
     } catch (err) {
-      console.error('Login error:', err);
-      setMessage(err.response?.data?.message || 'Login failed. Please try again.');
+      setMessage('Login failed. Please try again.');
     }
   };
 

@@ -1,13 +1,16 @@
 // components/Signup.js
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
+import { useDispatch, useSelector } from 'react-redux';
+import { signupUser, clearError } from '../../redux/features/user/userSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Button from '../Button';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { signup, isLoading, error, clearError } = useUserStore();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const error = useSelector((state) => state.user.error);
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -20,8 +23,9 @@ const Signup = () => {
 
   // Clear store-level error when inputs change
   useEffect(() => {
-    if (error) clearError();
-  }, [formData, clearError, error]);
+    if (error) dispatch(clearError());
+    // eslint-disable-next-line
+  }, [formData, error, dispatch]);
 
   const validateForm = () => {
     const errors = {};
@@ -38,25 +42,22 @@ const Signup = () => {
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
-  };  const handleSubmit = async (e) => {
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     if (!validateForm()) return;
 
     try {
-      const response = await signup(formData);
-      console.log('Signup successful:', response);
-      if (response.user) {
-        navigate('/', { replace: true });
+      const resultAction = await dispatch(signupUser(formData));
+      if (signupUser.fulfilled.match(resultAction)) {
+        setMessage('Signup successful! Redirecting to home...');
+        setTimeout(() => navigate('/'), 1500);
       } else {
-        navigate('/login', { 
-          state: { message: 'Account created successfully! Please login.' },
-          replace: true 
-        });
+        setMessage(resultAction.payload || 'Signup failed. Please try again.');
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      setMessage(err.response?.data?.message || 'Signup failed. Please try again.');
+      setMessage('Signup failed. Please try again.');
     }
   };
 

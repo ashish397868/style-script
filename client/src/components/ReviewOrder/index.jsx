@@ -1,5 +1,5 @@
-import { useCartStore } from "../../store/cartStore";
-import { useCheckoutStore } from "../../store/checkoutStore";
+import { useSelector, useDispatch } from "react-redux";
+import { addToCart, removeFromCart, clearCart } from "../../redux/features/cart/cartSlice";
 import { paymentAPI, orderAPI } from "../../services/api";
 
 import { useNavigate } from "react-router-dom";
@@ -7,12 +7,10 @@ import { useState } from "react";
 import { FiTruck, FiCreditCard, FiArrowLeft, FiCheck, FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
 
 export default function ReviewOrder() {
-  const cart = useCartStore((state) => state.cart);
-  const subTotal = useCartStore((state) => state.subTotal);
-  const addToCart = useCartStore((state) => state.addToCart);
-  const removeFromCart = useCartStore((state) => state.removeFromCart);
-  const clearCart = useCartStore((state) => state.clearCart);
-  const selectedAddress = useCheckoutStore((state) => state.selectedAddress);
+  const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart.cart);
+  const subTotal = useSelector((state) => state.cart.subTotal);
+  const selectedAddress = useSelector((state) => state.checkout.selectedAddress);
 
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
@@ -24,15 +22,15 @@ export default function ReviewOrder() {
   }
 
   const handleIncrease = (key, item) => {
-    addToCart(key, 1, item);
+    dispatch(addToCart({ key, qty: 1, itemDetails: item }));
   };
 
   const handleDecrease = (key) => {
-    removeFromCart(key, 1);
+    dispatch(removeFromCart({ key, qty: 1 }));
   };
 
   const handleRemove = (key) => {
-    removeFromCart(key, cart[key].qty);
+    dispatch(removeFromCart({ key, qty: cart[key].qty }));
   };
 
   // Function to load Razorpay SDK dynamically
@@ -151,7 +149,7 @@ export default function ReviewOrder() {
           receipt: receiptId, // always use the original receiptId
           email: user.email,
         });
-        clearCart();
+        dispatch(clearCart());
         navigate(`/success/${orderRes.data.order._id}`);
       } catch (verifyErr) {
         console.error(verifyErr);

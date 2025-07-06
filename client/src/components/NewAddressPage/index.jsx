@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
-import { userAPI } from '../../services/api';
+import { useSelector, useDispatch } from 'react-redux';
+import { addAddressAsync } from '../../redux/features/userSlice';
 import { FiSave, FiX, FiMapPin, FiPlus } from 'react-icons/fi';
 import Loader from '../Loader';
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
-  const user = useUserStore((s) => s.user);
-  const setUser = useUserStore((s) => s.setUser);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [address, setAddress] = useState({
     name: '',
     addressLine1: '',
@@ -36,17 +36,12 @@ const NewAddressPage = () => {
     setLoading(true);
     setError('');
     try {
-      let addresses = Array.isArray(user?.addresses) ? [...user.addresses] : [];
-      // If isDefault, unset all others
-      if (address.isDefault) {
-        addresses = addresses.map(a => ({ ...a, isDefault: false }));
+      const resultAction = await dispatch(addAddressAsync(address));
+      if (addAddressAsync.fulfilled.match(resultAction)) {
+        navigate('/addresses');
+      } else {
+        setError(resultAction.payload || 'Failed to add address');
       }
-      // Add new address (simulate _id for frontend, backend will replace)
-      const newAddress = { ...address, _id: Date.now().toString() };
-      addresses.push(newAddress);
-      const res = await userAPI.setDefaultAddress(addresses);
-      setUser(res.data);
-      navigate('/addresses');
     } catch (err) {
       setError('Failed to add address');
     } finally {

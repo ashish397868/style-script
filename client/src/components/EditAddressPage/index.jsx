@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser as setUserAction } from '../../redux/features/userSlice';
 import { userAPI } from '../../services/api';
 import { FiSave, FiX, FiMapPin } from 'react-icons/fi';
 import Loader from '../Loader';
@@ -8,8 +9,8 @@ import Loader from '../Loader';
 const EditAddressPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const user = useUserStore((s) => s.user);
-  const setUser = useUserStore((s) => s.setUser);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
   const [address, setAddress] = useState({
     name: '',
     addressLine1: '',
@@ -69,7 +70,7 @@ const EditAddressPage = () => {
         });
       }
       const res = await userAPI.setDefaultAddress(updatedAddresses);
-      setUser(res.data);
+      dispatch(setUserAction(res.data));
       navigate('/addresses');
     } catch (err) {
       setError('Failed to update address');

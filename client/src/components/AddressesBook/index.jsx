@@ -1,13 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useUserStore } from '../../store/userStore';
+import { useSelector, useDispatch } from 'react-redux';
 import { userAPI } from '../../services/api';
 import { FiEdit, FiTrash2, FiMapPin, FiCheck, FiPlus } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../Loader';
 
 const AddressBook = () => {
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
+  const user = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -18,7 +18,7 @@ const AddressBook = () => {
     setLoading(true);
     try {
       const res = await userAPI.getProfile();
-      setUser(res.data);
+      dispatch({ type: 'user/setUser', payload: res.data });
       setAddresses(res.data.addresses || []);
     } catch (err) {
       setAddresses([]);
@@ -26,7 +26,7 @@ const AddressBook = () => {
     } finally {
       setLoading(false);
     }
-  }, [setUser]);
+  }, [dispatch]);
 
   useEffect(() => {
     fetchProfile();

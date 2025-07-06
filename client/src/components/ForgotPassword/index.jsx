@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/userStore';
+import { useDispatch, useSelector } from 'react-redux';
+import { forgotPassword, resetPassword, clearError } from '../../redux/features/userSlice';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Button from '../Button';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const { forgotPassword, resetPassword, isLoading, error, clearError } = useUserStore();
+  const dispatch = useDispatch();
+  const isLoading = useSelector((state) => state.user.isLoading);
+  const error = useSelector((state) => state.user.error);
 
   const [step, setStep] = useState(1); // 1: email input, 2: reset code, 3: new password
   const [formData, setFormData] = useState({
@@ -48,11 +51,15 @@ const ForgotPassword = () => {
     if (!validateEmailForm()) return;
 
     try {
-      const response = await forgotPassword(formData.email);
-      setMessage('A password reset link has been sent to your email. Please check your inbox.');
-      setStep(2);
+      const resultAction = await dispatch(forgotPassword(formData.email));
+      if (forgotPassword.fulfilled.match(resultAction)) {
+        setMessage('A password reset link has been sent to your email. Please check your inbox.');
+        setStep(2);
+      } else {
+        setMessage(resultAction.payload || 'Failed to send reset email. Please try again.');
+      }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Failed to send reset email. Please try again.');
+      setMessage('Failed to send reset email. Please try again.');
     }
   };
 
@@ -62,16 +69,24 @@ const ForgotPassword = () => {
     if (!validateResetForm()) return;
 
     try {
-      await resetPassword({email:formData.email,token: formData.resetCode, newPassword: formData.newPassword});
-      setMessage('Password reset successful!');
-      setTimeout(() => {
-        navigate('/login', { 
-          state: { message: 'Password has been reset successfully. Please login with your new password.' },
-          replace: true 
-        });
-      }, 2000);
+      const resultAction = await dispatch(resetPassword({
+        email: formData.email,
+        resetCode: formData.resetCode,
+        newPassword: formData.newPassword
+      }));
+      if (resetPassword.fulfilled.match(resultAction)) {
+        setMessage('Password reset successful!');
+        setTimeout(() => {
+          navigate('/login', { 
+            state: { message: 'Password has been reset successfully. Please login with your new password.' },
+            replace: true 
+          });
+        }, 2000);
+      } else {
+        setMessage(resultAction.payload || 'Failed to reset password. Please try again.');
+      }
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Failed to reset password. Please try again.');
+      setMessage('Failed to reset password. Please try again.');
     }
   };
 

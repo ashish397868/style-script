@@ -5,9 +5,9 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "../Loader";
 import { FaStar, FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
 import { productAPI, reviewAPI } from "../../services/api";
-import { useProductStore } from "../../store/productStore";
-import { useCartStore } from "../../store/cartStore";
-import { useUserStore } from "../../store/userStore";
+import { fetchProducts } from "../../redux/features/product/productSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../redux/features/cart/cartSlice";
 import PincodeChecker from "../../components/PincodeChecker";
 import ReviewForm from "../../components/ReviewForm";
 import ReviewCard from "../../components/ReviewCard";
@@ -18,7 +18,9 @@ import "react-toastify/dist/ReactToastify.css";
 export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const { products, fetchProducts, loading: productsLoading } = useProductStore();
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.product.products);
+  const productsLoading = useSelector((state) => state.product.loading);
 
   const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
@@ -31,10 +33,15 @@ export default function ProductDetailPage() {
   const [reviews, setReviews] = useState([]);
   const [activeTab, setActiveTab] = useState("description");
 
-  const addToCart = useCartStore((s) => s.addToCart);
-  const isAuthenticated = useUserStore((s) => s.isAuthenticated);
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 
   // Fetch product + variants
+  useEffect(() => {
+    if (!products || products.length === 0) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products]);
+
   useEffect(() => {
     let foundProduct = null;
     if (products && products.length > 0) {
@@ -52,40 +59,12 @@ export default function ProductDetailPage() {
       } else {
         setVariants(products.filter((v) => v.title === foundProduct.title));
       }
+    } else if (products && products.length > 0) {
+      setError("Product not found.");
+      setProduct(null);
+      setIsLoading(false);
     } else {
-      // If not found in global products, fetch from API
       setIsLoading(true);
-      (async () => {
-        try {
-          const { data: prod } = await productAPI.getProductBySlug(slug);
-          setProduct(prod);
-          setColor(prod.color || "");
-          setSize(prod.size || "");
-          setError(null);
-          // Use variants from backend if present
-          if (Array.isArray(prod.variants) && prod.variants.length > 0) {
-            setVariants(prod.variants);
-          } else {
-            // fallback: try to get variants from global products
-            if (products && products.length > 0) {
-              setVariants(products.filter((v) => v.title === prod.title));
-            } else {
-              // fallback: fetch all variants from API
-              try {
-                const { data: allVariantsRaw } = await productAPI.getAllProducts({ title: prod.title });
-                setVariants(allVariantsRaw.filter((v) => v.title === prod.title));
-              } catch {
-                setVariants([]);
-              }
-            }
-          }
-        } catch {
-          setError("Product not found.");
-          setProduct(null);
-        } finally {
-          setIsLoading(false);
-        }
-      })();
     }
   }, [slug, products]);
   // When color changes, set size to a valid size for that color if current size is not available
@@ -260,14 +239,18 @@ const AvailabilityMessage = ({ color, size }) => {
       return;
     }
     const key = `${product._id}-${size}-${color}`;
-    addToCart(key, 1, {
-      price: product.price,
-      name: product.title,
-      size,
-      color,
-      image: product.images?.[0],
-      productId: product._id,
-    });
+    dispatch(addToCart({
+      key,
+      qty: 1,
+      itemDetails: {
+        price: product.price,
+        name: product.title,
+        size,
+        color,
+        image: product.images?.[0],
+        productId: product._id,
+      },
+    }));
     toast.success("Added to cart!");
   };
 
@@ -281,14 +264,18 @@ const AvailabilityMessage = ({ color, size }) => {
       return;
     }
     const key = `${product._id}-${size}-${color}`;
-    addToCart(key, 1, {
-      price: product.price,
-      name: product.title,
-      size,
-      color,
-      image: product.images && product.images[0],
-      productId: product._id,
-    });
+    dispatch(addToCart({
+      key,
+      qty: 1,
+      itemDetails: {
+        price: product.price,
+        name: product.title,
+        size,
+        color,
+        image: product.images && product.images[0],
+        productId: product._id,
+      },
+    }));
     navigate("/checkout");
   };
 

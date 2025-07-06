@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useUserStore } from "../../store/userStore";
-import { useCheckoutStore } from "../../store/checkoutStore";
+import { useSelector, useDispatch } from "react-redux";
+import { initAuth } from "../../redux/features/user/userSlice";
+import { setSelectedAddress as setSelectedAddressAction } from "../../redux/features/checkout/checkoutSlice";
 import api from "../../services/api";
 import { FiEdit2, FiPlus, FiCheck, FiX, FiMapPin, FiUser, FiPhone, FiHome } from "react-icons/fi";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
-Modal.setAppElement("#root");
+
+// Fix for SSR/CSR: Only set app element if window is defined
+if (typeof window !== "undefined") {
+  Modal.setAppElement("#root");
+}
 
 const AddressSelection = ({ onAddressSelect }) => {
   const navigate = useNavigate();
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
-  const initAuth = useUserStore((state) => state.initAuth);
-  const setSelectedAddress = useCheckoutStore((state) => state.setSelectedAddress);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user);
+  // const isAuthenticated = useSelector((state) => state.user.isAuthenticated); // if needed
+  // const selectedAddressRedux = useSelector((state) => state.checkout.selectedAddress); // if needed
 
   const [address, setAddress] = useState([]);
   const [selectedAddress, setSelectedAddressState] = useState(null);
@@ -33,15 +38,23 @@ const AddressSelection = ({ onAddressSelect }) => {
   // Ensure user is loaded from global state or fetch if token exists
   useEffect(() => {
     if (!user && localStorage.getItem('token')) {
-      initAuth();
+      dispatch(initAuth());
     }
     // eslint-disable-next-line
-  }, []);
+  }, [user, dispatch]);
 
   useEffect(() => {
     if (user && Array.isArray(user.addresses)) {
       setAddress(user.addresses);
       setSelectedAddressState(user.addresses.length > 0 ? user.addresses[0] : null);
+    } else if (user && Array.isArray(user.address)) {
+      // fallback for user.address (singular) as array
+      setAddress(user.address);
+      setSelectedAddressState(user.address.length > 0 ? user.address[0] : null);
+    } else if (user && user.address && typeof user.address === 'object') {
+      // fallback for user.address (singular) as object
+      setAddress([user.address]);
+      setSelectedAddressState(user.address);
     } else {
       setAddress([]);
       setSelectedAddressState(null);
@@ -122,7 +135,8 @@ const AddressSelection = ({ onAddressSelect }) => {
       const response = await api.patch("/users/profile", payload);
       
       if (response.data && response.data.user) {
-        setUser(response.data.user);
+        // Update user in Redux by re-initializing auth (fetches latest user)
+        dispatch(initAuth());
         
         if (response.data.user.address) {
           if (Array.isArray(response.data.user.address)) {
@@ -198,7 +212,7 @@ const AddressSelection = ({ onAddressSelect }) => {
 
   const handleDeliverToAddress = () => {
     if (selectedAddress) {
-      setSelectedAddress(selectedAddress);
+      dispatch(setSelectedAddressAction(selectedAddress));
       onAddressSelect?.(selectedAddress);
       navigate('/review-order');
     }
@@ -362,7 +376,7 @@ const AddressSelection = ({ onAddressSelect }) => {
             <div className="space-y-5">
               {/* ...existing form fields... */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <label className="flex text-sm font-medium text-gray-700 mb-2 items-center">
                   <FiUser className="mr-2 text-gray-500" /> Full Name
                 </label>
                 <input
@@ -380,7 +394,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                 {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <label className="flex text-sm font-medium text-gray-700 mb-2 items-center">
                   <FiPhone className="mr-2 text-gray-500" /> Phone Number
                 </label>
                 <input
@@ -398,7 +412,7 @@ const AddressSelection = ({ onAddressSelect }) => {
                 {errors.phone && <p className="mt-2 text-sm text-red-600">{errors.phone}</p>}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                <label className="flex text-sm font-medium text-gray-700 mb-2 items-center">
                   <FiHome className="mr-2 text-gray-500" /> Address Line 1
                 </label>
                 <input

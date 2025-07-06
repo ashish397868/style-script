@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
-import { useCartStore } from "../../store/cartStore";
-import { useUserStore } from "../../store/userStore";
+import { useSelector, useDispatch } from "react-redux";
+import { logout as logoutAction, initAuth } from "../../redux/features/user/userSlice";
+import { loadCart, addToCart, removeFromCart, clearCart } from "../../redux/features/cart/cartSlice";
 import Dropdown from "../DropDown";
 import UserDropdown from "../UserDropDown";
 import CartButton from "../CartSidebar/CartButton";
@@ -21,24 +22,26 @@ const Navbar = ({
   adminLinks = [],
 }) => {
   const navigate = useNavigate();
-  const { cart, addToCart, removeFromCart, subTotal, clearCart } = useCartStore();
-  const { user, logout, isAuthenticated } = useUserStore();
+  const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart.cart);
+  const subTotal = useSelector((state) => state.cart.subTotal);
+  const user = useSelector((state) => state.user.user);
+  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
 
   useEffect(() => {
-    useCartStore.getState().loadCart();
-    useUserStore.getState().initAuth();
-  }, []);
+    dispatch(loadCart());
+    dispatch(initAuth());
+    // eslint-disable-next-line
+  }, [dispatch]);
 
-  useEffect(() => {
-    useCartStore.getState().saveCart();
-  }, [cart]);
+  // No need to dispatch saveCart; cart is saved in localStorage by the reducer
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutAction());
     navigate("/login");
   };
 
@@ -129,7 +132,15 @@ const Navbar = ({
         </div>
       </nav>
 
-      <CartSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} cart={cart} addToCart={addToCart} removeFromCart={removeFromCart} clearCart={clearCart} subTotal={subTotal} />
+      <CartSidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        cart={cart}
+        addToCart={(key, qty, itemDetails) => dispatch(addToCart({ key, qty, itemDetails }))}
+        removeFromCart={(key, qty) => dispatch(removeFromCart({ key, qty }))}
+        clearCart={() => dispatch(clearCart())}
+        subTotal={subTotal}
+      />
     </>
   );
 };

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { userAPI } from '../../services/api';
-import { useUserStore } from '../../store/userStore';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserProfileAsync, updateUserProfileAsync } from '../../redux/features/userSlice';
 import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX } from 'react-icons/fi';
 import Loader from '../Loader';
 
 
 const UserProfile = () => {
-  const user = useUserStore((s) => s.user) || { name: '', email: '', phone: '' };
-  const setUser = useUserStore((s) => s.setUser);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user.user) || { name: '', email: '', phone: '' };
+  const userLoading = useSelector((state) => state.user.isLoading);
+  const userError = useSelector((state) => state.user.error);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', phone: '' });
   const [loading, setLoading] = useState(true);
@@ -15,7 +18,6 @@ const UserProfile = () => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    // If user is already in store, use it, else fetch from backend
     if (user && user.name) {
       setForm({
         name: user.name || '',
@@ -24,26 +26,23 @@ const UserProfile = () => {
       });
       setLoading(false);
     } else {
-      const fetchProfile = async () => {
-        setLoading(true);
-        try {
-          const res = await userAPI.getProfile();
-          setUser(res.data);
+      setLoading(true);
+      dispatch(fetchUserProfileAsync())
+        .unwrap()
+        .then((res) => {
           setForm({
-            name: res.data.name || '',
-            email: res.data.email || '',
-            phone: res.data.phone || '',
+            name: res.name || '',
+            email: res.email || '',
+            phone: res.phone || '',
           });
           setError('');
-        } catch (err) {
+        })
+        .catch(() => {
           setError('Failed to load profile. Please try again later.');
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProfile();
+        })
+        .finally(() => setLoading(false));
     }
-  }, [user, setUser]);
+  }, [user, dispatch]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -68,12 +67,11 @@ const UserProfile = () => {
     setError('');
     setSuccess('');
     try {
-      const res = await userAPI.updateProfile(form);
-      setUser(res.data);
+      const res = await dispatch(updateUserProfileAsync(form)).unwrap();
       setEditMode(false);
       setSuccess('Profile updated successfully!');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update profile. Please try again.');
+      setError(err || 'Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -95,16 +93,16 @@ const UserProfile = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {loading ? (
+          {loading || userLoading ? (
  <Loader />
           ) : (
             <div className="p-6 sm:p-8">
-              {error && (
+              {(error || userError) && (
                 <div className="bg-red-50 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  {error}
+                  {error || userError}
                 </div>
               )}
               

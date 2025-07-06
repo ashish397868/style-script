@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useProductStore } from '../../store/productStore';
-import { useCartStore } from '../../store/cartStore';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProductsAsync } from '../../redux/features/productSlice';
+import { addToCart } from '../../redux/features/cartSlice';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { FaStar, FaRegHeart, FaShoppingCart, FaFilter, FaTimes } from 'react-icons/fa';
@@ -12,8 +13,10 @@ import { useNavigate } from 'react-router-dom';
 
 const Products = () => {
   const navigate = useNavigate();
-  const { products, fetchProducts, loading, error } = useProductStore();
-  const addToCart = useCartStore((s) => s.addToCart);
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.product.products);
+  const loading = useSelector((state) => state.product.loading);
+  const error = useSelector((state) => state.product.error);
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [priceRange, setPriceRange] = useState([0, 5000]);
@@ -23,10 +26,10 @@ const Products = () => {
 
   useEffect(() => {
     if (!products || products.length === 0) {
-      fetchProducts();
+      dispatch(fetchProductsAsync());
     }
     // eslint-disable-next-line
-  }, []);
+  }, [dispatch, products]);
 
   // Categories with icons
   const categories = [
@@ -201,15 +204,19 @@ const Products = () => {
                   return;
                 }
                 const key = `${product._id || product.id}-${size}-${color}`;
-                addToCart(key, 1, {
-                  price: product.price,
-                  name: product.name || product.title,
-                  size,
-                  color,
-                  image: product.image || (Array.isArray(product.images) ? product.images[0] : undefined),
-                  productId: product._id || product.id,
-                });
-                toast.success(`${name} added to cart!`);
+            dispatch(addToCart({
+              key,
+              qty: 1,
+              itemDetails: {
+                price: product.price,
+                name: product.name || product.title,
+                size,
+                color,
+                image: product.image || (Array.isArray(product.images) ? product.images[0] : undefined),
+                productId: product._id || product.id,
+              },
+            }));
+            toast.success(`${name} added to cart!`);
               }}
               aria-label={`Add ${name} to cart`}
             >
@@ -269,7 +276,7 @@ const Products = () => {
         <h2 className="font-bold text-xl mb-2">Error Loading Products</h2>
         <p>{error}</p>
         <button 
-          onClick={() => fetchProducts(true)}
+          onClick={() => dispatch(fetchProductsAsync())}
           className="mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
         >
           Try Again

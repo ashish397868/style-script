@@ -72,7 +72,7 @@ const Navbar = ({
               <Dropdown label="Tshirts" items={tshirtItems} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${hoverColor}`} />
 
               {isAuthenticated ? (
-                <UserDropdown user={user} userLinks={userLinks} />
+                <UserDropdown user={user} userLinks={userLinks} onLogout={handleLogout} />
               ) : (
                 <div className="flex items-center">
                   <Link to="/login" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out mx-2">

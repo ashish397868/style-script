@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const UserDropdown = ({ user, userLinks = [] }) => {
+const UserDropdown = ({ user, userLinks = [], onLogout }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
@@ -48,13 +48,13 @@ const UserDropdown = ({ user, userLinks = [] }) => {
           <div>
             <button
               onClick={() => {
-                // Handle logout logic here
                 setOpen(false);
+                if (onLogout) onLogout();
               }}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Logout
-            </button>          
+            </button>
           </div>
 
         </div>

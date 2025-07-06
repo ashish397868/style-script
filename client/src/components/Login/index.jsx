@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, clearError } from '../../redux/features/user/userSlice';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Button from '../Button';
+import useUserHook from '../../redux/features/user/useUserHook'
 
 const Login = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const isLoading = useSelector((state) => state.user.isLoading);
-  const error = useSelector((state) => state.user.error);
+  const { login, isLoading, error, clearUserError } = useUserHook();
 
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,18 +27,19 @@ const Login = () => {
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     if (!validateForm()) return;
 
     try {
-      const resultAction = await dispatch(loginUser(formData));
-      if (loginUser.fulfilled.match(resultAction)) {
-        const redirectTo = location.state?.from || '/';
-        navigate(redirectTo, { replace: true });
+      const resultAction = await login(formData);
+      if (resultAction.payload?.success) {
+        setMessage(resultAction.payload?.message || 'Login successful! Redirecting to home...');
+        navigate("/");
       } else {
-        setMessage(resultAction.payload || 'Login failed. Please try again.');
+        setMessage(resultAction.payload?.message || 'Login failed. Please try again.');
       }
     } catch (err) {
       setMessage('Login failed. Please try again.');
@@ -52,36 +49,30 @@ const Login = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    if (error) clearError();
+    if (error) clearUserError();
     if (formErrors[name]) setFormErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const togglePasswordVisibility = () => setShowPassword(prev => !prev);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-xl p-8 space-y-6">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:px-6">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-6 md:p-8 space-y-6">
+        <h2 className="text-center text-2xl sm:text-3xl font-extrabold text-gray-900">
           Sign in to your account
         </h2>
 
-        {message && (
-          <div className={`p-3 rounded-md ${message.includes('successful') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-            {message}
+        {(error || message) && (
+          <div className={`p-3 rounded-md ${message.includes('success') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {error || message}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-              <span className="block sm:inline">{error}</span>
-            </div>
-          )}
-
-          <div className="rounded-md shadow-sm -space-y-px">
+        <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+          <div className="space-y-4">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="sr-only">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
               <input
                 id="email"
                 name="email"
@@ -89,50 +80,58 @@ const Login = () => {
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${formErrors.email ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
+                className={`appearance-none relative block w-full px-3 py-2.5 border ${
+                  formErrors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
+                } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm`}
                 placeholder="Email address"
               />
-              {formErrors.email && <p className="mt-2 text-sm text-red-600">{formErrors.email}</p>}
+              {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
             </div>
 
             {/* Password Input */}
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                name="password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`appearance-none rounded-none relative block w-full px-3 py-2 border ${formErrors.password ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm`}
-                placeholder="Password"
-              />
-              <button
-                type="button"
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                onClick={togglePasswordVisibility}
-              >
-                {showPassword
-                  ? <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400" />
-                  : <AiOutlineEye className="h-5 w-5 text-gray-400" />}
-              </button>
-              {formErrors.password && <p className="mt-2 text-sm text-red-600">{formErrors.password}</p>}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`appearance-none relative block w-full px-3 py-2.5 border ${
+                    formErrors.password ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-pink-500 focus:border-pink-500'
+                  } placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm pr-10`}
+                  placeholder="Password"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword
+                    ? <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400 hover:text-gray-500" />
+                    : <AiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-500" />}
+                </button>
+              </div>
+              {formErrors.password && <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>}
             </div>
           </div>
 
           {/* Forgot Password Link */}
-          <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-pink-600 hover:text-pink-500">
-                Forgot your password?
-              </Link>
-            </div>
+          <div className="flex justify-end">
+            <Link to="/forgot-password" className="text-sm font-medium text-pink-600 hover:text-pink-500">
+              Forgot your password?
+            </Link>
           </div>
 
           {/* Submit Button */}
           <div>
-            <Button type="submit" loading={isLoading}>
+            <Button 
+              type="submit" 
+              loading={isLoading}
+              className="w-full justify-center py-2.5"
+            >
               {isLoading ? 'Signing in...' : 'Sign in'}
             </Button>
           </div>

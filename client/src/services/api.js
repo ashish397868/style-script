@@ -1,7 +1,3 @@
-// Pincode Routes
-export const pincodeAPI = {
-  getPincodes: () => api.get('/get-pincode'),
-};
 import axios from 'axios';
 
 const api = axios.create({
@@ -79,6 +75,11 @@ export const userAPI = {
   deleteAccount: () => api.delete('/users/profile'),
   setDefaultAddress: (addresses) => api.patch('/users/profile', { addresses }),
   removeAddress: (addresses) => api.patch('/users/profile', { addresses }),
+};
+
+// Pincode Routes
+export const pincodeAPI = {
+  getPincodes: () => api.get('/get-pincode'),
 };
 
 // Product Routes

@@ -19,7 +19,10 @@ export default function ReviewForm({ productId, onSuccess }) {
       toast.success("Review submitted!");
       setComment("");
       setRating(5);
-      onSuccess?.();
+      // Call onSuccess safely after successful submission
+      if (typeof onSuccess === "function") {
+        try { onSuccess(); } catch (e) { /* ignore */ }
+      }
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to submit review.");
     } finally {

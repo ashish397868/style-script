@@ -1,9 +1,12 @@
 // App.jsx
 import { Suspense, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Navbar from "./screens/Navbar";
-import Footer from "./screens/Footer";
-import Home from "./components/HomePage";           // eagerly loaded
+// import Navbar from "./screens/Navbar";
+// import Footer from "./screens/Footer";
+import Home from "./components/HomePage";
+
+const Navbar = lazy(() => import("./screens/Navbar")); // eagerly loaded
+const Footer = lazy(() => import("./screens/Footer")); // eagerly loaded
 
 // Lazy‑load all other route components:
 // Authentication
@@ -26,7 +29,7 @@ const CategoryPage        = lazy(() => import("./screens/CategoryPage"));
 const ThemesPage         = lazy(() => import("./screens/ThemePage"));
 
 // product page
-const ProductPage         = lazy(() => import("./components/ProductPage"));
+const ProductPage         = lazy(() => import("./screens/ProductPage"));
 
 // Checkout and order review
 const Success             = lazy(() => import("./screens/Success"));

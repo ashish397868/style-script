@@ -1,152 +1,169 @@
+// src/pages/HomeCarousel.jsx
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { useNavigate } from "react-router-dom";
-import { useMemo, Suspense, useCallback, useEffect } from "react";
 import FeatureCard from "./FeaturedCard";
-import { imageLink, collectionsImageLink, themeCollectionImageLink, features } from "../../constants/homePageConstants";
 import LazyMotionImg from "./LazyLoadingImage";
+import {
+  imageLink,
+  collectionsImageLink,
+  themeCollectionImageLink,
+  features,
+} from "../../constants/homePageConstants";
 
-const Index = () => {
+export default function HomeCarousel() {
   const navigate = useNavigate();
 
-  // Preload critical carousel images
+  // 1) Preload ALL carousel images at mount time
   useEffect(() => {
-    const preloadImages = imageLink.slice(0, 2).map(src => {
-      const img = new Image();
-      img.src = src;
-      return img;
+    const linkTags = imageLink.map((src) => {
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = src;
+      document.head.appendChild(link);
+      return link;
     });
-    
     return () => {
-      preloadImages.forEach(img => {
-        img.src = '';
-      });
+      linkTags.forEach((link) => document.head.removeChild(link));
     };
-  }, []);
+  }, [imageLink]);
 
-  // Memoize carousel images to prevent re-renders with optimizations
-  const carouselImages = useMemo(() => 
-    imageLink.map((src, index) => (
-      <div key={index}>
-        <LazyMotionImg
-          src={src}
-          alt={`Banner ${index + 1}`}
-          className="w-full h-auto"
-          index={index}
-          loading={index === 0 ? "eager" : "lazy"} // Load first image immediately
-          priority={index === 0} // Prioritize first image
-        />
-      </div>
-    )), []);
+  // 2) Keep track of current slide index so we can eager-load the next one
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Memoize collection images - updated to match theme size
-  const collectionImages = useMemo(() => 
-    collectionsImageLink.map((item, index) => (
-      <LazyMotionImg
-        key={`collection-${index}`}
-        src={item.url}
-        alt={`Collection ${index + 1}`}
-        className="w-full h-[400px] object-cover rounded-lg shadow-md"
-        index={index}
-        path={item.path} // Pass path for navigation
-      />
-    )), []);
+  // Memoize carousel slides
+  const carouselSlides = useMemo(
+    () =>
+      imageLink.map((src, idx) => {
+        // Decide loading strategy per-slide:
+        // - idx === 0  → eager (first slide)
+        // - idx === currentIndex + 1 → eager (preload the next slide)
+        // - otherwise → lazy
+        const loading = idx === 0 || idx === currentIndex + 1 ? "eager" : "lazy";
+        return (
+          <div key={idx} className="aspect-w-16 aspect-h-9 bg-gray-100">
+            <LazyMotionImg
+              src={src}
+              alt={`Banner ${idx + 1}`}
+              className="w-full h-full object-cover"
+              loading={loading}
+            />
+          </div>
+        );
+      }),
+    [imageLink, currentIndex]
+  );
 
-  // Memoize theme images
-  const themeImages = useMemo(() => 
-    themeCollectionImageLink.map((item, index) => (
-      <LazyMotionImg
-        key={`theme-${index}`}
-        src={item.url}
-        alt={`Theme ${index + 1}`}
-        className="w-full h-[400px] object-cover rounded-lg shadow-md"
-        index={index}
-        path={item.path} // Pass path for navigation
-      />
-    )), []);
+  // Collections grid
+  const collectionItems = useMemo(
+    () =>
+      collectionsImageLink.map(({ url, path }, idx) => (
+        <div
+          key={idx}
+          className="cursor-pointer w-full h-[400px] overflow-hidden rounded-lg shadow-md"
+          onClick={() => navigate(path)}
+        >
+          <LazyMotionImg
+            src={url}
+            alt={`Collection ${idx + 1}`}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )),
+    [collectionsImageLink, navigate]
+  );
 
-  const handleShopNowClick = useCallback(() => {
+  // Themes grid
+  const themeItems = useMemo(
+    () =>
+      themeCollectionImageLink.map(({ url, path }, idx) => (
+        <div
+          key={idx}
+          className="cursor-pointer w-full h-[400px] overflow-hidden rounded-lg shadow-md"
+          onClick={() => navigate(path)}
+        >
+          <LazyMotionImg
+            src={url}
+            alt={`Theme ${idx + 1}`}
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      )),
+    [themeCollectionImageLink, navigate]
+  );
+
+  const onShopNow = useCallback(() => {
     navigate("/products");
   }, [navigate]);
 
   return (
     <>
-      {/* Hero Carousel Section */}
-      <div className="max-w-full mx-auto relative flex justify-center items-center">
-        <div className="w-full">
-          {/* Preload first few images */}
-          {imageLink.slice(0, 3).map((src, index) => (
-            <link key={`preload-${index}`} rel="preload" as="image" href={src} />
-          ))}
-          
-          <Carousel 
-            autoPlay 
-            infiniteLoop 
-            showThumbs={false} 
-            showStatus={false} 
-            showIndicators={true} 
-            interval={5000} // Increased interval for better loading
-            stopOnHover 
-            dynamicHeight={false}
-            lazyLoad={false} // Disable carousel's lazy loading since we're handling it
-            swipeable={true}
-            emulateTouch={true}
-            preventMovementUntilSwipeScrollTolerance={true}
-            swipeScrollTolerance={50}
-          >
-            {carouselImages}
-          </Carousel>
+      {/* —— Hero Carousel —— */}
+      <div className="max-w-full mx-auto relative">
+        <Carousel
+          autoPlay
+          infiniteLoop
+          showThumbs={false}
+          showStatus={false}
+          showIndicators
+          interval={5000}
+          stopOnHover
+          dynamicHeight={false}
+          lazyLoad={true}
+          swipeable
+          emulateTouch
+          preventMovementUntilSwipeScrollTolerance
+          swipeScrollTolerance={50}
+          onChange={(index) => setCurrentIndex(index)}
+        >
+          {carouselSlides}
+        </Carousel>
 
-          <button 
-            className="absolute bottom-6 md:bottom-12 text-sm md:text-xl lg:text-2xl py-2 px-6 md:px-8 bg-white font-semibold md:font-bold rounded-xl md:rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors duration-200 z-10 shadow-lg left-1/2 transform -translate-x-1/2" 
-            onClick={handleShopNowClick}
-            aria-label="Shop Now"
-          >
-            Shop Now
-          </button>
-        </div>
+        <button
+          aria-label="Shop Now"
+          onClick={onShopNow}
+          className="absolute bottom-6 left-1/2 transform -translate-x-1/2 
+                     bg-white px-6 py-2 rounded-xl shadow-lg 
+                     text-lg font-semibold hover:bg-gray-100 transition"
+        >
+          Shop Now
+        </button>
       </div>
-      
-      {/* Collection Section */}
+
+      {/* —— Shop by Collection —— */}
       <section className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Shop by Collection</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Shop by Collection</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {collectionImages}
+          {collectionItems}
         </div>
       </section>
 
-      {/* Theme Section */}
+      {/* —— Shop by Theme —— */}
       <section className="max-w-6xl mx-auto px-4 py-12 bg-gray-50 rounded-xl my-8">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Shop by Theme</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Shop by Theme</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Suspense fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="w-full h-[400px] bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse rounded-lg" />
-              ))}
-            </div>
-          }>
-            {themeImages}
-          </Suspense>
+          {themeItems}
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* —— Features —— */}
       <section className="max-w-6xl mx-auto px-4 py-12">
-        <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">Why Choose Us</h2>
+        <h2 className="text-3xl font-bold text-center mb-8">Why Choose Us</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((item, index) => (
+          {features.map((f, i) => (
             <FeatureCard
-              key={index}
-              icon={item.icon}
-              title={item.title}
-              description={item.description}
+              key={i}
+              icon={f.icon}
+              title={f.title}
+              description={f.description}
             />
           ))}
         </div>
       </section>
     </>
   );
-};
-
-export default Index;
+}

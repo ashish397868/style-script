@@ -25,7 +25,7 @@ const Navbar = ({
   const {
     user,
     isAuthenticated,
-    logout: logoutUser,
+    logoutUser,
     initializeAuth
   } = useUserHook();
   
@@ -53,7 +53,7 @@ const Navbar = ({
 
   return (
     <>
-      <nav className={`${backgroundColor} shadow-lg w-full z-50`}>
+      <nav className={`${backgroundColor} shadow-lg w-full z-50 sticky top-0`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
             <Link to="/" className="flex items-center py-4 px-2">

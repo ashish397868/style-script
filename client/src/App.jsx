@@ -33,9 +33,9 @@ const ProductPage         = lazy(() => import("./screens/ProductPage"));
 
 // Checkout and order review
 const Success             = lazy(() => import("./screens/Success"));
+const Checkout            = lazy(() => import("./screens/Checkout/AddressSelection"));
 
 
-const Checkout            = lazy(() => import("./components/Checkout"));
 const ReviewOrder         = lazy(() => import("./components/ReviewOrder"));
 const Products            = lazy(() => import("./components/Products"));
 

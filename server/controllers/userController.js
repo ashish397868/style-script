@@ -1,8 +1,9 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const validator = require('validator');
 const sendEmail = require("../utils/sendEmail");
-const crypto = require("crypto");
+const {welcomeEmailTemplate} = require("../utils/emailTemplates/welcomeEmailTemplate");  
 
 const handleSignup = async (req, res) => {
   try {
@@ -17,56 +18,28 @@ const handleSignup = async (req, res) => {
     }
 
     // Validate email format
-    if (!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ message: "Invalid email format!" });
     }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
+    
+    const userExists = await User.exists({ email });
+    if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     const user = await User.create({ name, email, password });
 
     // send welcome email
-    sendEmail({
-      to: email,
-      subject: "👗 Welcome to ScriptStyle – Your Wardrobe Just Got an Upgrade!",
-      html: `
-  <div style="font-family: 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-    <div style="background: linear-gradient(135deg, #6b21a8, #9333ea); padding: 20px 30px; color: #fff;">
-      <h1 style="margin: 0;">Welcome, ${name}!</h1>
-      <p style="margin: 5px 0 0;">Thanks for joining <strong>ScriptStyle</strong> – Where fashion meets comfort!</p>
-    </div>
-
-    <div style="padding: 30px;">
-      <p style="font-size: 16px; color: #444;">
-        We're excited to have you on board. Whether you're upgrading your everyday look or shopping for a special occasion, we’ve got styles that speak your language.
-      </p>
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://scriptstyle.com/shop" style="background: #6b21a8; color: white; padding: 14px 24px; border-radius: 8px; text-decoration: none; font-size: 16px;">
-          🛍️ Start Shopping Now
-        </a>
-      </div>
-
-      <p style="font-size: 15px; color: #555;">
-        Need help or have questions? Our team is just a message away. Feel free to reply to this email or visit our support center.
-      </p>
-
-      <p style="font-size: 15px; color: #555;">Happy styling,<br><strong>The ScriptStyle Team</strong></p>
-    </div>
-
-    <div style="background: #f3f4f6; padding: 15px 30px; text-align: center; font-size: 13px; color: #777;">
-      You’re receiving this email because you signed up at ScriptStyle.<br>
-      <a href="https://scriptstyle.com/unsubscribe" style="color: #6b21a8; text-decoration: none;">Unsubscribe</a>
-    </div>
-  </div>
-  `,
+    setImmediate(() => {
+      sendEmail({
+        to: email,
+        subject: "👗 Welcome!",
+        html: welcomeEmailTemplate(name)
+      }).catch(console.error);
     });
 
     // Generate JWT token
-    const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d"});
 
     return res.status(201).json({
       message: "Signup successful!",
@@ -77,7 +50,6 @@ const handleSignup = async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
-        addresses: user.addresses,
         role: user.role,
       },
     });
@@ -94,7 +66,10 @@ const handleLogin = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required!" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
+    .select('name email password role phone addresses active')
+    .lean();
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials!" });
     }
@@ -133,71 +108,75 @@ const handleLogin = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, email, phone, currentPassword, newPassword, addresses } = req.body;
+    const { name, email, phone, addresses } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Basic validations and updates (same as before)
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) 
-      return res.status(400).json({ message: "Invalid email format" });
-    if (phone && !/^\+?[\d\s-]{10,}$/.test(phone)) 
-      return res.status(400).json({ message: "Invalid phone number format" });
-
-    // Password change logic (same as before)
-    if (newPassword) {
-      if (!currentPassword) 
-        return res.status(400).json({ message: "Current password is required" });
-      const isMatch = await bcrypt.compare(currentPassword, user.password);
-      if (!isMatch) 
-        return res.status(400).json({ message: "Current password is incorrect" });
-      if (newPassword.length < 8) 
-        return res.status(400).json({ message: "New password must be at least 8 characters long" });
-      user.password = newPassword;
+    if (email && !validator.isEmail(email)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+    if (phone && !validator.isMobilePhone(phone, 'any')) {
+      return res.status(400).json({ message: 'Invalid phone number format' });
     }
 
-    // Basic field updates
-    if (name) user.name = name;
-    if (email) user.email = email;
-    if (phone) user.phone = phone;
+    const hasUpdates =
+      Boolean(name) ||
+      Boolean(email) ||
+      Boolean(phone) ||
+      (Array.isArray(addresses) && addresses.length > 0);
 
-    // Address handling: update addresses array directly as subdocuments
-    if (addresses && Array.isArray(addresses)) {
-      user.addresses = addresses.map(addr => ({
-        name: addr.name || "",
-        phone: addr.phone || "",
-        country: addr.country || "India",
-        addressLine1: addr.addressLine1 || "",
-        addressLine2: addr.addressLine2 || "",
-        city: addr.city || "",
-        state: addr.state || "",
-        pincode: addr.pincode || ""
+    if (!hasUpdates) {
+      const current = await User.findById(userId)
+        .select('-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt')
+        .lean();
+      return res.json({
+        message: 'No changes to update',
+        user: current
+      });
+    }
+
+    const updateFields = {};
+    if (name)  updateFields.name  = name;
+    if (email) updateFields.email = email;
+    if (phone) updateFields.phone = phone;
+
+    if (Array.isArray(addresses)) {
+      updateFields.addresses = addresses.map(addr => ({
+        name:         addr.name         || '',
+        phone:        addr.phone        || '',
+        country:      addr.country      || 'India',
+        addressLine1: addr.addressLine1 || '',
+        addressLine2: addr.addressLine2 || '',
+        city:         addr.city         || '',
+        state:        addr.state        || '',
+        pincode:      addr.pincode      || ''
       }));
     }
 
-    // Save the user
-    await user.save();
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateFields },
+      {
+        new: true,
+        select: '-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt',
+        lean: true
+      }
+    );
 
-    // Fetch fresh user data (no need to populate addresses)
-    const finalUser = await User.findById(userId)
-      .select('-password -resetPasswordToken -resetPasswordExpires');
-
-    // Generate token
-    const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "3d",
-    });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     return res.json({
-      message: "Profile updated successfully",
-      token,
-      user: finalUser
+      message: 'Profile updated successfully',
+      success: true,
+      user: updatedUser
     });
 
   } catch (error) {
-    console.error("Update Profile Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error('Update Profile Error:', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 // GET all users (admin)
 const getAllUsers = async (req, res) => {
   try {

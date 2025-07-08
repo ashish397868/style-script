@@ -1,9 +1,9 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const validator = require('validator');
+const validator = require("validator");
 const sendEmail = require("../utils/sendEmail");
-const {welcomeEmailTemplate} = require("../utils/emailTemplates/welcomeEmailTemplate");  
+const { welcomeEmailTemplate } = require("../utils/emailTemplates/welcomeEmailTemplate");
 
 const handleSignup = async (req, res) => {
   try {
@@ -21,7 +21,7 @@ const handleSignup = async (req, res) => {
     if (!validator.isEmail(email)) {
       return res.status(400).json({ message: "Invalid email format!" });
     }
-    
+
     const userExists = await User.exists({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
@@ -34,12 +34,12 @@ const handleSignup = async (req, res) => {
       sendEmail({
         to: email,
         subject: "👗 Welcome!",
-        html: welcomeEmailTemplate(name)
+        html: welcomeEmailTemplate(name),
       }).catch(console.error);
     });
 
     // Generate JWT token
-    const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d"});
+    const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     return res.status(201).json({
       message: "Signup successful!",
@@ -66,9 +66,7 @@ const handleLogin = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required!" });
     }
 
-    const user = await User.findOne({ email })
-    .select('name email password role phone addresses active')
-    .lean();
+    const user = await User.findOne({ email }).select("name email password role phone addresses active").lean();
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials!" });
@@ -111,79 +109,49 @@ const updateProfile = async (req, res) => {
     const { name, email, phone, addresses } = req.body;
 
     if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: 'Invalid email format' });
-    }
-    if (phone && !validator.isMobilePhone(phone, 'any')) {
-      return res.status(400).json({ message: 'Invalid phone number format' });
+      return res.status(400).json({ message: "Invalid email format" });
     }
 
-    const hasUpdates =
-      Boolean(name) ||
-      Boolean(email) ||
-      Boolean(phone) ||
-      (Array.isArray(addresses) && addresses.length > 0);
+    if (phone && !validator.isMobilePhone(phone, "any")) {
+      return res.status(400).json({ message: "Invalid phone number format" });
+    }
+
+    const hasUpdates = Boolean(name) || Boolean(email) || Boolean(phone);
 
     if (!hasUpdates) {
-      const current = await User.findById(userId)
-        .select('-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt')
-        .lean();
+      const current = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
       return res.json({
-        message: 'No changes to update',
-        user: current
+        message: "No changes to update",
+        user: current,
       });
     }
 
     const updateFields = {};
-    if (name)  updateFields.name  = name;
+    if (name) updateFields.name = name;
     if (email) updateFields.email = email;
     if (phone) updateFields.phone = phone;
-
-    if (Array.isArray(addresses)) {
-      updateFields.addresses = addresses.map(addr => ({
-        name:         addr.name         || '',
-        phone:        addr.phone        || '',
-        country:      addr.country      || 'India',
-        addressLine1: addr.addressLine1 || '',
-        addressLine2: addr.addressLine2 || '',
-        city:         addr.city         || '',
-        state:        addr.state        || '',
-        pincode:      addr.pincode      || ''
-      }));
-    }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updateFields },
       {
         new: true,
-        select: '-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt',
-        lean: true
+        select: "-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt",
+        lean: true,
       }
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     return res.json({
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       success: true,
-      user: updatedUser
+      user: updatedUser,
     });
-
   } catch (error) {
-    console.error('Update Profile Error:', error);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-};
-
-// GET all users (admin)
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find().select("-password");
-    return res.json(users);
-  } catch (error) {
-    console.error("Get All Users Error:", error);
+    console.error("Update Profile Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -192,11 +160,22 @@ const getAllUsers = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
     return res.json(user);
   } catch (error) {
     console.error("Get User Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// GET all users (admin)
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("_id name phone role active").lean();
+    return res.json(users);
+  } catch (error) {
+    console.error("Get All Users Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -207,16 +186,31 @@ const updateUserRole = async (req, res) => {
     const { id } = req.params;
     const { makeAdmin } = req.body;
 
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (typeof makeAdmin === "boolean") {
-      user.role = makeAdmin ? "admin" : "user";
-      await user.save();
-      return res.json({ message: "User updated successfully", user });
+    // Validate input
+    if (typeof makeAdmin !== "boolean") {
+      return res.status(400).json({ message: "Invalid update data" });
     }
 
-    return res.status(400).json({ message: "Invalid update data" });
+    const newRole = makeAdmin ? "admin" : "user";
+
+    // Find and update in one operation
+    const user = await User.findByIdAndUpdate(
+      id,
+      { role: newRole },
+      {
+        new: true, // Return updated document
+        select: "_id name email role", // Only select needed fields
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json({
+      message: "User updated successfully",
+      user,
+    });
   } catch (error) {
     console.error("Update User Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -227,10 +221,13 @@ const updateUserRole = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: "User not found" });
 
-    await User.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(id);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     return res.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Delete User Error:", error);
@@ -244,26 +241,33 @@ const forgotPassword = async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email is required!" });
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "No account found with this email!" });
-
     // Generate 6 digit reset code
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const resetExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
 
-    user.resetPasswordToken = resetCode;
-    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15m
-    await user.save();
+    const user = await User.findOneAndUpdate(
+      { email },
+      {
+        resetPasswordToken: resetCode,
+        resetPasswordExpires: resetExpires,
+      },
+      { new: true, select: "_id email" }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "No account found with this email!" });
+    }
 
     await sendEmail({
       to: email,
       subject: "Password Reset Request",
       html: `<p>Your password reset code is: <strong>${resetCode}</strong></p>
-             <p>This code will expire in 15 minutes.</p>`
+             <p>This code will expire in 15 minutes.</p>`,
     });
 
     return res.json({
       success: true,
-      message: "Password reset code sent to email"
+      message: "Password reset code sent to email",
     });
   } catch (error) {
     console.error("Forgot Password Error:", error);
@@ -275,8 +279,6 @@ const forgotPassword = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
-    // console.log("Reset Password Data:", { email, otp, newPassword });
-    // console.log("Reset Password Body:", req.body);
     if (!email || !otp || !newPassword) return res.status(400).json({ message: "All fields are required!" });
 
     if (newPassword.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters long" });
@@ -285,7 +287,7 @@ const resetPassword = async (req, res) => {
       email,
       resetPasswordToken: otp,
       resetPasswordExpires: { $gt: Date.now() },
-    });
+    }).select("resetPasswordToken resetPasswordExpires");
 
     if (!user) return res.status(400).json({ message: "Invalid or expired password reset token" });
 
@@ -310,5 +312,5 @@ module.exports = {
   updateUserRole,
   getAllUsers,
   deleteUser,
-  getUser, // <-- export the new controller
+  getUser,
 };

@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useUserProfile from "../../redux/features/user/userProfileHook";
 import { FiPlus } from "react-icons/fi";
 import Loader from "../../components/Loader";
+import { addressAPI } from "../../services/api";
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
-  const { user, updateProfile } = useUserProfile();
   const [address, setAddress] = useState({
     name: "",
     addressLine1: "",
@@ -34,9 +33,7 @@ const NewAddressPage = () => {
     setLoading(true);
     setError("");
     try {
-      // Add the new address to the user's addresses array
-      const updatedAddresses = [...(user.addresses || []), address];
-      await updateProfile({ addresses: updatedAddresses });
+      await addressAPI.addAddress(address);
       navigate("/addresses");
     } catch (err) {
       setError("Failed to add address");

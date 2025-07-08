@@ -3,6 +3,7 @@ const app = express();
 require("dotenv").config(); // Load .env variables
 const database = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const addressRoutes = require("./routes/addressRoutes");
 const productRoutes = require("./routes/productRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const pincodeRoutes = require("./routes/pincodeRoutes");
@@ -24,6 +25,7 @@ app.use(express.json());
 database();
 
 app.use("/api/", userRoutes);
+app.use("/api/users/", addressRoutes);
 app.use("/api/", pincodeRoutes);
 app.use("/api/products/", productRoutes);
 app.use("/api/media/", mediaRoutes);

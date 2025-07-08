@@ -77,6 +77,13 @@ export const userAPI = {
   removeAddress: (addresses) => api.patch('/users/profile', { addresses }),
 };
 
+// address Routes
+export const addressAPI = {
+  addAddress: (addressData) => api.post('/users/me/addresses', addressData),
+  updateAddress: (addressId, addressData) => api.patch(`/users/me/addresses/${addressId}`, addressData),
+  deleteAddress: (addressId) => api.delete(`/users/me/addresses/${addressId}`),
+};
+
 // Pincode Routes
 export const pincodeAPI = {
   getPincodes: () => api.get('/get-pincode'),

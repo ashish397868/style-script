@@ -1,3 +1,11 @@
+// controllers/productController.js
+const Product = require("../models/Product");
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
+// cache.flushAll(); // Use this after create/update/delete
+
+let lastProductUpdatedAt = null; // to track if DB has changed
+
 // get product by theme (from route param)
 exports.getProductsByTheme = async (req, res) => {
   try {
@@ -13,8 +21,6 @@ exports.getProductsByTheme = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-// controllers/productController.js
-const Product = require("../models/Product");
 
 // Get all products with variants grouped by title (public)
 exports.getAllProducts = async (req, res) => {
@@ -28,17 +34,38 @@ exports.getAllProducts = async (req, res) => {
     if (color) filter.color = color;
     if (isFeatured != null) filter.isFeatured = isFeatured === "true";
 
+    // Key to uniquely cache this filter
+    const cacheKey = JSON.stringify(filter);
+
+    // Check latest product update time
+    const latestProduct = await Product.findOne().sort({ updatedAt: -1 });
+    const latestUpdatedAt = latestProduct?.updatedAt?.getTime() || 0;
+
+    // If data hasn't changed, use cache
+    if (
+      lastProductUpdatedAt === latestUpdatedAt &&
+      cache.has(cacheKey)
+    ) {
+      console.log("✔ Using cached data");
+      return res.json(cache.get(cacheKey));
+    }
+
+    // Otherwise, fetch fresh data
     const products = await Product.find(filter).sort({ createdAt: -1 });
-    
-    // Group products by title to create variants
     const groupedProducts = groupProductsByTitle(products);
-    
+
+    // Store in cache
+    cache.set(cacheKey, groupedProducts);
+    lastProductUpdatedAt = latestUpdatedAt;
+
+    console.log("📥 DB Fetched and cache updated");
     return res.json(groupedProducts);
   } catch (error) {
     console.error("Get All Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 // Helper function to group products by title
 const groupProductsByTitle = (products) => {
@@ -127,30 +154,26 @@ exports.getProducts = async (req, res) => {
 };
 
 // Get product variants by title (public)
-exports.getProductVariants = async (req, res) => {
+exports.getProductVariantByTitle = async (req, res) => {
   try {
     const { title } = req.params;
-    
-    // Find all products with the same title
-    const variants = await Product.find({ 
-      title: new RegExp(`^${title}$`, 'i') // Case insensitive match
-    }).sort({ createdAt: -1 });
-    
-    if (variants.length === 0) {
-      return res.status(404).json({ message: "No variants found for this product." });
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
     }
-    
-    // Filter only available variants
-    const availableVariants = variants.filter(variant => variant.availableQty > 0);
-    
-    return res.json({
-      title,
-      variants: availableVariants,
-      totalVariants: variants.length,
-      availableVariants: availableVariants.length
+
+    const variant = await Product.findOne({
+      title: new RegExp(title.trim(), 'i'), // Case-insensitive match
+      availableQty: { $gt: 0 }              // Only if in stock
     });
+
+    if (!variant) {
+      return res.status(404).json({ message: "No variant available" });
+    }
+
+    return res.json(variant);
   } catch (error) {
-    console.error("Get Product Variants Error:", error);
+    console.error("Get Variant By Title Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -184,9 +207,6 @@ exports.getSpecificVariant = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
-// Rest of your existing controller methods remain the same...
-// (getProductsByCategory, getProductBySlug, getProductById, getFeaturedProducts, etc.)
 
 // get product by category (from route param)
 exports.getProductsByCategory = async (req, res) => {
@@ -377,7 +397,7 @@ exports.updateProduct = async (req, res) => {
     const { id } = req.params;
     const updates = { ...req.body };
 
-    // If updating slug, it must be unique
+    // If updating slug, it does not match another product's slug and and excludes the current product
     if (updates.slug) {
       const existing = await Product.findOne({ slug: updates.slug, _id: { $ne: id } });
       if (existing) {

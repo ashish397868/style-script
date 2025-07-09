@@ -9,7 +9,6 @@ const razorpay = new Razorpay({
 });
 
 // 1️⃣ Create a Razorpay order
-// POST /api/payments/create
 exports.createPaymentOrder = async (req, res) => {
   try {
     const { amount, currency = "INR" } = req.body;
@@ -20,16 +19,9 @@ exports.createPaymentOrder = async (req, res) => {
     // generate your own internal order ID (receipt)
     const receiptId = "order_" + Date.now();
 
-    // save to DB before calling Razorpay
-    // const newOrder = await Order.create({
-    //   orderId: receiptId,
-    //   amount,
-    //   currency,
-    // });
-
     // Razorpay expects amount in paise
     const options = {
-      amount: amount * 100,
+      amount: amount * 100, //paise
       currency,
       receipt: receiptId,
     };
@@ -53,7 +45,6 @@ exports.createPaymentOrder = async (req, res) => {
 };
 
 // 2️⃣ Verify payment and update your Order
-// POST /api/payments/verify
 exports.verifyPayment = async (req, res) => {
   try {
     const {
@@ -61,7 +52,6 @@ exports.verifyPayment = async (req, res) => {
       razorpay_payment_id,
       razorpay_signature,
       receipt, // your internal orderId
-      email,
     } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !receipt) {
@@ -69,40 +59,43 @@ exports.verifyPayment = async (req, res) => {
     }
 
     // 1. Recompute signature
-    const generatedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
+    const generatedSignature = crypto
+    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
 
     if (generatedSignature !== razorpay_signature) {
-      return res.status(400).json({ message: "Invalid payment signature" });
+      return res.status(400).json({ message: "Unauthorized payment attempt" });
     }
 
     // 2. Find & update your Order
-    const order = await Order.findOne({ orderId: receipt });
+    const order = await Order.findOneAndUpdate(
+      { orderId: receipt },
+      {
+        status: "Paid",
+        paymentInfo: { razorpay_order_id, razorpay_payment_id, razorpay_signature },
+      },
+      { new: true }
+    );
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    order.status = "Paid";
-    order.paymentInfo = {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-    };
-    await order.save();
-
     // 3. Send confirmation email (optional)
-    if (email) {
-      await sendEmail({
-        to: email,
-        subject: `Payment Received for ${receipt}`,
-        html: `
-          <h2>Thank you for your purchase!</h2>
-          <p>Your payment for <strong>Order ${receipt}</strong> of amount <strong>₹${order.amount}</strong> has been received successfully.</p>
-          <p>We’re now processing your order and will notify you once it’s shipped.</p>
-          <br/>
-          <p>Happy Shopping,<br/><strong>ScriptStyle Team</strong></p>
-        `,
-      });
-    }
+    setImmediate(()=>{
+      sendEmail({
+          to: req.user.email,
+          subject: `Payment Received for ${receipt}`,
+          html: `
+            <h2>Thank you for your purchase!</h2>
+            <p>Your payment for <strong>Order ${receipt}</strong> of amount <strong>₹${order.amount}</strong> has been received successfully.</p>
+            <p>We’re now processing your order and will notify you once it’s shipped.</p>
+            <br/>
+            <p>Happy Shopping,<br/><strong>ScriptStyle Team</strong></p>
+          `,
+        })
+    })
 
     res.json({ success: true, message: "Payment verified and order updated", order });
   } catch (error) {

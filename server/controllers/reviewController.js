@@ -1,6 +1,7 @@
 // controllers/reviewController.js
 const Review  = require("../models/Review");
-const Product = require("../models/Product");
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
 
 // Create a new review (authenticated users)
 exports.createReview = async (req, res) => {
@@ -8,18 +9,21 @@ exports.createReview = async (req, res) => {
     const { productId, rating, comment } = req.body;
     const userId = req.user._id;
 
-    // Basic validation
+    // Validate input
     if (!productId || rating == null) {
       return res.status(400).json({ message: "productId and rating are required" });
     }
 
     // Optional: prevent duplicate reviews by same user
-    const existing = await Review.findOne({ productId, userId });
+    const existing = await Review.exists({ productId, userId });
     if (existing) {
       return res.status(400).json({ message: "You have already reviewed this product" });
     }
 
     const review = await Review.create({ productId, userId, rating, comment });
+
+    cache.del("all-reviews");
+    cache.del(`reviews-product-${productId}`);
     return res.status(201).json({ message: "Review created", review });
   } catch (err) {
     console.error("createReview error:", err);
@@ -31,9 +35,22 @@ exports.createReview = async (req, res) => {
 exports.getReviewsForProduct = async (req, res) => {
   try {
     const { productId } = req.params;
+
+    const cacheKey = `reviews-product-${productId}`;
+
+    // Try cache first
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+
     const reviews = await Review.find({ productId })
-      .populate("userId", "name")    // bring in user's name
-      .sort({ createdAt: -1 });
+      .populate("userId", "name") 
+      .sort({ createdAt: -1 })
+      .lean();
+
+    cache.set(cacheKey, reviews)
+
     return res.json(reviews);
   } catch (err) {
     console.error("getReviewsForProduct error:", err);
@@ -45,7 +62,7 @@ exports.getReviewsForProduct = async (req, res) => {
 exports.getReviewById = async (req, res) => {
   try {
     const { id } = req.params;
-    const review = await Review.findById(id).populate("userId", "name");
+    const review = await Review.findById(id).populate("userId", "name").lean();
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
@@ -72,8 +89,10 @@ exports.updateReview = async (req, res) => {
     }
 
     if (rating != null) review.rating = rating;
-    if (comment   != null) review.comment = comment;
+    if (comment!= null) review.comment = comment;
     await review.save();
+
+     cache.del("all-reviews");
 
     return res.json({ message: "Review updated", review });
   } catch (err) {
@@ -98,6 +117,7 @@ exports.deleteReview = async (req, res) => {
     }
 
     await Review.findByIdAndDelete(id);
+    cache.del("all-reviews");
     return res.json({ message: "Review deleted" });
   } catch (err) {
     console.error("deleteReview error:", err);
@@ -108,10 +128,21 @@ exports.deleteReview = async (req, res) => {
 // Admin: get all reviews (admin)
 exports.getAllReviews = async (req, res) => {
   try {
+
+    const cacheKey = "all-reviews";
+
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+
     const reviews = await Review.find()
       .populate("userId", "name email")
       .populate("productId", "title slug")
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+
+      cache.set(cacheKey, reviews); // Cache the result
     return res.json(reviews);
   } catch (err) {
     console.error("getAllReviews error:", err);

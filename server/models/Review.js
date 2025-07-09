@@ -7,4 +7,8 @@ const ReviewSchema = new Schema({
   comment: String,
 }, { timestamps: true });
 
+ReviewSchema.index({ createdAt: -1 });
+ReviewSchema.index({ productId: 1 });
+ReviewSchema.index({ userId: 1 });
+
 module.exports = model("Review", ReviewSchema);

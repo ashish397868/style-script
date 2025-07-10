@@ -1,5 +1,11 @@
 import axios from 'axios';
 
+// Create a custom event for authentication errors
+export const AUTH_EVENTS = {
+  UNAUTHORIZED: 'auth:unauthorized',
+  AUTH_ERROR: 'auth:error'
+};
+
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
   headers: {
@@ -49,9 +55,19 @@ api.interceptors.response.use(
       data: error.response?.data,
     });
 
+    // Don't redirect immediately for 401 errors
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Only clear auth state if not already trying to authenticate
+      const isAuthEndpoint = error.config?.url.includes('/login') || 
+                             error.config?.url.includes('/signup') || 
+                             error.config?.url.includes('/users/profile');
+      
+      // If this is an auth endpoint failure, we should clear the token
+      if (isAuthEndpoint) {
+        localStorage.removeItem('token');
+        // Dispatch a custom event for authentication errors
+        window.dispatchEvent(new CustomEvent(AUTH_EVENTS.UNAUTHORIZED));
+      }
     }
     return Promise.reject(error);
   }

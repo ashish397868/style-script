@@ -1,9 +1,12 @@
 // App.jsx
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 // import Navbar from "./screens/Navbar";
 // import Footer from "./screens/Footer";
 import Home from "./components/HomePage";
+import useUserHook from "./redux/features/user/useUserHook";
+import Loader from "./components/Loader";
+import { AUTH_EVENTS } from "./services/api";
 
 const Navbar = lazy(() => import("./screens/Navbar")); // eagerly loaded
 const Footer = lazy(() => import("./screens/Footer")); // eagerly loaded
@@ -62,6 +65,29 @@ const ProtectedRoute      = lazy(() => import("./screens/ProtectedRoute"));
 
 function AppContent() {
   const location = useLocation();
+  const { initializeAuth, isLoading, logoutUser } = useUserHook();
+  
+  // Initialize authentication on app load
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
+
+  // Listen for authentication events
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      logoutUser();
+    };
+
+    window.addEventListener(AUTH_EVENTS.UNAUTHORIZED, handleUnauthorized);
+    
+    return () => {
+      window.removeEventListener(AUTH_EVENTS.UNAUTHORIZED, handleUnauthorized);
+    };
+  }, [logoutUser]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <>

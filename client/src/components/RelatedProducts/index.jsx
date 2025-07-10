@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProductsAsync } from "../../redux/features/product/productSlice";
+import { fetchProducts } from "../../redux/features/product/productSlice";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../ProductCard";
 import { FiArrowRight } from "react-icons/fi";
@@ -18,7 +18,7 @@ function RelatedProducts({ excludeIds, categories = [] }) {
 
   useEffect(() => {
     if (!products || products.length === 0) {
-      dispatch(fetchProductsAsync());
+      dispatch(fetchProducts());
     }
     // Only set loading true if products are not loaded
     setLoading(!products || products.length === 0);

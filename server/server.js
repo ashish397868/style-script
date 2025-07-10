@@ -12,6 +12,9 @@ const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const compression = require('compression');
+
+app.use(compression()); // Enable compression for all responses
 
 // Configure rate limiters
 const globalLimiter = rateLimit({

@@ -8,7 +8,7 @@ import { addressAPI } from "../../services/api";
 const EditAddressPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useUserProfile(); // ← pull in updateAddress
+  const { user, fetchProfile } = useUserProfile();
   const [address, setAddress] = useState({
     name: "",
     addressLine1: "",
@@ -23,16 +23,40 @@ const EditAddressPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Populate form from Redux user
+  // Populate form from Redux user or fetch from API
   useEffect(() => {
-    if (user?.addresses) {
-      const found = user.addresses.find((a) => String(a._id) === id);
-      if (found) {
-        setAddress({ ...found });
+    const loadAddress = async () => {
+      setLoading(true);
+      try {
+        // First try to get address from the Redux store
+        if (user?.addresses) {
+          const found = user.addresses.find((a) => String(a._id) === id);
+          if (found) {
+            setAddress({ ...found });
+            setLoading(false);
+            return;
+          }
+        }
+        
+        // If not found in Redux store, fetch the latest profile data
+        const profileData = await fetchProfile();
+        const foundInFresh = profileData.addresses?.find((a) => String(a._id) === id);
+        
+        if (foundInFresh) {
+          setAddress({ ...foundInFresh });
+        } else {
+          setError("Address not found");
+        }
+      } catch (err) {
+        console.error("Failed to load address:", err);
+        setError("Failed to load address details");
+      } finally {
+        setLoading(false);
       }
-    }
-    setLoading(false);
-  }, [user, id]);
+    };
+
+    loadAddress();
+  }, [user, id, fetchProfile]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

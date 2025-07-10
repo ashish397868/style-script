@@ -4,8 +4,8 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const sendEmail = require("../utils/sendEmail");
 const { welcomeEmailTemplate } = require("../utils/emailTemplates/welcomeEmailTemplate");
-const NodeCache = require('node-cache');
-const cache = new NodeCache({ stdTTL: 60 * 30 }); // 30 min cache
+// const NodeCache = require('node-cache');
+// const cache = new NodeCache({ stdTTL: 60 * 30 }); // 30 min cache
 
 const handleSignup = async (req, res) => {
   try {
@@ -165,16 +165,16 @@ const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const cacheKey = `user-${userId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) {
-      return res.json(cached);
-    }
+    // const cacheKey = `user-${userId}`;
+    // const cached = cache.get(cacheKey);
+    // if (cached) {
+    //   return res.json(cached);
+    // }
 
     const user = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    cache.set(cacheKey, user);
+    // cache.set(cacheKey, user);
     return res.json(user);
   } catch (error) {
     console.error("Get User Error:", error);
@@ -220,7 +220,7 @@ const updateUserRole = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    cache.del(`user-${id}`); // Clear cache for updated user
+    // cache.del(`user-${id}`); // Clear cache for updated user
     
     return res.json({
       message: "User updated successfully",

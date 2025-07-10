@@ -15,20 +15,32 @@ import {
 export default function HomeCarousel() {
   const navigate = useNavigate();
 
-  // 1) Preload ALL carousel images at mount time
+  // 1) Preload carousel images - only preload the first few that are likely to be seen
   useEffect(() => {
-    const linkTags = imageLink.map((src) => {
+    // Only preload the first 2 images to avoid unnecessary network requests
+    const imagesToPreload = imageLink.slice(0, 2);
+    
+    const linkTags = imagesToPreload.map((src, index) => {
       const link = document.createElement("link");
       link.rel = "preload";
       link.as = "image";
       link.href = src;
+      // Add fetchPriority="high" to the first image
+      if (index === 0) {
+        link.setAttribute("fetchPriority", "high");
+      }
       document.head.appendChild(link);
       return link;
     });
+    
     return () => {
-      linkTags.forEach((link) => document.head.removeChild(link));
+      linkTags.forEach((link) => {
+        if (document.head.contains(link)) {
+          document.head.removeChild(link);
+        }
+      });
     };
-  }, [imageLink]);
+  }, []);
 
   // 2) Keep track of current slide index so we can eager-load the next one
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,10 +50,12 @@ export default function HomeCarousel() {
     () =>
       imageLink.map((src, idx) => {
         // Decide loading strategy per-slide:
-        // - idx === 0  → eager (first slide)
+        // - idx === 0  → eager (first slide) with high priority
         // - idx === currentIndex + 1 → eager (preload the next slide)
         // - otherwise → lazy
         const loading = idx === 0 || idx === currentIndex + 1 ? "eager" : "lazy";
+        const priority = idx === 0 ? "high" : "auto";
+        
         return (
           <div key={idx} className="aspect-w-16 aspect-h-9 bg-gray-100">
             <LazyMotionImg
@@ -49,6 +63,7 @@ export default function HomeCarousel() {
               alt={`Banner ${idx + 1}`}
               className="w-full h-full object-cover"
               loading={loading}
+              fetchPriority={priority}
             />
           </div>
         );

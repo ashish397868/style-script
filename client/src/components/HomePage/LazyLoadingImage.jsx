@@ -7,6 +7,8 @@ const OptimizedLazyImage = React.memo(({
   className, 
   index = 0, 
   priority = false,
+  fetchPriority = "auto",
+  loading = "lazy",
   path = ''
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -85,14 +87,15 @@ const OptimizedLazyImage = React.memo(({
         <img
           src={src}
           alt={alt}
-          loading={priority ? "eager" : "lazy"}
+          loading={loading}
+          fetchPriority={fetchPriority}
           decoding="async"
-        onLoad={handleLoad}
-        onError={handleError}
-        className={`w-full h-full object-contain rounded-lg transition-all duration-500 ease-out transform group-hover:scale-105 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
+          onLoad={handleLoad}
+          onError={handleError}
+          className={`w-full h-full object-contain rounded-lg transition-all duration-500 ease-out transform group-hover:scale-105 ${
+            isLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
       </Link>
       
       {/* Hover overlay effect */}

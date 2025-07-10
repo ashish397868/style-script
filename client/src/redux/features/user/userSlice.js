@@ -71,15 +71,15 @@ const userSlice = createSlice({
   name: 'user',
   initialState: {
     user: null,
-    isLoading: false,
+    isLoading: true, // Start with loading true
     error: null,
-    isAuthenticated: false,
+    isAuthenticated: null, // Initially null to indicate "not yet checked"
   },
   reducers: {
     logout: (state) => {
       localStorage.removeItem('token');
       state.user = null;
-      state.isAuthenticated = false;
+      state.isAuthenticated = false; // Set to false, not null, when explicitly logged out
       state.error = null;
     },
     clearError: (state) => {
@@ -121,13 +121,21 @@ const userSlice = createSlice({
         state.isAuthenticated = false;
       })
       // Init Auth
+      .addCase(initAuth.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(initAuth.fulfilled, (state, action) => {
+        state.isLoading = false;
         if (action.payload) {
           state.user = action.payload;
           state.isAuthenticated = true;
+        } else {
+          state.isAuthenticated = false; // Explicitly set to false when checked and not authenticated
         }
       })
       .addCase(initAuth.rejected, (state) => {
+        state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
       })

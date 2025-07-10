@@ -1,5 +1,5 @@
 // App.jsx
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 // import Navbar from "./screens/Navbar";
 // import Footer from "./screens/Footer";
@@ -65,11 +65,15 @@ const ProtectedRoute      = lazy(() => import("./screens/ProtectedRoute"));
 
 function AppContent() {
   const location = useLocation();
-  const { initializeAuth, isLoading, logoutUser } = useUserHook();
+  const { initializeAuth, logoutUser } = useUserHook();
   
   // Initialize authentication on app load
   useEffect(() => {
-    initializeAuth();
+    const init = async () => {
+      await initializeAuth();
+    };
+    
+    init();
   }, [initializeAuth]);
 
   // Listen for authentication events
@@ -85,16 +89,16 @@ function AppContent() {
     };
   }, [logoutUser]);
 
-  if (isLoading) {
-    return <Loader />;
-  }
-
   return (
     <>
       {/* Show navbar/footer only on non-admin pages */}
-      {!location.pathname.startsWith("/admin") && <Navbar />}
+      {!location.pathname.startsWith("/admin") && (
+        <Suspense fallback={<div className="h-16 bg-white shadow-lg w-full"></div>}>
+          <Navbar />
+        </Suspense>
+      )}
 
-      <Suspense fallback={<div style={{ textAlign: "center", margin: "2rem" }}>Loading…</div>}>
+      <Suspense fallback={<div style={{ textAlign: "center", margin: "2rem" }}><Loader /></div>}>
         <Routes>
           {/* Eagerly‑loaded Home */}
           <Route path="/" element={<Home />} />
@@ -215,15 +219,15 @@ function AppContent() {
         </Routes>
       </Suspense>
 
-      {!location.pathname.startsWith("/admin") && <Footer />}
+      {!location.pathname.startsWith("/admin") && (
+        <Suspense fallback={<div className="h-16 bg-gray-100"></div>}>
+          <Footer />
+        </Suspense>
+      )}
     </>
   );
 }
 
 export default function App() {
-  return (
-    // <Router>
-      <AppContent />
-    // </Router>
-  );
+  return <AppContent />;
 }

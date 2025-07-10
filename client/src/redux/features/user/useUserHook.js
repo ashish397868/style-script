@@ -31,7 +31,11 @@ const useUser = () => {
   }, [dispatch]);
 
   const initializeAuth = useCallback(() => {
-    return dispatch(initAuth());
+    return dispatch(initAuth()).unwrap().catch(error => {
+      // Silently handle rejection - we just need to know when it's done
+      console.log('Auth initialization completed with error:', error);
+      return null;
+    });
   }, [dispatch]);
 
   const sendForgotPasswordEmail = useCallback((email) => {

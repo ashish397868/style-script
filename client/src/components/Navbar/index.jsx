@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
+import { BeatLoader } from "react-spinners";
 import useUserHook from '../../redux/features/user/useUserHook';
 import useCartHook from '../../redux/features/cart/useCartHook';
 import Dropdown from "../DropDown";
@@ -26,7 +27,8 @@ const Navbar = ({
     user,
     isAuthenticated,
     logoutUser,
-    initializeAuth
+    initializeAuth,
+    isLoading
   } = useUserHook();
   
   useEffect(() => {
@@ -51,6 +53,58 @@ const Navbar = ({
     navigate("/login");
   };
 
+  // Auth component to show loader, user dropdown, or login buttons based on auth state
+  const AuthComponent = () => {
+    if (isLoading || isAuthenticated === null) {
+      return (
+        <div className="w-24 flex justify-center items-center py-2">
+          <BeatLoader color="#C70039" size={8} />
+        </div>
+      );
+    }
+    
+    if (isAuthenticated) {
+      return <UserDropdown user={user} userLinks={userLinks} onLogout={handleLogout} />;
+    }
+    
+    return (
+      <div className="flex items-center">
+        <Link to="/login" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out mx-2">
+          Login
+        </Link>
+        <Link to="/signup" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
+          Signup
+        </Link>
+      </div>
+    );
+  };
+  
+  // Mobile auth component
+  const MobileAuthComponent = () => {
+    if (isLoading || isAuthenticated === null) {
+      return (
+        <div className="w-16 flex justify-center items-center py-1">
+          <BeatLoader color="#C70039" size={6} />
+        </div>
+      );
+    }
+    
+    if (isAuthenticated) {
+      return <UserDropdown user={user} userLinks={userLinks} />;
+    }
+    
+    return (
+      <div className="flex items-center space-x-1">
+        <Link to="/login" className="px-2 py-1 text-xs rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
+          Login
+        </Link>
+        <Link to="/signup" className="px-2 py-1 text-xs rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
+          Signup
+        </Link>
+      </div>
+    );
+  };
+
   return (
     <>
       <nav className={`${backgroundColor} shadow-lg w-full z-50 sticky top-0`}>
@@ -69,7 +123,7 @@ const Navbar = ({
                 </Link>
               ))}
 
-              {isAuthenticated && user.role === "admin" && (
+              {isAuthenticated && user?.role === "admin" && (
                 <Link to="/admin" className={`py-4 px-2 ${textColor} ${hoverColor} font-semibold`}>
                   Admin
                 </Link>
@@ -77,18 +131,7 @@ const Navbar = ({
 
               <Dropdown label="Tshirts" items={tshirtItems} buttonClass={`${textColor} ${hoverColor} font-semibold `} itemClass={`${hoverColor}`} />
 
-              {isAuthenticated ? (
-                <UserDropdown user={user} userLinks={userLinks} onLogout={handleLogout} />
-              ) : (
-                <div className="flex items-center">
-                  <Link to="/login" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out mx-2">
-                    Login
-                  </Link>
-                  <Link to="/signup" className="px-3 py-1 rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
-                    Signup
-                  </Link>
-                </div>
-              )}
+              <AuthComponent />
 
               <CartButton count={cartCount} onClick={() => setSidebarOpen(true)} iconClass={`${cartIconColor} ${cartIconHover}`} />
             </div>
@@ -96,18 +139,7 @@ const Navbar = ({
             {/* Mobile controls */}
             <div className="md:hidden flex items-center space-x-2">
               {/* User dropdown for mobile */}
-              {isAuthenticated ? (
-                <UserDropdown user={user} userLinks={userLinks} />
-              ) : (
-                <div className="flex items-center space-x-1">
-                  <Link to="/login" className="px-2 py-1 text-xs rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
-                    Login
-                  </Link>
-                  <Link to="/signup" className="px-2 py-1 text-xs rounded bg-pink-600 text-white hover:bg-pink-700 font-medium transition duration-150 ease-in-out">
-                    Signup
-                  </Link>
-                </div>
-              )}
+              <MobileAuthComponent />
 
               <CartButton count={cartCount} onClick={() => setSidebarOpen(true)} iconClass={`${cartIconColor} ${cartIconHover}`} />
               <button onClick={() => setMenuOpen(!menuOpen)} className={`p-2 rounded-full ${textColor} ${hoverColor}`}>
@@ -127,7 +159,7 @@ const Navbar = ({
             ))}
 
             {/* Admin link for mobile */}
-            {isAuthenticated && user.role === "admin" && (
+            {isAuthenticated && user?.role === "admin" && (
               <Link to="/admin" className={`block px-3 py-2 rounded-md text-base font-medium ${textColor} ${hoverColor}`} onClick={() => setMenuOpen(false)}>
                 Admin
               </Link>

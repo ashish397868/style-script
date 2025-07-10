@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const { authenticateUser, isAdmin } = require('../middlewares/authMiddleware');
 const{
     handleSignup,
@@ -13,11 +14,19 @@ const{
     getUser
 }=require('../controllers/userController');
 
+// Stricter rate limit for authentication routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 10, // 10 login attempts per windowMs per IP
+  standardHeaders: 'draft-7',
+  message: 'Too many login attempts from this IP, please try again after 15 minutes'
+});
+
 // Public routes
-router.post('/signup', handleSignup);//tested
-router.post('/login',handleLogin);//tested
-router.post('/forgot-password',forgotPassword);//tested
-router.post('/reset-password',resetPassword);//tested
+router.post('/signup', authLimiter,  handleSignup);//tested
+router.post('/login', authLimiter, handleLogin);//tested
+router.post('/forgot-password', authLimiter, forgotPassword);//tested
+router.post('/reset-password', authLimiter, resetPassword);//tested
 
 // Protected routes
 router.get('/users/profile', authenticateUser, getUser);

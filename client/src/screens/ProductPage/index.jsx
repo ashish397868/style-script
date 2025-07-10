@@ -63,6 +63,26 @@ export default function ProductDetailPage() {
     }
   }, [slug, products]);
 
+  // Update product when color changes
+  const handleColorChange = (newColor) => {
+    setColor(newColor);
+    
+    // Find variant with the selected color
+    if (variants && variants.length > 0) {
+      const colorVariant = variants.find(
+        (v) => v.color === newColor && v.title === product.title
+      );
+      
+      if (colorVariant) {
+        // Update product data with the selected color variant
+        setProduct({
+          ...colorVariant,
+          variants: variants // Keep the variants array
+        });
+      }
+    }
+  };
+
   // When color changes, set size to valid size
   useEffect(() => {
     if (!color || !variants.length) return;
@@ -168,7 +188,7 @@ export default function ProductDetailPage() {
               variants={variants}
               color={color}
               size={size}
-              setColor={setColor}
+              setColor={handleColorChange}
               setSize={setSize}
             />
             

@@ -66,8 +66,6 @@ export default function ColorAndSizeSelector({
               color={c} 
               isActive={color === c} 
               onClick={() => setColor(c)}
-              selectedSize={size}
-              isVariantAvailable={isVariantAvailable}
             />
           ))}
         </div>
@@ -102,31 +100,19 @@ export default function ColorAndSizeSelector({
 function ColorButton({ 
   color: buttonColor, 
   isActive, 
-  onClick, 
-  selectedSize,
-  isVariantAvailable
+  onClick
 }) {
-  const available = selectedSize 
-    ? isVariantAvailable(buttonColor, selectedSize) 
-    : true;
-  
   return (
     <button
-      onClick={() => available && onClick()}
-      disabled={selectedSize && !available}
+      onClick={onClick}
       className={`
         px-4 py-2 rounded-md border-2 text-sm font-medium transition-all
         ${isActive 
           ? 'border-pink-500 bg-pink-50 text-pink-700' 
-          : available 
-            ? 'border-gray-300 hover:border-pink-300 text-gray-700' 
-            : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed'
-        }
+          : 'border-gray-300 hover:border-pink-300 text-gray-700'}
       `}
-      title={selectedSize && !available ? 'Currently unavailable in this size' : ''}
     >
       {buttonColor}
-      {selectedSize && !available && <span className="text-xs block">Unavailable</span>}
     </button>
   );
 }

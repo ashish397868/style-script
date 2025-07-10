@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 60 * 60 }); // 60 mins cache
 
 // Add a new address
 exports.addAddress = async (req, res) => {
@@ -22,6 +24,8 @@ exports.addAddress = async (req, res) => {
     );
 
     if (!user) return res.status(404).json({ message: 'User not found' });
+
+    cache.del(`user-${userId}`);
     res.json({ message: 'Address added', user });
   } catch (err) {
     console.error(err);
@@ -52,6 +56,9 @@ exports.updateAddress = async (req, res) => {
     );
 
     if (!user) return res.status(404).json({ message: 'Address not found' });
+
+    cache.del(`user-${userId}`);
+
     res.json({ message: 'Address updated', user });
   } catch (err) {
     console.error(err);
@@ -72,6 +79,9 @@ exports.deleteAddress = async (req, res) => {
     );
 
     if (!user) return res.status(404).json({ message: 'Address not found' });
+
+    cache.del(`user-${userId}`);
+    
     res.json({ message: 'Address deleted', user });
   } catch (err) {
     console.error(err);

@@ -48,6 +48,8 @@ exports.createOrder = async (req, res) => {
       amount,
     });
 
+    cache.del("admin_order_list");
+
     return res.status(201).json({ message: "Order placed.", order });
   } catch (err) {
     console.error("createOrder error:", err);

@@ -13,8 +13,25 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const compression = require('compression');
+const helmet = require('helmet');
 
 app.use(compression()); // Enable compression for all responses
+
+// Use Helmet for security headers
+app.use(helmet());
+
+// Configure content security policy
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net", "checkout.razorpay.com"],
+    styleSrc: ["'self'", "'unsafe-inline'", "cdn.jsdelivr.net"],
+    imgSrc: ["'self'", "data:", "res.cloudinary.com","https://codeswear.nyc3.cdn.digitaloceanspaces.com"],
+    connectSrc: ["'self'", "checkout.razorpay.com"],
+    frameSrc: ["'self'", "checkout.razorpay.com"],
+    objectSrc: ["'none'"]
+  }
+}));
 
 // Configure rate limiters
 const globalLimiter = rateLimit({

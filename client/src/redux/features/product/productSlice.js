@@ -41,18 +41,6 @@ export const fetchProductBySlug = createAsyncThunk(
   }
 );
 
-export const searchProducts = createAsyncThunk(
-  'product/searchProducts',
-  async (query, { rejectWithValue }) => {
-    try {
-      const response = await productAPI.searchProducts(query);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Search failed');
-    }
-  }
-);
-
 const initialState = {
   products: [],
   featured: [],
@@ -119,18 +107,6 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
-      .addCase(searchProducts.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(searchProducts.fulfilled, (state, action) => {
-        state.products = action.payload.products;
-        state.totalPages = action.payload.totalPages;
-        state.loading = false;
-      })
-      .addCase(searchProducts.rejected, (state, action) => {
-        state.error = action.payload;
-        state.loading = false;
-      });
   },
 });
 

@@ -26,9 +26,6 @@ router.get("/featured", getFeaturedProducts);
 router.get("/slug/:slug", getProductBySlug);
 router.get("/:id", getProductById);
 router.get("/:id/related", getRelatedProducts);
-router.get("/search", getProducts);
-router.get("/variant/:title", getProductVariantByTitle);
-router.get("/:id/variants/:variantId", getSpecificVariant);
 
 // ADMIN
 router.post("/", authenticateUser, isAdmin, createProduct);

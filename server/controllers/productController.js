@@ -217,7 +217,7 @@ exports.getProductBySlug = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).lean();
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
@@ -226,10 +226,11 @@ exports.getProductById = async (req, res) => {
     const variants = await Product.find({ 
       title: product.title,
       availableQty: { $gt: 0 } // Only available variants
-    });
+    })
+    .lean();
     
     return res.json({
-      ...product.toObject(),
+      ...product,
       variants
     });
   } catch (error) {
@@ -241,7 +242,11 @@ exports.getProductById = async (req, res) => {
 // Get featured products (public)
 exports.getFeaturedProducts = async (req, res) => {
   try {
-    const featured = await Product.find({ isFeatured: true }).sort({ createdAt: -1 }).limit(10);
+    const featured = await Product.find({ isFeatured: true })
+    .select("_id slug title size price images color availableQty createdAt")
+    .sort({ createdAt: -1 })
+    .limit(10) 
+    .lean();
     
     // Group featured products by title
     const groupedFeatured = groupProductsByTitle(featured);

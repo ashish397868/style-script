@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchProductsAsync } from '../../redux/features/productSlice';
-import { addToCart } from '../../redux/features/cartSlice';
+import { fetchProducts } from '../../redux/features/product/productSlice';
+import { addToCart } from '../../redux/features/cart/cartSlice';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import { FaStar, FaRegHeart, FaShoppingCart, FaFilter, FaTimes } from 'react-icons/fa';
@@ -26,7 +26,7 @@ const Products = () => {
 
   useEffect(() => {
     if (!products || products.length === 0) {
-      dispatch(fetchProductsAsync());
+      dispatch(fetchProducts());
     }
     // eslint-disable-next-line
   }, [dispatch, products]);

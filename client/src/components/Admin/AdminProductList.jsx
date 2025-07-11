@@ -1,19 +1,21 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProductStore } from '../../store/productStore';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProducts } from '../../redux/features/product/productSlice';
 import Loader from '../Loader';
 import api from '../../services/api';
 
 const AdminProductList = () => {
-  const { products, fetchProducts, loading, error } = useProductStore();
+  const { products, loading, error } = useSelector(state => state.product);
+  const dispatch = useDispatch();
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProducts();
+    dispatch(fetchProducts());
     // eslint-disable-next-line
   }, []);
 
@@ -26,7 +28,7 @@ const AdminProductList = () => {
     try {
       // Optionally show a loading state here
       await api.delete(`/products/${productId}`);
-      fetchProducts();
+      dispatch(fetchProducts(true)); // Force refresh
       setDeleteConfirm(null);
     } catch (err) {
       alert('Failed to delete product.');

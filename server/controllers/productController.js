@@ -6,22 +6,6 @@ const {groupProductsByTitle}=require("../helper/productHelper")
 
 let lastProductUpdatedAt = null; // to track if DB has changed
 
-// get product by theme (from route param)
-exports.getProductsByTheme = async (req, res) => {
-  try {
-    const { theme } = req.params;
-    // Assuming you store theme as a field in Product, e.g. product.theme or product.themes (array)
-    // Adjust the query below if your schema is different
-    const products = await Product.find({ themes: theme }).sort({ createdAt: -1 });
-    // If you use a single theme field, use: { theme }
-    const groupedProducts = groupProductsByTitle(products);
-    return res.json(groupedProducts);
-  } catch (error) {
-    console.error("Get Products By Theme Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 // Get all products with variants grouped by title (public)
 exports.getAllProducts = async (req, res) => {
   try {
@@ -171,12 +155,25 @@ exports.getSpecificVariant = async (req, res) => {
   }
 };
 
+// get product by theme (from route param)
+exports.getProductsByTheme = async (req, res) => {
+  try {
+    const { theme } = req.params;
+    const products = await Product.find({ themes: theme }).sort({ createdAt: -1 }).lean();
+    const groupedProducts = groupProductsByTitle(products);
+    return res.json(groupedProducts);
+  } catch (error) {
+    console.error("Get Products By Theme Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // get product by category (from route param)
 exports.getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
 
-    const products = await Product.find({ category }).sort({ createdAt: -1 });
+    const products = await Product.find({ category }).sort({ createdAt: -1 }).lean();
     
     // Group products by title for variants
     const groupedProducts = groupProductsByTitle(products);
@@ -192,7 +189,7 @@ exports.getProductsByCategory = async (req, res) => {
 exports.getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-    const product = await Product.findOne({ slug });
+    const product = await Product.findOne({ slug }).lean();
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
@@ -201,10 +198,10 @@ exports.getProductBySlug = async (req, res) => {
     const variants = await Product.find({ 
       title: product.title,
       availableQty: { $gt: 0 } // Only available variants
-    });
+    }).lean();
     
     return res.json({
-      ...product.toObject(),
+      ...product,
       variants
     });
   } catch (error) {
@@ -217,7 +214,7 @@ exports.getProductBySlug = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findById(id).lean();
+  const product = await Product.findById(id).lean();
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }

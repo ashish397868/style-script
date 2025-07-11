@@ -2,7 +2,7 @@
 const Product = require("../models/Product");
 const NodeCache = require('node-cache');
 const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
-// cache.flushAll(); // Use this after create/update/delete
+const {groupProductsByTitle}=require("../helper/productHelper")
 
 let lastProductUpdatedAt = null; // to track if DB has changed
 
@@ -64,43 +64,6 @@ exports.getAllProducts = async (req, res) => {
     console.error("Get All Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
-};
-
-
-// Helper function to group products by title
-const groupProductsByTitle = (products) => {
-  const grouped = {};
-  
-  products.forEach(product => {
-    const key = product.title;
-    if (!grouped[key]) {
-      grouped[key] = {
-        ...product.toObject(),
-        variants: []
-      };
-    }
-    
-    // Add this product as a variant
-    grouped[key].variants.push(product.toObject());
-  });
-  
-  // Convert to array and process each group
-  return Object.values(grouped).map(group => {
-    // Filter out variants with 0 quantity
-    group.variants = group.variants.filter(variant => variant.availableQty > 0);
-    
-    // If no variants are available, don't include this product group
-    if (group.variants.length === 0) {
-      return null;
-    }
-    
-    // Set the main product data to the first available variant
-    const firstAvailableVariant = group.variants[0];
-    return {
-      ...firstAvailableVariant,
-      variants: group.variants
-    };
-  }).filter(Boolean); // Remove null entries
 };
 
 // Get products with pagination and variant grouping (public)
@@ -294,20 +257,21 @@ exports.getFeaturedProducts = async (req, res) => {
 exports.getRelatedProducts = async (req, res) => {
   try {
     const { id } = req.params;
-    const base = await Product.findById(id);
-    if (!base) return res.status(404).json({ message: "Product not found" });
+    const baseProduct = await Product.findById(id).select("category tags").lean();
+    if (!baseProduct) return res.status(404).json({ message: "Product not found" });
 
     // find others in same category or sharing tags, excluding itself
     const related = await Product.find({
       _id: { $ne: id },
       availableQty: { $gt: 0 }, // Only available products
       $or: [
-        { category: base.category },
-        { tags: { $in: base.tags } }
+        { category: baseProduct.category },
+        { tags: { $in: baseProduct.tags } }
       ]
     })
       .limit(8)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     // Group related products by title
     const groupedRelated = groupProductsByTitle(related);

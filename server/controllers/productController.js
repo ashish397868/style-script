@@ -330,7 +330,7 @@ exports.createProduct = async (req, res) => {
     }
 
     // Check for existing slug
-    const existing = await Product.findOne({ slug });
+    const existing = await Product.exists({ slug });
     if (existing) {
       return res.status(400).json({ message: "Slug must be unique." });
     }
@@ -363,9 +363,9 @@ exports.updateProduct = async (req, res) => {
     const { id } = req.params;
     const updates = { ...req.body };
 
-    // If updating slug, it does not match another product's slug and and excludes the current product
+    // check karo ki koi aur product (jiska _id is product ke id se alag hai) already same slug use kar raha hai ya nahi.
     if (updates.slug) {
-      const existing = await Product.findOne({ slug: updates.slug, _id: { $ne: id } });
+      const existing = await Product.exists({ slug: updates.slug, _id: { $ne: id } });
       if (existing) {
         return res.status(400).json({ message: "Slug must be unique." });
       }
@@ -374,7 +374,7 @@ exports.updateProduct = async (req, res) => {
     const product = await Product.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    });
+    }).lean();
 
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
@@ -391,7 +391,7 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
+    const product = await Product.findByIdAndDelete(id).lean();
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }

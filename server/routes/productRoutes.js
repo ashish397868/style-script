@@ -10,10 +10,7 @@ const {
   updateProduct,
   deleteProduct,
   getRelatedProducts,
-  getProducts,
   getProductsByCategory,
-  getProductVariantByTitle,
-  getSpecificVariant,
   getProductsByTheme,
 } = require("../controllers/productController");
 const { authenticateUser, isAdmin } = require("../middlewares/authMiddleware");

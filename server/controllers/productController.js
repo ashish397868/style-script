@@ -1,8 +1,8 @@
 // controllers/productController.js
 const Product = require("../models/Product");
-const NodeCache = require('node-cache');
+const NodeCache = require("node-cache");
 const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
-const {groupProductsByTitle}=require("../helper/productHelper")
+const { groupProductsByTitle } = require("../helper/productHelper");
 
 let lastProductUpdatedAt = null; // to track if DB has changed
 
@@ -18,27 +18,23 @@ exports.getAllProducts = async (req, res) => {
     if (color) filter.color = color;
     if (isFeatured != null) filter.isFeatured = isFeatured === "true";
 
-    // Key to uniquely cache this filter
     const cacheKey = JSON.stringify(filter);
 
-    // Check latest product update time
-    const latestProduct = await Product.findOne().sort({ updatedAt: -1 });
-    const latestUpdatedAt = latestProduct?.updatedAt?.getTime() || 0;
+    const products = await Product.find(filter).sort({ updatedAt: -1 }).lean();
 
-    // If data hasn't changed, use cache
-    if (
-      lastProductUpdatedAt === latestUpdatedAt &&
-      cache.has(cacheKey)
-    ) {
+    if (products.length === 0) {
+      return res.json([]); // nothing to group or cache
+    }
+
+    const latestUpdatedAt = new Date(products[0].updatedAt).getTime();
+
+    if (lastProductUpdatedAt === latestUpdatedAt && cache.has(cacheKey)) {
       console.log("✔ Using cached data");
       return res.json(cache.get(cacheKey));
     }
 
-    // Otherwise, fetch fresh data
-    const products = await Product.find(filter).sort({ createdAt: -1 });
     const groupedProducts = groupProductsByTitle(products);
 
-    // Store in cache
     cache.set(cacheKey, groupedProducts);
     lastProductUpdatedAt = latestUpdatedAt;
 
@@ -69,7 +65,7 @@ exports.getProductsByCategory = async (req, res) => {
     const { category } = req.params;
 
     const products = await Product.find({ category }).sort({ createdAt: -1 }).lean();
-    
+
     // Group products by title for variants
     const groupedProducts = groupProductsByTitle(products);
 
@@ -88,16 +84,16 @@ exports.getProductBySlug = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
-    
+
     // Get all variants of this product
-    const variants = await Product.find({ 
+    const variants = await Product.find({
       title: product.title,
-      availableQty: { $gt: 0 } // Only available variants
+      availableQty: { $gt: 0 }, // Only available variants
     }).lean();
-    
+
     return res.json({
       ...product,
-      variants
+      variants,
     });
   } catch (error) {
     console.error("Get Product By Slug Error:", error);
@@ -109,21 +105,20 @@ exports.getProductBySlug = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-  const product = await Product.findById(id).lean();
+    const product = await Product.findById(id).lean();
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
-    
+
     // Get all variants of this product
-    const variants = await Product.find({ 
+    const variants = await Product.find({
       title: product.title,
-      availableQty: { $gt: 0 } // Only available variants
-    })
-    .lean();
-    
+      availableQty: { $gt: 0 }, // Only available variants
+    }).lean();
+
     return res.json({
       ...product,
-      variants
+      variants,
     });
   } catch (error) {
     console.error("Get Product By ID Error:", error);
@@ -134,15 +129,11 @@ exports.getProductById = async (req, res) => {
 // Get featured products (public)
 exports.getFeaturedProducts = async (req, res) => {
   try {
-    const featured = await Product.find({ isFeatured: true })
-    .select("_id slug title size price images color availableQty createdAt")
-    .sort({ createdAt: -1 })
-    .limit(10) 
-    .lean();
-    
+    const featured = await Product.find({ isFeatured: true }).select("_id slug title size price images color availableQty createdAt").sort({ createdAt: -1 }).limit(10).lean();
+
     // Group featured products by title
     const groupedFeatured = groupProductsByTitle(featured);
-    
+
     return res.json(groupedFeatured);
   } catch (error) {
     console.error("Get Featured Products Error:", error);
@@ -161,10 +152,7 @@ exports.getRelatedProducts = async (req, res) => {
     const related = await Product.find({
       _id: { $ne: id },
       availableQty: { $gt: 0 }, // Only available products
-      $or: [
-        { category: baseProduct.category },
-        { tags: { $in: baseProduct.tags } }
-      ]
+      $or: [{ category: baseProduct.category }, { tags: { $in: baseProduct.tags } }],
     })
       .limit(8)
       .sort({ createdAt: -1 })

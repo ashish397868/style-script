@@ -4,7 +4,7 @@ import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
-import api from "../../services/api";
+import api, { addressAPI, userAPI } from "../../services/api";
 import { FiPlus, FiMapPin } from "react-icons/fi";
 import { setSelectedAddress as setSelectedAddressAction } from "../../redux/features/checkout/checkoutSlice";
 
@@ -60,6 +60,22 @@ export default function AddressSelection({ onAddressSelect }) {
     setAddresses(userAddresses);
     setSelectedAddress(userAddresses[0] || null);
   }, [user]);
+  
+  // Function to manually fetch user data
+  const fetchUserData = async () => {
+    try {
+      const { data } = await userAPI.getProfile();
+      if (data?.user) {
+        const userAddresses = Array.isArray(data.user.addresses) ? data.user.addresses : [];
+        setAddresses(userAddresses);
+        if (userAddresses.length > 0 && !selectedAddress) {
+          setSelectedAddress(userAddresses[0]);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+    }
+  };
 
   const validateAddress = () => {
     const newErrors = {};
@@ -94,33 +110,34 @@ export default function AddressSelection({ onAddressSelect }) {
     if (!validateAddress()) return;
 
     try {
-      const updatedAddresses = isEditing
-        ? addresses.map((addr) =>
-            addr._id === currentAddress._id ? currentAddress : addr
-          )
-        : [...addresses, currentAddress];
-
-      const { data } = await api.patch("/users/profile", {
-        addresses: updatedAddresses,
-      });
-
-      if (data?.user) {
-        initializeAuth();                   // reload user data
-        setSelectedAddress(currentAddress);
+      if (isEditing) {
+        // Update existing address
+        await addressAPI.updateAddress(currentAddress._id, currentAddress);
+      } else {
+        // Add new address
+        await addressAPI.addAddress(currentAddress);
       }
-
-      setIsModalOpen(false);
-      setIsEditing(false);
-      setCurrentAddress({
-        name: "",
-        phone: "",
-        addressLine1: "",
-        addressLine2: "",
-        city: "",
-        state: "",
-        pincode: "",
-        country: "India",
-      });
+      
+      // Reload user data to get updated addresses
+      await initializeAuth();
+      // Explicitly fetch fresh user data to get the addresses
+      await fetchUserData();
+      
+      // Small delay to ensure data is refreshed
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setIsEditing(false);
+        setCurrentAddress({
+          name: "",
+          phone: "",
+          addressLine1: "",
+          addressLine2: "",
+          city: "",
+          state: "",
+          pincode: "",
+          country: "India",
+        });
+      }, 500);
     } catch (err) {
       console.error("Error saving address:", err);
     }

@@ -16,6 +16,11 @@ export default defineConfig({
       verbose: true, // Log compression stats
     }),
   ],
+    server: {
+    host: true, // or '0.0.0.0' - allows external connections
+    port: 5173, // specify port (optional)
+    open: true, // automatically open browser (optional)
+  },
   build: {
     rollupOptions: {
       output: {

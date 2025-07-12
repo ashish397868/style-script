@@ -28,7 +28,7 @@ const UserDropdown = ({ user, userLinks = [], onLogout }) => {
         {user && user.profilePicture ? (
           <img src={user.profilePicture} alt="Profile" className="w-8 h-8 rounded-full" />
         ) : (
-          <FaUserCircle className="w-8 h-8 text-pink-600" />
+          <FaUserCircle className="w-8 h-8 text-pink-600 cursor-pointer" />
         )}
       </button>
 

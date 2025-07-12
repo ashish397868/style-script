@@ -7,7 +7,8 @@ export const AUTH_EVENTS = {
 };
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  // baseURL: 'http://localhost:5000/api',
+  baseURL : 'http://192.168.2.25:5000/api', // Replace with your actual IP
   headers: {
     'Content-Type': 'application/json',
   },

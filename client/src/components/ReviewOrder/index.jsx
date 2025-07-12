@@ -3,22 +3,39 @@ import { addToCart, removeFromCart, clearCart } from "../../redux/features/cart/
 import { paymentAPI, orderAPI } from "../../services/api";
 
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FiTruck, FiCreditCard, FiArrowLeft, FiCheck, FiPlus, FiMinus, FiTrash2 } from "react-icons/fi";
+import useUser from "../../redux/features/user/useUserHook";
 
 export default function ReviewOrder() {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
   const subTotal = useSelector((state) => state.cart.subTotal);
   const selectedAddress = useSelector((state) => state.checkout.selectedAddress);
+  const { user, isAuthenticated, initializeAuth } = useUser();
 
   const navigate = useNavigate();
   const [isPaying, setIsPaying] = useState(false);
+
+  // On mount, check if user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated && localStorage.getItem("token")) {
+      initializeAuth();
+    } else if (!isAuthenticated && !localStorage.getItem("token")) {
+      // Redirect to login if not authenticated and no token
+      navigate("/login", { state: { from: "/review-order" } });
+    }
+  }, [isAuthenticated, initializeAuth, navigate]);
 
   // Redirect if no address is selected
   if (!selectedAddress) {
     navigate("/checkout");
     return null;
+  }
+
+  // Redirect if not authenticated
+  if (!isAuthenticated && !user) {
+    return null; // Return null while checking auth or redirecting
   }
 
   const handleIncrease = (key, item) => {
@@ -51,6 +68,20 @@ export default function ReviewOrder() {
  const handleBuy = async () => {
   setIsPaying(true);
 
+  // First, verify we have authenticated user with email
+  if (!isAuthenticated || !user) {
+    alert("Please log in before checking out.");
+    setIsPaying(false);
+    navigate("/login", { state: { from: "/review-order" } });
+    return;
+  }
+
+  if (!user.email) {
+    alert("User email is required. Please update your profile.");
+    setIsPaying(false);
+    return;
+  }
+
   // 1️⃣ Load SDK
   const res = await loadRazorpayScript();
   if (!res) {
@@ -62,11 +93,13 @@ export default function ReviewOrder() {
   // 2️⃣ Prepare to call your APIs
   let orderRes;
   let paymentOrderRes;
-  let user;
   let receiptId;
   try {
-    // grab user & generate your own receipt string (use for both DB and Razorpay)
-    user = JSON.parse(localStorage.getItem("user-storage"))?.state?.user;
+    // Check if user and email exist
+    if (!user || !user.email) {
+      throw new Error("User email not found. Please log in again.");
+    }
+    
     receiptId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
     // build products array from cart
@@ -128,7 +161,8 @@ export default function ReviewOrder() {
   // 3️⃣ Build Razorpay checkout options
   const { order: rzOrder } = paymentOrderRes.data;
   const options = {
-    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    // key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+    key: "rzp_test_SFgsIpfsLyvuro",
     amount: rzOrder.amount,
     currency: rzOrder.currency,
     order_id: rzOrder.id,      // razorpay_order_id

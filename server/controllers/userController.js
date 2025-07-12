@@ -147,7 +147,7 @@ const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    cache.del(`user-${userId}`);
+    // cache.del(`user-${userId}`);
 
     return res.json({
       message: "Profile updated successfully",
@@ -165,16 +165,16 @@ const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const cacheKey = `user-${userId}`;
-    const cached = cache.get(cacheKey);
-    if (cached) {
-      return res.json(cached);
-    }
+    // const cacheKey = `user-${userId}`;
+    // const cached = cache.get(cacheKey);
+    // if (cached) {
+    //   return res.json(cached);
+    // }
 
     const user = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    cache.set(cacheKey, user);
+    // cache.set(cacheKey, user);
     return res.json(user);
   } catch (error) {
     console.error("Get User Error:", error);
@@ -185,12 +185,12 @@ const getUser = async (req, res) => {
 // GET all users (admin)
 const getAllUsers = async (req, res) => {
   try {
-    const cacheKey = "all-users";
-    const cached = cache.get(cacheKey);
-    if (cached) return res.json(cached);
+    // const cacheKey = "all-users";
+    // const cached = cache.get(cacheKey);
+    // if (cached) return res.json(cached);
 
     const users = await User.find().select("_id name phone role active").lean();
-    cache.set(cacheKey, users);
+    // cache.set(cacheKey, users);
     return res.json(users);
   } catch (error) {
     console.error("Get All Users Error:", error);
@@ -225,8 +225,8 @@ const updateUserRole = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    cache.del(`all-users`);
-    cache.del(`user-${id}`); // Clear cache for updated user
+    // cache.del(`all-users`);
+    // cache.del(`user-${id}`); // Clear cache for updated user
     
     return res.json({
       message: "User updated successfully",
@@ -249,8 +249,8 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-  cache.del(`all-users`);
-  cache.del(`user-${id}`);
+  // cache.del(`all-users`);
+  // cache.del(`user-${id}`);
     return res.json({ message: "User deleted successfully" });
   } catch (error) {
     console.error("Delete User Error:", error);
@@ -289,7 +289,7 @@ const forgotPassword = async (req, res) => {
     });
 
     const userId = user._id.toString();
-    cache.del(`user-${userId}`);
+    // cache.del(`user-${userId}`);
     return res.json({
       success: true,
       message: "Password reset code sent to email",
@@ -320,9 +320,9 @@ const resetPassword = async (req, res) => {
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     await user.save();
-    cache.del(`all-users`);
-    const userId = user._id.toString();
-    cache.del(`user-${userId}`);
+      // cache.del(`all-users`);
+      // const userId = user._id.toString();
+      // cache.del(`user-${userId}`);
     return res.json({ success: true, message: "Password has been reset successfully" });
   } catch (error) {
     console.error("Reset Password Error:", error);

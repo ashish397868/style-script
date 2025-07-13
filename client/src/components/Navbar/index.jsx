@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiMenu } from "react-icons/fi";
 import { BeatLoader } from "react-spinners";
@@ -22,6 +22,8 @@ const Navbar = ({
   userLinks = []
 }) => {
   const navigate = useNavigate();
+  const menuRef = useRef(null);
+  const hamburgerRef = useRef(null);
 
   const {
     user,
@@ -47,6 +49,29 @@ const Navbar = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
+
+  // Handle clicks outside the menu to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        menuOpen &&
+        menuRef.current && 
+        !menuRef.current.contains(event.target) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+    
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen]);
 
   const handleLogout = () => {
     logoutUser();
@@ -144,7 +169,11 @@ const Navbar = ({
               <MobileAuthComponent />
 
               <CartButton count={cartCount} onClick={() => setSidebarOpen(true)} iconClass={`${cartIconColor} ${cartIconHover}`} />
-              <button onClick={() => setMenuOpen(!menuOpen)} className={`p-2 rounded-full ${textColor} ${hoverColor}`}>
+              <button 
+                ref={hamburgerRef}
+                onClick={() => setMenuOpen(!menuOpen)} 
+                className={`p-2 rounded-full ${textColor} ${hoverColor}`}
+              >
                 <FiMenu className="text-2xl" />
               </button>
             </div>
@@ -152,7 +181,10 @@ const Navbar = ({
         </div>
 
         {/* Mobile Menu */}
-        <div className={`${menuOpen ? "block" : "hidden"} md:hidden`}>
+        <div 
+          ref={menuRef} 
+          className={`${menuOpen ? "block" : "hidden"} md:hidden`}
+        >
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {shopLinks.map((item, index) => (
               <Link key={index} to={item.path} className={`block px-3 py-2 rounded-md text-base font-medium ${textColor} ${hoverColor}`} onClick={() => setMenuOpen(false)}>

@@ -65,7 +65,7 @@ export default function ReviewOrder() {
     });
   };
 
- const handleBuy = async () => {
+const handleBuy = async () => {
   setIsPaying(true);
 
   // First, verify we have authenticated user with email
@@ -161,8 +161,7 @@ export default function ReviewOrder() {
   // 3️⃣ Build Razorpay checkout options
   const { order: rzOrder } = paymentOrderRes.data;
   const options = {
-    // key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-    key: "rzp_test_SFgsIpfsLyvuro",
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID,
     amount: rzOrder.amount,
     currency: rzOrder.currency,
     order_id: rzOrder.id,      // razorpay_order_id
@@ -191,14 +190,25 @@ export default function ReviewOrder() {
         setIsPaying(false);
       }
     },
+    modal: {
+      ondismiss: () => {
+        // This handles when user closes the modal
+        setIsPaying(false);
+      }
+    }
   };
 
   // 4️⃣ Open checkout
   const rzp = new window.Razorpay(options);
-  rzp.open();
+  
+  // Handle payment failure
+  rzp.on('payment.failed', (response) => {
+    console.error('Payment failed:', response.error);
+    alert(`Payment failed: ${response.error.description}`);
+    setIsPaying(false);
+  });
 
-  // you can leave setIsPaying(false) in the handler or
-  // hook into rzp.on('payment.failed', () => setIsPaying(false))
+  rzp.open();
 };
 
 

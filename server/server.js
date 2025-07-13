@@ -51,10 +51,16 @@ const apiLimiter = rateLimit({
 });
 
 app.use(cors({
-  origin: ['http://localhost:3000',
+  origin: [
+     'http://localhost:3000',
      'http://localhost:5173',
+
+    'http://192.168.1.6:3000',  // Home Wifi
+    'http://192.168.1.6:5173', 
+    
+    //College wifi
+    'http://192.168.2.25:5173',
     'http://192.168.2.25:3000',  // Add your IP for React
-    'http://192.168.2.25:5173'   // Add your IP for Vite
     ], // Allow both React and Vite URLs
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

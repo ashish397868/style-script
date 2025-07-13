@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import api, { addressAPI, userAPI } from "../../services/api";
-import { FiPlus, FiMapPin } from "react-icons/fi";
+import { FiPlus, FiMapPin, FiRefreshCw } from "react-icons/fi";
 import { setSelectedAddress as setSelectedAddressAction } from "../../redux/features/checkout/checkoutSlice";
 
 import useUser from "../../redux/features/user/useUserHook";  
@@ -21,6 +21,7 @@ export default function AddressSelection({ onAddressSelect }) {
   const navigate = useNavigate();
   const dispatch  = useDispatch();
   const { user, initializeAuth, isAuthenticated } = useUser();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
@@ -58,12 +59,19 @@ export default function AddressSelection({ onAddressSelect }) {
       : [];
 
     setAddresses(userAddresses);
-    setSelectedAddress(userAddresses[0] || null);
-  }, [user]);
+    
+    // Only set selected address if none is selected or if the current one is no longer in the list
+    const addressStillExists = userAddresses.some(addr => selectedAddress && addr._id === selectedAddress._id);
+    if (!selectedAddress || !addressStillExists) {
+      setSelectedAddress(userAddresses[0] || null);
+    }
+  }, [user, selectedAddress]);
   
   // Function to manually fetch user data
   const fetchUserData = async () => {
+    setIsRefreshing(true);
     try {
+      await initializeAuth();
       const { data } = await userAPI.getProfile();
       if (data?.user) {
         const userAddresses = Array.isArray(data.user.addresses) ? data.user.addresses : [];
@@ -74,6 +82,8 @@ export default function AddressSelection({ onAddressSelect }) {
       }
     } catch (err) {
       console.error("Error fetching user data:", err);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -180,17 +190,26 @@ export default function AddressSelection({ onAddressSelect }) {
   return (
     <div className="max-w-4xl mx-auto p-4">
       <div className="bg-gradient-to-r from-pink-50 to-pink-50 rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-6">
-          <h1 className="text-2xl font-bold text-white">
-            Select a delivery address
-          </h1>
-          <p className="text-pink-100 mt-2">
-            {addresses.length > 0
-              ? `You have ${addresses.length} saved address${
-                  addresses.length > 1 ? "es" : ""
-                }`
-              : "You don't have any saved address yet"}
-          </p>
+        <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-6 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-white">
+              Select a delivery address
+            </h1>
+            <p className="text-pink-100 mt-2">
+              {addresses.length > 0
+                ? `You have ${addresses.length} saved address${
+                    addresses.length > 1 ? "es" : ""
+                  }`
+                : "You don't have any saved address yet"}
+            </p>
+          </div>
+          <button 
+            onClick={fetchUserData} 
+            className="text-white hover:text-pink-200 transition-colors"
+            disabled={isRefreshing}
+          >
+            <FiRefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+          </button>
         </div>
 
         <div className="p-6">
@@ -248,15 +267,17 @@ export default function AddressSelection({ onAddressSelect }) {
         </div>
       </div>
 
-      <AddressFormModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleSubmitAddress}
-        currentAddress={currentAddress}
-        handleInputChange={handleInputChange}
-        errors={errors}
-        isEditing={isEditing}
-      />
+      {isModalOpen && (
+        <AddressFormModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleSubmitAddress}
+          currentAddress={currentAddress}
+          handleInputChange={handleInputChange}
+          errors={errors}
+          isEditing={isEditing}
+        />
+      )}
     </div>
   );
 }

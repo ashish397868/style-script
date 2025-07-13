@@ -6,7 +6,7 @@ import useUserProfile from "../../redux/features/user/userProfileHook";
 import { addressAPI } from "../../services/api";
 
 const AddressBook = () => {
-  const { user, fetchProfile } = useUserProfile();
+  const { user, fetchProfile, updateProfile } = useUserProfile();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -47,6 +47,9 @@ const AddressBook = () => {
       const updated = addresses.filter((addr) => addr._id !== id);
       await addressAPI.deleteAddress(id);
       setAddresses(updated);
+      
+      // Update the Redux store to ensure changes reflect everywhere in the app
+      await updateProfile({ addresses: updated });
     } catch {
       setError("Failed to remove address");
     } finally {

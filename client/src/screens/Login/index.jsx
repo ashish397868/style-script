@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import Button from '../../components/Button';
 import useUserHook from '../../redux/features/user/useUserHook'
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, isLoading, error, clearUserError } = useUserHook();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,9 @@ const Login = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [message, setMessage] = useState('');
+
+  // Get the redirect path from location state if it exists
+  const from = location.state?.from || "/";
 
   const validateForm = () => {
     const errors = {};
@@ -36,8 +40,9 @@ const Login = () => {
     try {
       const resultAction = await login(formData);
       if (resultAction.payload?.success) {
-        setMessage(resultAction.payload?.message || 'Login successful! Redirecting to home...');
-        navigate("/");
+        setMessage(resultAction.payload?.message || 'Login successful! Redirecting...');
+        // Redirect to the page they were trying to access or home if none
+        navigate(from);
       } else {
         setMessage(resultAction.payload?.message || 'Login failed. Please try again.');
       }

@@ -88,7 +88,8 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/login');
+    // After logout, the protected route will handle the redirect to login
+    // with the current location preserved in state
   };
 
   const StatCard = ({ title, value, icon: Icon, color }) => (

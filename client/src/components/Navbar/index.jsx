@@ -50,7 +50,9 @@ const Navbar = ({
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/login");
+    // Keep the user on the current page after logout
+    // They'll be redirected to login if they try to access a protected route
+    // No need to explicitly navigate to login
   };
 
   // Auth component to show loader, user dropdown, or login buttons based on auth state
@@ -90,7 +92,7 @@ const Navbar = ({
     }
     
     if (isAuthenticated) {
-      return <UserDropdown user={user} userLinks={userLinks} />;
+      return <UserDropdown user={user} userLinks={userLinks} onLogout={handleLogout} />;
     }
     
     return (

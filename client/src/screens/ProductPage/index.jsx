@@ -136,7 +136,8 @@ export default function ProductDetailPage() {
 
   const handleBuyNow = () => {
     if (!isAuthenticated) {
-      navigate("/login");
+      // Save the current path to navigate back after login
+      navigate("/login", { state: { from: location.pathname } });
       return;
     }
     if (!product || !size || !color) {

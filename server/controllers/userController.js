@@ -189,7 +189,7 @@ const getAllUsers = async (req, res) => {
     // const cached = cache.get(cacheKey);
     // if (cached) return res.json(cached);
 
-    const users = await User.find().select("_id name phone role active").lean();
+    const users = await User.find().select("_id name phone role active createdAt updatedAt").lean();
     // cache.set(cacheKey, users);
     return res.json(users);
   } catch (error) {

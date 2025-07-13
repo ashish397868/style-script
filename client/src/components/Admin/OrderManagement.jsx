@@ -174,19 +174,19 @@ const OrderManagement = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white rounded-t-2xl">
-          <h1 className="text-3xl font-bold flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-3" viewBox="0 0 20 20" fill="currentColor">
+        <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-4 md:p-6 text-white rounded-t-lg md:rounded-t-2xl">
+          <h1 className="text-2xl md:text-3xl font-bold flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 md:h-8 md:w-8 mr-2 md:mr-3" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M3 3a1 1 0 011-1h2a1 1 0 011 1v1h6V3a1 1 0 011-1h2a1 1 0 011 1v1h1a1 1 0 011 1v2a1 1 0 01-1 1h-1v8a2 2 0 01-2 2H5a2 2 0 01-2-2V7H2a1 1 0 01-1-1V4a1 1 0 011-1h1V3zm2 2V4H4v1h1zm10 0V4h-1v1h1zM4 7v8a1 1 0 001 1h10a1 1 0 001-1V7H4z" clipRule="evenodd" />
             </svg>
             Order Management
           </h1>
-          <p className="mt-2 text-pink-200">View, filter, and manage all customer orders</p>
+          <p className="mt-1 text-sm md:text-base text-pink-200">View, filter, and manage all customer orders</p>
         </div>
-        <div className="bg-white rounded-b-2xl shadow-xl overflow-hidden p-6">
+        <div className="bg-white rounded-b-lg md:rounded-b-2xl shadow-xl overflow-hidden p-4 md:p-6">
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Search Input */}
@@ -241,125 +241,328 @@ const OrderManagement = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      {/* Desktop Table - Hidden on mobile */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order Info</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Delivery</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {currentOrders.length > 0 ? (
-              currentOrders.map((order) => (
+            {currentOrders.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center py-6">
+                  <div className="flex flex-col items-center justify-center">
+                    <svg 
+                      className="h-16 w-16 text-gray-300 mb-4" 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-gray-700 mb-1">No orders found</h3>
+                    <p className="text-gray-500">Try adjusting your search or filters</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              currentOrders.map(order => (
                 <tr key={order._id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      #{order.orderId}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {format(new Date(order.createdAt), 'MMM dd, yyyy hh:mm a')}
+                    <div className="flex flex-col">
+                      <div className="text-sm font-medium text-gray-900">#{order.orderId}</div>
+                      <div className="text-sm text-gray-500">
+                        {format(new Date(order.createdAt), 'PP')}
+                      </div>
+                      <div className="text-sm font-medium text-gray-900 mt-1">₹{order.amount}</div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900">
-                      {order.products.map(p => p.name).join(', ')}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {order.products.reduce((sum, p) => sum + p.quantity, 0)} items
+                      {order.products.map((p, i) => (
+                        <div key={i} className="mb-1">
+                          {p.name} ({p.size}, {p.color}) x {p.quantity}
+                        </div>
+                      ))}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 capitalize">
-                      {order.name}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {order.email}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ₹{order.amount}
+                    <div className="text-sm font-medium text-gray-900">{order.name}</div>
+                    <div className="text-sm text-gray-500">{order.email}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      order.status === 'Paid' ? 'bg-green-100 text-green-800' :
-                      order.status === 'Cancelled' || order.status === 'Failed' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {order.status}
-                    </span>
+                    <div className="flex flex-col space-y-1">
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${order.status === 'Paid' ? 'bg-green-100 text-green-800' : 
+                          order.status === 'Failed' ? 'bg-red-100 text-red-800' : 
+                          order.status === 'Cancelled' ? 'bg-red-100 text-red-800' : 
+                          'bg-yellow-100 text-yellow-800'}`}>
+                        {order.status}
+                      </span>
+                      
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                        ${order.deliveryStatus === 'delivered' ? 'bg-green-100 text-green-800' : 
+                          order.deliveryStatus === 'shipped' || order.deliveryStatus === 'out for delivery' ? 'bg-blue-100 text-blue-800' : 
+                          order.deliveryStatus === 'returned' ? 'bg-red-100 text-red-800' : 
+                          'bg-gray-100 text-gray-800'}`}>
+                        {order.deliveryStatus ? order.deliveryStatus.charAt(0).toUpperCase() + order.deliveryStatus.slice(1) : 'Unshipped'}
+                      </span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded-full capitalize  ${
-                      order.deliveryStatus === 'delivered' ? 'bg-green-100 text-green-800' :
-                      order.deliveryStatus === 'returned' ? 'bg-red-100 text-red-800' :
-                      order.deliveryStatus === 'unshipped' ? 'bg-gray-100 text-gray-800' :
-                      'bg-pink-100 text-pink-800'
-                    }`}>
-                      {order.deliveryStatus}
-                    </span>
-                    {order.trackingId && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        {order.shippingProvider}: {order.trackingId}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    {order.status !== 'Cancelled' && order.status !== 'Failed' && (
-                      <>
-                        <button
-                          onClick={() => openShippingModal(order)}
-                          className="text-pink-600 hover:text-pink-900 flex items-center"
-                        >
-                          <FiTruck className="inline mr-1" /> Ship
-                        </button>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div className="flex space-x-2 justify-end">
+                      <button
+                        onClick={() => openShippingModal(order)}
+                        className="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded hover:bg-indigo-50"
+                      >
+                        <FiTruck className="inline mr-1" /> 
+                        {order.deliveryStatus === 'unshipped' || !order.deliveryStatus ? 'Ship' : 'Update'}
+                      </button>
+                      
+                      {order.status !== 'Cancelled' && (
                         <button
                           onClick={() => openCancelModal(order)}
-                          className="text-red-600 hover:text-red-900 flex items-center"
+                          className="text-red-600 hover:text-red-900 px-2 py-1 rounded hover:bg-red-50"
                         >
-                          <FiAlertTriangle className="inline mr-1" /> Cancel
+                          <FiAlertTriangle className="inline mr-1" /> 
+                          Cancel
                         </button>
-                      </>
-                    )}
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="px-6 py-4 text-center text-sm text-gray-500">
-                  No orders found
-                </td>
-              </tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Pagination */}
+      {/* Mobile Order Cards */}
+      <div className="md:hidden">
+        {currentOrders.length === 0 ? (
+          <div className="text-center py-6">
+            <div className="flex flex-col items-center justify-center">
+              <svg 
+                className="h-16 w-16 text-gray-300 mb-4" 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-700 mb-1">No orders found</h3>
+              <p className="text-gray-500">Try adjusting your search or filters</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {currentOrders.map(order => (
+              <div key={order._id} className="bg-white p-4 rounded-lg shadow border border-gray-200">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <span className="text-sm font-semibold text-gray-900">#{order.orderId}</span>
+                    <p className="text-xs text-gray-500">
+                      {format(new Date(order.createdAt), 'PP')}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-sm font-semibold text-gray-900">₹{order.amount}</span>
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap gap-1 mb-3">
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full 
+                    ${order.status === 'Paid' ? 'bg-green-100 text-green-800' : 
+                      order.status === 'Failed' ? 'bg-red-100 text-red-800' : 
+                      order.status === 'Cancelled' ? 'bg-red-100 text-red-800' : 
+                      'bg-yellow-100 text-yellow-800'}`}>
+                    {order.status}
+                  </span>
+                  
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full 
+                    ${order.deliveryStatus === 'delivered' ? 'bg-green-100 text-green-800' : 
+                      order.deliveryStatus === 'shipped' || order.deliveryStatus === 'out for delivery' ? 'bg-blue-100 text-blue-800' : 
+                      order.deliveryStatus === 'returned' ? 'bg-red-100 text-red-800' : 
+                      'bg-gray-100 text-gray-800'}`}>
+                    {order.deliveryStatus ? order.deliveryStatus.charAt(0).toUpperCase() + order.deliveryStatus.slice(1) : 'Unshipped'}
+                  </span>
+                </div>
+                
+                <div className="border-t border-gray-100 pt-2 mb-3">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Customer:</p>
+                  <p className="text-sm text-gray-600">{order.name}</p>
+                  <p className="text-sm text-gray-500">{order.email}</p>
+                </div>
+                
+                <div className="border-t border-gray-100 pt-2 mb-3">
+                  <p className="text-sm font-medium text-gray-700 mb-1">Products:</p>
+                  {order.products.map((p, i) => (
+                    <div key={i} className="text-sm text-gray-600">
+                      {p.name} ({p.size}, {p.color}) x {p.quantity}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="border-t border-gray-100 pt-3 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => openShippingModal(order)}
+                    className="inline-flex items-center px-3 py-1 border border-indigo-600 text-sm leading-4 font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 focus:outline-none transition-colors"
+                  >
+                    <FiTruck className="mr-1" /> 
+                    {order.deliveryStatus === 'unshipped' || !order.deliveryStatus ? 'Ship' : 'Update'}
+                  </button>
+                  
+                  {order.status !== 'Cancelled' && (
+                    <button
+                      onClick={() => openCancelModal(order)}
+                      className="inline-flex items-center px-3 py-1 border border-red-600 text-sm leading-4 font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none transition-colors"
+                    >
+                      <FiAlertTriangle className="mr-1" /> 
+                      Cancel
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex justify-between items-center mt-4">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 border rounded-md disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 border rounded-md disabled:opacity-50"
-          >
-            Next
-          </button>
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6 mt-4">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                currentPage === 1 
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                currentPage === totalPages 
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm text-gray-700">
+                Showing <span className="font-medium">{indexOfFirstOrder + 1}</span> to{' '}
+                <span className="font-medium">
+                  {Math.min(indexOfLastOrder, filteredOrders.length)}
+                </span>{' '}
+                of <span className="font-medium">{filteredOrders.length}</span> results
+              </p>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <button
+                  onClick={() => setCurrentPage(1)}
+                  disabled={currentPage === 1}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="sr-only">First</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M15.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 010 1.414zm-6 0a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 011.414 1.414L5.414 10l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === 1 ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="sr-only">Previous</span>
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                
+                {/* Page numbers */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter(page => {
+                    if (totalPages <= 5) return true;
+                    return (
+                      page === 1 ||
+                      page === totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    );
+                  })
+                  .map((page, index, array) => {
+                    // Add ellipsis
+                    if (index > 0 && page > array[index - 1] + 1) {
+                      return (
+                        <span key={`ellipsis-${page}`} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                          ...
+                        </span>
+                      );
+                    }
+                    
+                    return (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          currentPage === page
+                            ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+                
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`relative inline-flex items-center px-2 py-2 border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === totalPages ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="sr-only">Next</span>
+                  <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <button
+                  onClick={() => setCurrentPage(totalPages)}
+                  disabled={currentPage === totalPages}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                    currentPage === totalPages ? 'text-gray-300' : 'text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="sr-only">Last</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10.293 15.707a1 1 0 010-1.414L14.586 10l-4.293-4.293a1 1 0 111.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    <path fillRule="evenodd" d="M4.293 15.707a1 1 0 010-1.414L8.586 10 4.293 5.707a1 1 0 011.414-1.414l5 5a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
         </div>
       )}
 

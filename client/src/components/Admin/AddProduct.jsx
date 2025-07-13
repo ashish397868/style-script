@@ -134,27 +134,27 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-6 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-6 text-white">
-            <h1 className="text-3xl font-bold flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mr-3" viewBox="0 0 20 20" fill="currentColor">
+          <div className="bg-gradient-to-r from-pink-600 to-purple-700 p-4 md:p-6 text-white">
+            <h1 className="text-2xl md:text-3xl font-bold flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 md:h-8 md:w-8 mr-2 md:mr-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clipRule="evenodd" />
               </svg>
               Add New Product
             </h1>
-            <p className="mt-2 text-pink-200">Fill in the details below to add a new product to your inventory</p>
+            <p className="mt-1 text-sm md:text-base text-pink-200">Fill in the details below to add a new product to your inventory</p>
           </div>
           
           {/* Form */}
-          <form onSubmit={handleSubmit} className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleSubmit} className="p-4 md:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               {/* Left Column */}
               <div>
                 {/* Title */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Product Title *
                   </label>
@@ -164,17 +164,17 @@ const AddProduct = () => {
                     onChange={handleChange}
                     placeholder="e.g. Premium Cotton T-Shirt"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                   />
                 </div>
                 
                 {/* Slug */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Product Slug *
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500 text-xs md:text-sm truncate w-32 md:w-auto">
                       yourstore.com/products/
                     </div>
                     <input
@@ -183,14 +183,14 @@ const AddProduct = () => {
                       onChange={handleChange}
                       placeholder="premium-cotton-tshirt"
                       required
-                      className="w-full pl-48 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="w-full pl-[7.5rem] md:pl-48 pr-3 md:pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                   <p className="mt-1 text-xs text-gray-500">Unique URL identifier for your product</p>
                 </div>
                 
                 {/* Description */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description *
                   </label>
@@ -201,12 +201,12 @@ const AddProduct = () => {
                     placeholder="Detailed product description..."
                     rows="4"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                    className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                   ></textarea>
                 </div>
                 
                 {/* Price & Quantity */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 md:mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Price *
@@ -224,13 +224,13 @@ const AddProduct = () => {
                         min="0"
                         step="0.01"
                         required
-                        className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                        className="w-full pl-7 md:pl-8 pr-3 md:pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Stock Quantity *
+                      Quantity *
                     </label>
                     <input
                       name="availableQty"
@@ -240,71 +240,25 @@ const AddProduct = () => {
                       placeholder="0"
                       min="0"
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
-              </div>
-              
-              {/* Right Column */}
-              <div>
+                
                 {/* Category & Brand */}
-                <div className="grid grid-cols-1 gap-4 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 md:mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Category *
                     </label>
-                    <div className="flex gap-2">
-                      <select
-                        name="category"
-                        value={form.category}
-                        onChange={handleChange}
-                        required
-                        className="w-full px-1 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
-                      >
-                        <option value="">Select category</option>
-                        <option value="Sweatshirts">Sweatshirts</option>
-                        <option value="Hoodies">Hoodies</option>
-                        <option value="Zipper Hoodies">Zipper Hoodies</option>
-                        <option value="TShirts">TShirts</option>
-                        <option value="Polo TShirts">Polo TShirts</option>
-                        <option value="Oversized Tshirts">Oversized Tshirts</option>
-                        {form.category && !["Sweatshirts","Hoodies","Zipper Hoodies","TShirts","Polo TShirts","Oversized Tshirts"].includes(form.category) && (
-                          <option value={form.category}>{form.category.charAt(0).toUpperCase() + form.category.slice(1)}</option>
-                        )}
-                      </select>
-                      <input
-                        type="text"
-                        placeholder="Add new category"
-                        value={form.newCategory || ''}
-                        onChange={e =>
-                          setForm(prev => ({
-                            ...prev,
-                            newCategory: e.target.value
-                          }))
-                        }
-                        className="px-2 py-3 border border-gray-300 rounded-lg"
-                      />
-                      <button
-                        type="button"
-                        className="bg-pink-600 hover:bg-pink-700 text-white px-3 rounded-lg"
-                        onClick={() => {
-                          if (
-                            form.newCategory &&
-                            !["Clothing","Electronics","Home & Kitchen","Beauty","Sports"].includes(form.newCategory)
-                          ) {
-                            setForm(prev => ({
-                              ...prev,
-                              category: prev.newCategory,
-                              newCategory: ''
-                            }));
-                          }
-                        }}
-                      >
-                        Add
-                      </button>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">Select or add a new category</p>
+                    <input
+                      name="category"
+                      value={form.category}
+                      onChange={handleChange}
+                      placeholder="e.g. Clothing, Electronics"
+                      required
+                      className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -315,13 +269,13 @@ const AddProduct = () => {
                       value={form.brand}
                       onChange={handleChange}
                       placeholder="e.g. Nike, Apple"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
                 
                 {/* Size & Color */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-4 md:mb-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Size
@@ -331,7 +285,7 @@ const AddProduct = () => {
                       value={form.size}
                       onChange={handleChange}
                       placeholder="e.g. S, M, L"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                   <div>
@@ -343,31 +297,28 @@ const AddProduct = () => {
                       value={form.color}
                       onChange={handleChange}
                       placeholder="e.g. Red, pink"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                   </div>
                 </div>
                 
                 {/* Tags */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Tags
                   </label>
-                  <div className="flex flex-wrap gap-2 mb-3">
+                  <div className="flex flex-wrap mb-2 gap-1">
                     {form.tags.map((tag, index) => (
-                      <span 
-                        key={index} 
-                        className="inline-flex items-center bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm"
-                      >
+                      <div key={index} className="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full flex items-center">
                         {tag}
                         <button
                           type="button"
                           onClick={() => removeTag(tag)}
-                          className="ml-2 text-pink-600 hover:text-pink-900"
+                          className="ml-1 text-gray-500 hover:text-gray-700 focus:outline-none"
                         >
-                          ×
+                          &times;
                         </button>
-                      </span>
+                      </div>
                     ))}
                   </div>
                   <div className="flex">
@@ -375,21 +326,47 @@ const AddProduct = () => {
                       type="text"
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
-                      placeholder="Add a tag and press Enter"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
-                      onKeyPress={(e) => e.key === 'Enter' && addTag(e)}
+                      placeholder="Enter tag and press Add"
+                      className="flex-grow px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addTag(e);
+                        }
+                      }}
                     />
                     <button
+                      type="button"
                       onClick={addTag}
-                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
+                      className="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-800 rounded-r-lg hover:bg-gray-300 transition"
                     >
                       Add
                     </button>
                   </div>
                 </div>
+              </div>
+              
+              {/* Right Column */}
+              <div>
+                {/* Featured Switch */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="isFeatured"
+                      name="isFeatured"
+                      checked={form.isFeatured}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="isFeatured" className="ml-2 block text-sm text-gray-900">
+                      Feature this product on homepage
+                    </label>
+                  </div>
+                </div>
                 
                 {/* Images */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Image URLs or Upload
                   </label>
@@ -398,9 +375,9 @@ const AddProduct = () => {
                       <div key={index} className="relative">
                         {/* Show image preview if URL is valid */}
                         {img.match(/^https?:\/\//) ? (
-                          <img src={img} alt="preview" className="w-16 h-16 object-cover rounded-xl border-2 border-dashed" />
+                          <img src={img} alt="preview" className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-xl border-2 border-dashed" />
                         ) : (
-                          <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 flex items-center justify-center">
+                          <div className="bg-gray-200 border-2 border-dashed rounded-xl w-14 h-14 md:w-16 md:h-16 flex items-center justify-center">
                             <span className="text-xs text-gray-500">Image</span>
                           </div>
                         )}
@@ -414,57 +391,68 @@ const AddProduct = () => {
                       </div>
                     ))}
                   </div>
-                  <div className="flex mb-2">
+                  
+                  {/* Image URL Input */}
+                  <div className="flex mb-3">
                     <input
                       type="text"
                       value={imageInput}
                       onChange={(e) => setImageInput(e.target.value)}
-                      placeholder="Paste image URL"
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      placeholder="Enter image URL"
+                      className="flex-grow px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
                     />
                     <button
+                      type="button"
                       onClick={addImage}
-                      className="bg-pink-600 hover:bg-pink-700 text-white px-4 rounded-r-lg transition"
+                      className="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-800 rounded-r-lg hover:bg-gray-300 transition"
                     >
-                      Add
+                      Add URL
                     </button>
                   </div>
+                  
+                  {/* Image Upload */}
                   <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileUpload}
-                      disabled={uploading}
-                      className="mb-2"
-                    />
-                    {uploading && <span className="text-pink-600 ml-2">Uploading...</span>}
-                  </div>
-                </div>
-                
-                {/* Featured */}
-                <div className="flex items-center mb-6">
-                  <div className="relative flex items-start">
-                    <div className="flex items-center h-5">
+                    <label className="block text-sm font-medium text-gray-500 mb-1">
+                      Or upload an image:
+                    </label>
+                    <div className="relative">
                       <input
-                        name="isFeatured"
-                        type="checkbox"
-                        checked={form.isFeatured}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
+                        type="file"
+                        onChange={handleFileUpload}
+                        accept="image/*"
+                        className="sr-only"
+                        id="file-upload"
                       />
-                    </div>
-                    <div className="ml-3 text-sm">
-                      <label htmlFor="isFeatured" className="font-medium text-gray-700">
-                        Feature this product
+                      <label
+                        htmlFor="file-upload"
+                        className={`flex items-center justify-center w-full px-4 py-3 border-2 border-dashed rounded-lg ${
+                          uploading ? 'bg-gray-100 border-gray-300' : 'border-gray-300 hover:border-gray-400'
+                        } cursor-pointer`}
+                      >
+                        {uploading ? (
+                          <div className="flex items-center">
+                            <svg className="animate-spin h-5 w-5 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span className="text-gray-500">Uploading...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <svg className="h-6 w-6 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span className="text-gray-500">Click to upload image</span>
+                          </div>
+                        )}
                       </label>
-                      <p className="text-gray-500">Show this product prominently on your store</p>
                     </div>
+                    {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
                   </div>
                 </div>
               </div>
             </div>
             
-            {/* Form Actions */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
               <div>
                 {success && (
@@ -485,34 +473,59 @@ const AddProduct = () => {
                 )}
               </div>
               
-              <button
-                type="submit"
-                disabled={loading}
-                className={`px-6 py-3 rounded-lg font-medium transition flex items-center ${
-                  loading 
-                    ? 'bg-pink-400 cursor-not-allowed' 
-                    : 'bg-pink-600 hover:bg-pink-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
-                } text-white`}
-              >
-                {loading ? (
-                  <>
-                    <Loader />
-                  </>
-                ) : (
-                  <>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    Add Product
-                  </>
-                )}
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Reset form
+                    setForm({
+                      title: '',
+                      slug: '',
+                      description: '',
+                      price: '',
+                      images: [],
+                      category: '',
+                      brand: '',
+                      size: '',
+                      color: '',
+                      tags: [],
+                      availableQty: '',
+                      isFeatured: false,
+                    });
+                    setTagInput('');
+                    setImageInput('');
+                    setError('');
+                    setSuccess(false);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors"
+                >
+                  Reset
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`px-4 py-2 border border-transparent rounded-md font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors ${
+                    loading ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {loading ? (
+                    <div className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Adding Product...
+                    </div>
+                  ) : (
+                    'Add Product'
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>
         
-        {/* Info Panel */}
-        <div className="mt-8 bg-pink-50 rounded-xl p-6 border border-pink-100">
+        <div className="mt-8 bg-pink-50 rounded-xl p-4 md:p-6 border border-pink-100">
           <div className="flex">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-pink-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

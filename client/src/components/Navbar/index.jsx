@@ -8,6 +8,8 @@ import Dropdown from "../DropDown";
 import UserDropdown from "../UserDropDown";
 import CartButton from "../CartSidebar/CartButton";
 import CartSidebar from "../CartSidebar";
+import SearchBar from "../SearchBar";
+import { FiSearch } from "react-icons/fi";
 
 const Navbar = ({
   shopLinks = [],
@@ -137,10 +139,17 @@ const Navbar = ({
       <nav className={`${backgroundColor} shadow-lg w-full z-50 sticky top-0`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="flex items-center py-4 px-2">
-              {logo && <img src={logo} alt="Logo" className="h-8 w-8 mr-2 rounded " />}
-              <span className={`font-bold text-lg text-pink-600 `}>{brandName}</span>
-            </Link>
+            <div className="flex items-center">
+              <Link to="/" className="flex items-center py-4 px-2">
+                {logo && <img src={logo} alt="Logo" className="h-8 w-8 mr-2 rounded " />}
+                <span className={`font-bold text-lg text-pink-600 `}>{brandName}</span>
+              </Link>
+              
+              {/* Desktop Search Bar - Next to logo */}
+              <div className="hidden md:block ml-4">
+                <SearchBar />
+              </div>
+            </div>
 
             {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-4">
@@ -176,6 +185,42 @@ const Navbar = ({
               >
                 <FiMenu className="text-2xl" />
               </button>
+            </div>
+          </div>
+          
+          {/* Mobile Search Bar - Always visible in a separate row */}
+          <div className="md:hidden py-2 pb-3">
+            <div className="w-full">
+              <form className="flex w-full">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-pink-500 text-gray-800"
+                  onChange={(e) => {
+                    if (e.target.value.trim() === '') return;
+                    navigate(`/category/all?search=${encodeURIComponent(e.target.value)}`);
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (e.target.value.trim() === '') return;
+                      navigate(`/category/all?search=${encodeURIComponent(e.target.value)}`);
+                    }
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-pink-600 text-white rounded-r-md hover:bg-pink-700"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    const value = e.target.previousSibling.value;
+                    if (value.trim() === '') return;
+                    navigate(`/category/all?search=${encodeURIComponent(value)}`);
+                  }}
+                >
+                  <FiSearch />
+                </button>
+              </form>
             </div>
           </div>
         </div>

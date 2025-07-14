@@ -46,6 +46,40 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
+// Search products by query string (public)
+exports.searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+    
+    if (!q || q.trim() === '') {
+      return res.json([]);
+    }
+
+    const searchQuery = {
+      $or: [
+        { title: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { tags: { $regex: q, $options: 'i' } }
+      ]
+    };
+
+    const products = await Product.find(searchQuery)
+      .limit(20)
+      .sort({ isFeatured: -1, updatedAt: -1 })
+      .lean();
+
+    if (products.length === 0) {
+      return res.json([]);
+    }
+
+    const groupedProducts = groupProductsByTitle(products);
+    return res.json(groupedProducts);
+  } catch (error) {
+    console.error("Search Products Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // get product by theme (from route param)
 exports.getProductsByTheme = async (req, res) => {
   try {

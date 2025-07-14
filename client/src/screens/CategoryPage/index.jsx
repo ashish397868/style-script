@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import ProductCard from "../../components/ProductCard";
 import { useEffect, useState } from "react";
 import { productAPI } from "../../services/api";
@@ -6,26 +6,45 @@ import Loader from "../../components/Loader";
 
 const CategoryPage = () => {
   const { category } = useParams();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchQuery = searchParams.get('search');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
 
   useEffect(() => {
     setLoading(true);
     setError(null);
     
-    productAPI.getProductsByCategory(category)
-      .then(res => {
-        console.log("Category products received:", res.data);
-        setProducts(res.data);
+    const fetchProducts = async () => {
+      try {
+        let response;
+        
+        if (searchQuery) {
+          setTitle(`Search: ${searchQuery}`);
+          setSubtitle(`Showing search results for "${searchQuery}"`);
+          response = await productAPI.searchProducts(searchQuery);
+        } else {
+          setTitle(`${category} Collection`);
+          setSubtitle(`Browse our latest collection of ${category.toLowerCase()}.`);
+          response = await productAPI.getProductsByCategory(category);
+        }
+        
+        console.log("Products received:", response.data);
+        setProducts(response.data);
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Error fetching category products:", err);
+      } catch (err) {
+        console.error("Error fetching products:", err);
         setError(err.message || "Failed to load products");
         setLoading(false);
-      });
-  }, [category]);
+      }
+    };
+
+    fetchProducts();
+  }, [category, searchQuery]);
 
   if (loading) {
     return (
@@ -43,7 +62,7 @@ const CategoryPage = () => {
         <div className="container px-5 py-12 mx-auto">
           <div className="text-center py-8">
             <p className="text-xl text-red-600 mb-4">
-              Error loading {category.toLowerCase()}
+              Error loading {searchQuery ? 'search results' : category.toLowerCase()}
             </p>
             <p className="text-gray-600">{error}</p>
             <button 
@@ -63,10 +82,10 @@ const CategoryPage = () => {
       <div className="container px-5 py-12 mx-auto">
         <div className="flex flex-col text-center w-full mb-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-4 capitalize">
-            {category} Collection
+            {title}
           </h1>
           <p className="lg:w-2/3 mx-auto text-gray-600">
-            Browse our latest collection of {category.toLowerCase()}.
+            {subtitle}
           </p>
         </div>
 
@@ -74,7 +93,7 @@ const CategoryPage = () => {
           <>
             <div className="text-center mb-6">
               <p className="text-gray-600">
-                Showing {products.length} {products.length === 1 ? 'product' : 'products'} in {category.toLowerCase()}
+                Showing {products.length} {products.length === 1 ? 'product' : 'products'}
               </p>
             </div>
             
@@ -96,10 +115,12 @@ const CategoryPage = () => {
             <div className="max-w-md mx-auto">
               <div className="text-6xl mb-4">📦</div>
               <p className="text-xl text-gray-700 mb-4">
-                No {category.toLowerCase()} available at the moment.
+                {searchQuery 
+                  ? `No results found for "${searchQuery}"` 
+                  : `No ${category.toLowerCase()} available at the moment.`}
               </p>
               <p className="text-gray-600 mb-6">
-                Please check back later for new arrivals, or browse other categories.
+                Please check back later for new arrivals, or try a different search term.
               </p>
               <button 
                 onClick={() => window.history.back()} 

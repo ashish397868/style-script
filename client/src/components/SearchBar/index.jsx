@@ -117,7 +117,7 @@ const SearchBar = () => {
                 className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
               >
                 {product.images && product.images[0] && (
-                  <img src={product.images[0]} alt={product.title} className="h-10 w-10 object-cover mr-2" />
+                  <img src={product.images[0]} alt={product.title} className="h-10  object-contain mr-4" />
                 )}
                 <div>
                   <div className="text-sm font-medium">{product.title}</div>

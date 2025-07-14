@@ -29,12 +29,23 @@ const useUserProfile = () => {
     }
   }, [dispatch]);
 
+  // Change password
+  const changePassword = useCallback(async (passwordData) => {
+    try {
+      const res = await userAPI.changePassword(passwordData);
+      return res.data;
+    } catch (err) {
+      throw err.response?.data?.message || 'Failed to change password';
+    }
+  }, []);
+
   return {
     user,
     isLoading,
     error,
     fetchProfile,
     updateProfile,
+    changePassword,
   };
 };
 

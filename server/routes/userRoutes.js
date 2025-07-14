@@ -11,7 +11,8 @@ const{
     getAllUsers,
     updateUserRole,
     deleteUser,
-    getUser
+    getUser,
+    changePassword
 }=require('../controllers/userController');
 
 // Stricter rate limit for authentication routes
@@ -31,6 +32,7 @@ router.post('/reset-password', authLimiter, resetPassword);//tested
 // Protected routes
 router.get('/users/profile', authenticateUser, getUser);
 router.patch('/users/profile', authenticateUser,updateProfile);//tested
+router.post('/users/change-password', authenticateUser, changePassword);
 
 // Admin routes
 router.get('/users', authenticateUser, isAdmin, getAllUsers);//tested

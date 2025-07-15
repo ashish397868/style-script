@@ -43,7 +43,14 @@ const handleSignup = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    return res.status(201).json({
+    return res.status(201)
+    .cookie("token", token, {
+      httpOnly: true,   // cannot be accessed via JS
+      secure: false,    // set to true if using HTTPS
+      sameSite: "lax",  //balanced security
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
+    .json({
       message: "Signup successful!",
       token,
       success: true,
@@ -85,7 +92,14 @@ const handleLogin = async (req, res) => {
 
     const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    return res.status(200).json({
+    return res.status(200)
+    .cookie("token", token, {
+      httpOnly: true,   // cannot be accessed via JS
+      secure: false,    // set to true if using HTTPS
+      sameSite: "lax",  //balanced security
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    })
+    .json({
       message: "Login successful!",
       token,
       success: true,
@@ -367,6 +381,20 @@ const changePassword = async (req, res) => {
   }
 };
 
+const handleLogout = async (req, res) => {
+  try {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax"
+    });
+    return res.json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(400).json({ success: false, message: "Error logging out" });
+  }
+};
+
 module.exports = {
   handleSignup,
   handleLogin,
@@ -378,4 +406,5 @@ module.exports = {
   deleteUser,
   getUser,
   changePassword,
+  handleLogout
 };

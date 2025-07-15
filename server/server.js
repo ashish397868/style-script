@@ -15,7 +15,9 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
 app.use(compression()); // Enable compression for all responses
 
 // Use Helmet for security headers

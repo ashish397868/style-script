@@ -31,15 +31,9 @@ const Navbar = ({
     user,
     isAuthenticated,
     logoutUser,
-    initializeAuth,
     isLoading
   } = useUserHook();
   
-  useEffect(() => {
-    initializeAuth();
-    // eslint-disable-next-line
-  }, []);
-
   const {
     cart,
     subTotal,

@@ -28,7 +28,7 @@ api.interceptors.request.use(
       url: config.url,
       method: config.method,
       data: config.data,
-      headers: config.headers,
+      // headers: config.headers,
     });
     return config;
   },
@@ -80,19 +80,13 @@ export const authAPI = {
   login: (credentials) => api.post('/login', credentials),
   signup: (userData) => api.post('/signup', userData),
   forgotPassword: (email) => api.post('/forgot-password', { email }),
-  resetPassword: (data) => api.post('/reset-password', data),
-  verifyEmail: (token) => api.get(`/users/verify-email/${token}`),
-  getProfile: () => api.get('/users/profile'),
+  resetPassword: (data) => api.post('/reset-password', data)
 };
 
-// User Routes
 export const userAPI = {
   getProfile: () => api.get('/users/profile'),
   updateProfile: (userData) => api.patch('/users/profile', userData),
   changePassword: (passwordData) => api.post('/users/change-password', passwordData),
-  deleteAccount: () => api.delete('/users/profile'),
-  setDefaultAddress: (addresses) => api.patch('/users/profile', { addresses }),
-  removeAddress: (addresses) => api.patch('/users/profile', { addresses }),
 };
 
 // address Routes
@@ -153,26 +147,7 @@ export const mediaAPI = {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
-  }),
-  uploadBulk: (formData) => api.post('/media/upload/bulk', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
-  deleteMedia: (mediaId) => api.delete(`/media/${mediaId}`),
-};
-
-// Bulk Upload Routes
-export const bulkUploadAPI = {
-  uploadProducts: (formData) => api.post('/bulk-upload/products', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
-  getUploadStatus: (uploadId) => api.get(`/bulk-upload/status/${uploadId}`),
-  downloadTemplate: () => api.get('/bulk-upload/template', {
-    responseType: 'blob',
-  }),
+  })
 };
 
 export default api;

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authAPI } from '../../../services/api';
+import { authAPI,userAPI } from '../../../services/api';
 
 // Async thunks
 export const loginUser = createAsyncThunk(
@@ -34,7 +34,7 @@ export const initAuth = createAsyncThunk(
     try {
       const token = localStorage.getItem('token');
       if (!token) return null;
-      const response = await authAPI.getProfile();
+      const response = await userAPI.getProfile();
       return response.data;
     } catch (error) {
       localStorage.removeItem('token');

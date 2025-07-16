@@ -3,6 +3,7 @@ const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const express = require('express');
 
 // Configure rate limiters
 const globalLimiter = rateLimit({

@@ -10,13 +10,6 @@ export const shopLinks = [
   { label: "Zipper Hoodies", path: "/category/zipperhoodies" },
 ];
 
-export const adminLinks = [
-  { label: "Dashboard", path: "/admin/dashboard" },
-  { label: "Products", path: "/admin/products" },
-  { label: "Orders", path: "/admin/orders" },
-  { label: "Users", path: "/admin/users" },
-];
-
 export const userLinks=[
   { label: "Profile", path: "/profile" },
   { label: "Orders", path: "/orders" },

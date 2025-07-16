@@ -1,3 +1,4 @@
+//  Carousel Banner Images
 const imageLink = [
   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/banner/6.webp",
   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/banner/3.webp",
@@ -5,6 +6,7 @@ const imageLink = [
   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/banner/5.webp",
 ];
 
+// collections Images Links
 const collectionsImageLink=[
   {url: "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/collections/caps.webp", path: "/category/caps"},
   {url: "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/collections/hoodie.webp", path: "/category/hoodies"},
@@ -14,15 +16,7 @@ const collectionsImageLink=[
   {url: "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/collections/sweatshirt.webp", path: "/category/sweatshirts"},
 ];
 
-// const themeCollectionImageLink = [
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/combooffers.webp",
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/gaming.webp",
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/fitness.webp",
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/lifestyle.webp",
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/programming.webp",
-//   "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/trending.webp",
-// ];
-
+// theme colllection links
 const themeCollectionImageLink=[
   {url: "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/combooffers.webp", path: "/theme/combooffers"},
   {url: "https://codeswear.nyc3.cdn.digitaloceanspaces.com/constants/landing/themes/gaming.webp", path: "/theme/gaming"},
@@ -33,6 +27,7 @@ const themeCollectionImageLink=[
 ];
 
 
+// features
 const features = [
   {
     icon: "👕",

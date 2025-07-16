@@ -1,8 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const getInitialCart = () => {
   try {
-    const cart = localStorage.getItem('cart');
+    const cart = localStorage.getItem("cart");
     if (cart) {
       const parsed = JSON.parse(cart);
       return parsed;
@@ -12,55 +12,51 @@ const getInitialCart = () => {
 };
 
 const calculateSubTotal = (cart) => {
-  return Object.keys(cart).reduce(
-    (total, k) => total + (cart[k].price * cart[k].qty),
-    0
-  );
+  return Object.keys(cart).reduce((total, itemId) => total + cart[itemId].price * cart[itemId].qty, 0);
 };
 
 const initialCart = getInitialCart();
+
 const initialState = {
   cart: initialCart,
   subTotal: calculateSubTotal(initialCart),
 };
 
 const cartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState,
   reducers: {
     addToCart: (state, action) => {
       const { key, qty, itemDetails } = action.payload;
       if (state.cart[key]) {
-        state.cart[key].qty += qty;
+        state.cart[key].qty += qty; //agr vo product cart mein hai to , uski quantity plus krdo
       } else {
-        state.cart[key] = { ...itemDetails, qty };
+        state.cart[key] = { ...itemDetails, qty }; //nhi to new product add krdo cart mein
       }
       state.subTotal = calculateSubTotal(state.cart);
-      localStorage.setItem('cart', JSON.stringify(state.cart));
+      localStorage.setItem("cart", JSON.stringify(state.cart));
     },
+
     removeFromCart: (state, action) => {
       const { key, qty } = action.payload;
       if (state.cart[key]) {
         state.cart[key].qty -= qty;
-        if (state.cart[key].qty <= 0) {
+        if (state.cart[key].qty <= 0) { //agr quantity zero se kam hai to us item ko delete krdo cart se
           delete state.cart[key];
         }
       }
       state.subTotal = calculateSubTotal(state.cart);
-      localStorage.setItem('cart', JSON.stringify(state.cart));
+      localStorage.setItem("cart", JSON.stringify(state.cart));
     },
+
     clearCart: (state) => {
       state.cart = {};
       state.subTotal = 0;
-      localStorage.setItem('cart', JSON.stringify(state.cart));
-    },
-    loadCart: (state) => {
-      const cart = getInitialCart();
-      state.cart = cart;
-      state.subTotal = calculateSubTotal(cart);
-    },
+      localStorage.setItem("cart", JSON.stringify(state.cart));
+    }
+
   },
 });
 
-export const { addToCart, removeFromCart, clearCart, loadCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -1,5 +1,5 @@
-import { useSelector, useDispatch } from "react-redux";
-import { addToCart, removeFromCart, clearCart } from "../../redux/features/cart/cartSlice";
+import { useSelector } from "react-redux";
+import useCartHook from "../../redux/features/cart/useCartHook"
 import { paymentAPI, orderAPI } from "../../services/api";
 
 import { useNavigate } from "react-router-dom";
@@ -8,9 +8,9 @@ import { FiTruck, FiCreditCard, FiArrowLeft, FiCheck, FiPlus, FiMinus, FiTrash2 
 import useUser from "../../redux/features/user/useUserHook";
 
 export default function ReviewOrder() {
-  const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart.cart);
-  const subTotal = useSelector((state) => state.cart.subTotal);
+  const cartHook = useCartHook();
+  const { addItem, removeItem, clearCart, cart ,subTotal } = cartHook;
+
   const selectedAddress = useSelector((state) => state.checkout.selectedAddress);
   const { user, isAuthenticated, initializeAuth } = useUser();
 
@@ -39,15 +39,15 @@ export default function ReviewOrder() {
   }
 
   const handleIncrease = (key, item) => {
-    dispatch(addToCart({ key, qty: 1, itemDetails: item }));
+    addItem(key, 1 , item );
   };
 
   const handleDecrease = (key) => {
-    dispatch(removeFromCart({ key, qty: 1 }));
+    removeItem(key, 1);
   };
 
   const handleRemove = (key) => {
-    dispatch(removeFromCart({ key, qty: cart[key].qty }));
+    removeItem(key, cart[key].qty);
   };
 
   // Function to load Razorpay SDK dynamically
@@ -182,7 +182,7 @@ const handleBuy = async () => {
           receipt: receiptId, // always use the original receiptId
           email: user.email,
         });
-        dispatch(clearCart());
+        clearCart();
         navigate(`/success/${orderRes.data.order._id}`);
       } catch (verifyErr) {
         console.error(verifyErr);

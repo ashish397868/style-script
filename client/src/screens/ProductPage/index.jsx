@@ -4,7 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Loader from "../../components/Loader";
 import {  reviewAPI } from "../../services/api";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../redux/features/cart/cartSlice";
+import useCart from "../../redux/features/cart/useCartHook";
 import { fetchProducts } from "../../redux/features/product/productSlice";
 import ProductGallery from "../../components/ProductPage/ProductGallery";
 import ProductDetails from "../../components/ProductPage/ProductDetails";
@@ -29,6 +29,7 @@ export default function ProductDetailPage() {
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [reviews, setReviews] = useState([]);
+  const { addItem } = useCart();
 
   // Fetch product + variants
   useEffect(() => {
@@ -119,10 +120,10 @@ export default function ProductDetailPage() {
       return;
     }
     const key = `${product._id}-${size}-${color}`;
-    dispatch(addToCart({
+    addItem(
       key,
-      qty: 1,
-      itemDetails: {
+       1,
+      {
         price: product.price,
         name: product.title,
         size,
@@ -130,7 +131,7 @@ export default function ProductDetailPage() {
         image: product.images?.[0],
         productId: product._id,
       },
-    }));
+    );
     toast.success("Added to cart!");
   };
 
@@ -145,10 +146,10 @@ export default function ProductDetailPage() {
       return;
     }
     const key = `${product._id}-${size}-${color}`;
-    dispatch(addToCart({
+    addItem(
       key,
-      qty: 1,
-      itemDetails: {
+      1,
+      {
         price: product.price,
         name: product.title,
         size,
@@ -156,7 +157,7 @@ export default function ProductDetailPage() {
         image: product.images?.[0],
         productId: product._id,
       },
-    }));
+    );
     navigate("/checkout");
   };
 

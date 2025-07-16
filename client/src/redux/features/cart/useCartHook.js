@@ -3,8 +3,7 @@ import { useCallback } from "react";
 import {
   addToCart,
   removeFromCart,
-  clearCart,
-  loadCart
+  clearCart
 } from "./cartSlice";
 
 const useCart = () => {
@@ -26,12 +25,9 @@ const useCart = () => {
     dispatch(clearCart());
   }, [dispatch]);
 
-  const reloadCart = useCallback(() => {
-    dispatch(loadCart());
-  }, [dispatch]);
 
   // computed values
-  const totalItems = Object.values(cart).reduce((sum, item) => sum + item.qty, 0);
+  const totalItems = Object.values(cart).reduce((sum, item) => sum + item.qty, 0); //total quantity calculate krra hai yeah
 
   return {
     // state values
@@ -42,8 +38,7 @@ const useCart = () => {
     // functions to manipulate cart
     addItem,
     removeItem,
-    clearItems,
-    reloadCart,
+    clearItems
   };
 };
 

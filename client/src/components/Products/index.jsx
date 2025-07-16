@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProducts } from '../../redux/features/product/productSlice';
-import { addToCart } from '../../redux/features/cart/cartSlice';
+import useCartHook from '../../redux/features/cart/useCartHook';
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
-import { FaStar, FaRegHeart, FaShoppingCart, FaFilter, FaTimes } from 'react-icons/fa';
+import { FaStar, FaShoppingCart, FaFilter, FaTimes } from 'react-icons/fa';
 import { IoShirtOutline } from 'react-icons/io5';
 import { GiTShirt } from 'react-icons/gi';
 import { RiTShirt2Line } from 'react-icons/ri';
@@ -23,6 +23,8 @@ const Products = () => {
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
   const [sortBy, setSortBy] = useState('newest');
+  const {addItem} = useCartHook();
+
 
   useEffect(() => {
     if (!products || products.length === 0) {
@@ -204,18 +206,18 @@ const Products = () => {
                   return;
                 }
                 const key = `${product._id || product.id}-${size}-${color}`;
-            dispatch(addToCart({
+            addItem(
               key,
-              qty: 1,
-              itemDetails: {
+              1, 
+              {
                 price: product.price,
                 name: product.name || product.title,
                 size,
                 color,
                 image: product.image || (Array.isArray(product.images) ? product.images[0] : undefined),
                 productId: product._id || product.id,
-              },
-            }));
+              }
+            );
             toast.success(`${name} added to cart!`);
               }}
               aria-label={`Add ${name} to cart`}

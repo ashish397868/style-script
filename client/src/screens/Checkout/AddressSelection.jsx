@@ -1,13 +1,11 @@
 // src/pages/AddressSelection.jsx
-import React, { useState, useEffect, useCallback } from "react";
+import  { useState, useEffect, useCallback } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-
-import api, { addressAPI, userAPI } from "../../services/api";
+import { useDispatch } from "react-redux";
+import  { addressAPI, userAPI } from "../../services/api";
 import { FiPlus, FiMapPin, FiRefreshCw } from "react-icons/fi";
 import { setSelectedAddress as setSelectedAddressAction } from "../../redux/features/checkout/checkoutSlice";
-
 import useUser from "../../redux/features/user/useUserHook";  
 import AddressCard from "./AddressCard";
 import AddressFormModal from "./AddressFormModal";

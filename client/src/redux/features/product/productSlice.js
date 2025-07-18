@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { productAPI } from '../../../services/api';
 
 export const fetchProducts = createAsyncThunk(
-  'product/fetchProducts',
+  'fetchProducts',
   async (force = false, { getState, rejectWithValue }) => {
     const { products } = getState().product;
     if (!force && products && products.length > 0) {
@@ -18,7 +18,7 @@ export const fetchProducts = createAsyncThunk(
 );
 
 export const fetchFeaturedProducts = createAsyncThunk(
-  'product/fetchFeaturedProducts',
+  'fetchFeaturedProducts',
   async (_, { rejectWithValue }) => {
     try {
       const response = await productAPI.getFeaturedProducts();
@@ -30,7 +30,7 @@ export const fetchFeaturedProducts = createAsyncThunk(
 );
 
 export const fetchProductBySlug = createAsyncThunk(
-  'product/fetchProductBySlug',
+  'fetchProductBySlug',
   async (slug, { rejectWithValue }) => {
     try {
       const response = await productAPI.getProductBySlug(slug);
@@ -61,6 +61,7 @@ const productSlice = createSlice({
   name: 'product',
   initialState,
   reducers: {
+
     setFilters: (state, action) => {
       state.filters = { ...state.filters, ...action.payload, page: 1 };
     },
@@ -71,8 +72,11 @@ const productSlice = createSlice({
       state.error = null;
     },
   },
+
   extraReducers: (builder) => {
     builder
+
+    // fetch products
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
       })
@@ -85,6 +89,8 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
+
+      // fetch featured Products
       .addCase(fetchFeaturedProducts.pending, (state) => {
         state.loading = true;
       })
@@ -96,6 +102,8 @@ const productSlice = createSlice({
         state.error = action.payload;
         state.loading = false;
       })
+
+      //  fetch products by slug
       .addCase(fetchProductBySlug.pending, (state) => {
         state.loading = true;
       })

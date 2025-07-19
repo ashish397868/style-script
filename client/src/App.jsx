@@ -1,5 +1,5 @@
 // App.jsx
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 // import Navbar from "./screens/Navbar";
 // import Footer from "./screens/Footer";

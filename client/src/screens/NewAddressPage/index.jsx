@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
-import Loader from "../../components/Loader";
 import { addressAPI } from "../../services/api";
+import useUserProfile from "../../redux/features/user/userProfileHook"; 
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
+  const { user, updateProfile } = useUserProfile(); 
+
   const [address, setAddress] = useState({
     name: "",
     addressLine1: "",
@@ -14,17 +16,16 @@ const NewAddressPage = () => {
     state: "",
     pincode: "",
     country: "",
-    phone: "",
-    isDefault: false,
+    phone: ""
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setAddress((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -33,18 +34,21 @@ const NewAddressPage = () => {
     setLoading(true);
     setError("");
     try {
-      await addressAPI.addAddress(address);
+      const res = await addressAPI.addAddress(address);
+      const newAddress = res?.data || address;
+
+      await updateProfile({
+        addresses: [...(user?.addresses || []), newAddress],
+      });
+
       navigate("/addresses");
     } catch (err) {
-      setError("Failed to add address");
+      setError("Failed to add address :- " ,err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loader />;
-  }
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
       <div className="flex items-center mb-6">
@@ -114,17 +118,18 @@ const NewAddressPage = () => {
             />
           </div>
         </div>
-        <div className="flex items-center mt-4">
-          <input type="checkbox" name="isDefault" checked={address.isDefault} onChange={handleChange} className="h-4 w-4 text-pink-500 rounded focus:ring-pink-500" />
-          <label className="ml-2 text-sm text-gray-700">Set as default address</label>
-        </div>
+
         <div className="flex justify-end gap-3 mt-8">
           <button type="button" onClick={() => navigate("/addresses")} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
             Cancel
           </button>
-          <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600" disabled={loading}>
-            Add Address
-          </button>
+        <button
+          type="submit"
+          className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 flex items-center justify-center"
+          disabled={loading}
+        >
+          {loading ? "Adding..." : "Add Address"}
+        </button>
         </div>
       </form>
     </div>

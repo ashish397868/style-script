@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import useUserProfile from "../../redux/features/user/userProfileHook";
 import { FiMapPin } from "react-icons/fi";
-import Loader from "../../components/Loader";
 import { addressAPI } from "../../services/api";
 
 const EditAddressPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, fetchProfile } = useUserProfile();
+  const { user, fetchProfile , updateProfile} = useUserProfile();
   const [address, setAddress] = useState({
     name: "",
     addressLine1: "",
@@ -59,10 +58,10 @@ const EditAddressPage = () => {
   }, [user, id, fetchProfile]);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value} = e.target;
     setAddress((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -80,11 +79,19 @@ const EditAddressPage = () => {
         state: address.state,
         pincode: address.pincode,
         country: address.country,
-        phone: address.phone,
-        isDefault: address.isDefault,
+        phone: address.phone
       });
 
-      navigate("/addresses");
+    // Immediately update Redux state (optimistic update)
+    await updateProfile({
+      addresses: user.addresses.map((a) =>
+        String(a._id) === String(id) ? { ...a, ...address } : a
+      ),
+    });
+
+    // ✅ Now navigate — UI already has updated state
+    navigate("/addresses");
+
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to update address");
@@ -92,8 +99,6 @@ const EditAddressPage = () => {
       setLoading(false);
     }
   };
-
-  if (loading) return <Loader />;
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
@@ -153,7 +158,7 @@ const EditAddressPage = () => {
             Cancel
           </button>
           <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600" disabled={loading}>
-            Save Address
+            {loading ? "Saving..." : "Save Address"}
           </button>
         </div>
       </form>

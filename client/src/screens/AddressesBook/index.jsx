@@ -13,6 +13,10 @@ const AddressBook = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+  if (user?.addresses?.length) {
+    setAddresses(user.addresses);
+    return;
+  }
     setLoading(true);
     fetchProfile()
       .then((res) => {
@@ -24,37 +28,26 @@ const AddressBook = () => {
         setError("Failed to load addresses");
       })
       .finally(() => setLoading(false));
-  }, [fetchProfile]);
-
-  const handleAddressClick = (address) => {
-    navigate(`/addresses/edit/${address._id}`);
-  };
+  }, [user,fetchProfile]);
 
   const handleAddAddress = () => {
     navigate("/addresses/new");
   };
 
-  const handleEditClick = (e, address) => {
-    e.stopPropagation();
+  const handleEditClick = (address) => {
     navigate(`/addresses/edit/${address._id}`);
   };
 
-  const removeAddress = async (e, id) => {
-    e.stopPropagation();
-    setLoading(true);
+  const removeAddress = async (id) => {
     setError("");
     try {
       const updated = addresses.filter((addr) => addr._id !== id);
       await addressAPI.deleteAddress(id);
       setAddresses(updated);
-      
-      // Update the Redux store to ensure changes reflect everywhere in the app
       await updateProfile({ addresses: updated });
     } catch {
       setError("Failed to remove address");
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   return (
@@ -71,7 +64,7 @@ const AddressBook = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {addresses.map((address) => (
-          <div key={address._id} className="border rounded-lg p-5 cursor-pointer transition-all hover:shadow-md border-gray-200 hover:border-pink-500" onClick={() => handleAddressClick(address)}>
+          <div key={address._id} className="border rounded-lg p-5 cursor-pointer transition-all hover:shadow-md border-gray-200 hover:border-pink-500" >
             <div className="flex items-start mb-4">
               <FiMapPin className="text-gray-500 mt-1 mr-2" />
               <div>
@@ -86,18 +79,12 @@ const AddressBook = () => {
               </div>
             </div>
 
-            {/* <div className="mt-4 pt-4 border-t border-gray-100">
-              <button className="text-pink-600 hover:text-pink-800 text-sm font-medium" onClick={(e) => e.stopPropagation()}>
-                Add delivery instructions
-              </button>
-            </div> */}
-
             <div className="flex space-x-3 mt-4">
-              <button className="flex items-center text-gray-700 hover:text-gray-900 cursor-pointer" onClick={(e) => handleEditClick(e, address)}>
+              <button className="flex items-center text-gray-700 hover:text-gray-900 cursor-pointer" onClick={() => handleEditClick(address)}>
                 <FiEdit className="mr-1" /> Edit
               </button>
-              <button className="flex items-center text-gray-700 hover:text-red-600 cursor-pointer" onClick={(e) => removeAddress(e, address._id)} disabled={loading}>
-                <FiTrash2 className="mr-1" /> Remove
+              <button className="flex items-center text-gray-700 hover:text-red-600 cursor-pointer" onClick={() => removeAddress(address._id)} disabled={loading}>
+                <FiTrash2 className="mr-1" /> {loading ? "Removing..." : "Remove"}
               </button>
             </div>
           </div>

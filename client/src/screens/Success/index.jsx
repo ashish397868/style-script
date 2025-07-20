@@ -7,8 +7,6 @@ import RelatedProducts from "../../components/RelatedProducts";
 
 export function Success() {
   const { id } = useParams();
-  // const id="6856f82a8176d9964b05db41"
-  console.log("Id  -   ", id);
   const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +19,7 @@ export function Success() {
         setOrderDetails(res.data);
         setError(null);
       } catch (err) {
-        setError("Failed to fetch order details.");
+        setError("Failed to fetch order details.",err);
       } finally {
         setLoading(false);
       }
@@ -39,7 +37,7 @@ export function Success() {
     return <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">{error || "Order not found."}</div>;
   }
 
-  const { _id, items, deliveryStatus, amount, estimatedDelivery, products = [] } = orderDetails;
+  const { _id, amount, estimatedDelivery, products = [] } = orderDetails;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12">

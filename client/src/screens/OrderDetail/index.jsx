@@ -18,7 +18,7 @@ export default function OrderDetail() {
         setOrder(res.data);
         setError(null);
       } catch (err) {
-        setError("Failed to fetch order details.");
+        setError("Failed to fetch order details.",err);
       } finally {
         setLoading(false);
       }
@@ -40,7 +40,7 @@ export default function OrderDetail() {
     );
   }
 
-  const { _id, products = [], amount, deliveryStatus, estimatedDelivery, createdAt, address } = order;
+  const { _id, products = [], amount, deliveryStatus, createdAt, address } = order;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white py-12">

@@ -6,7 +6,6 @@ const OptimizedLazyImage = React.memo(({
   alt, 
   className, 
   index = 0, 
-  priority = false,
   fetchPriority = "auto",
   loading = "lazy",
   path = ''

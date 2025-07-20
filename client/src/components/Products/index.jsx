@@ -9,13 +9,11 @@ import { IoShirtOutline } from "react-icons/io5";
 import { GiTShirt } from "react-icons/gi";
 import { RiTShirt2Line } from "react-icons/ri";
 import { MdOutlineLocalOffer, MdOutlineCategory } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
 import FilterSidebar from "../../components/FilterSideBar";
 import ProductCard from "../../components/ProductCardWithAddToCartButton";
 import colorMap from "../../constants/colorMap";
 
 const Products = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.products);
   const loading = useSelector((state) => state.product.loading);
@@ -43,9 +41,6 @@ const Products = () => {
     { id: "gaming", name: "Gaming Theme", icon: <MdOutlineLocalOffer className="mr-2" /> },
     { id: "coding", name: "Coding Theme", icon: <MdOutlineLocalOffer className="mr-2" /> },
   ];
-
-  // Helper to normalize color for comparison
-  const normalizeColor = (c) => c?.toLowerCase();
 
   // Calculate available sizes and colors dynamically from products
   const availableSizes = useMemo(() => {

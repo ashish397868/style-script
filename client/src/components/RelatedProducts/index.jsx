@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchProducts } from "../../redux/features/product/productSlice";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProductCard from "../ProductCard";
 import { FiArrowRight } from "react-icons/fi";
 import Loader from "../Loader";
@@ -53,7 +53,7 @@ function RelatedProducts({ excludeIds, categories = [] }) {
       setRelated(filtered.slice(0, 4));
       setError(null);
     } catch (err) {
-      setError("Failed to load related products.");
+      setError("Failed to load related products.",err);
     }
   }, [categories, excludeIds, products]);
 

@@ -71,9 +71,6 @@ const Navbar = ({
 
   const handleLogout = () => {
     logoutUser();
-    // Keep the user on the current page after logout
-    // They'll be redirected to login if they try to access a protected route
-    // No need to explicitly navigate to login
   };
 
   // Auth component to show loader, user dropdown, or login buttons based on auth state
@@ -139,7 +136,6 @@ const Navbar = ({
                 <span className={`font-bold text-lg text-pink-600 `}>{brandName}</span>
               </Link>
               
-              {/* Desktop Search Bar - Next to logo */}
               <div className="hidden md:block ml-4">
                 <SearchBar />
               </div>
@@ -194,13 +190,13 @@ const Navbar = ({
                     if (e.target.value.trim() === '') return;
                     navigate(`/category/all?search=${encodeURIComponent(e.target.value)}`);
                   }}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (e.target.value.trim() === '') return;
-                      navigate(`/category/all?search=${encodeURIComponent(e.target.value)}`);
-                    }
-                  }}
+                  onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (e.target.value.trim() === '') return;
+                        navigate(`/category/all?search=${encodeURIComponent(e.target.value)}`);
+                      }
+                    }}
                 />
                 <button
                   type="submit"

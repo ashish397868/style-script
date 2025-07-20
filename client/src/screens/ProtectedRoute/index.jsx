@@ -4,37 +4,33 @@ import useUserHook from "../../redux/features/user/useUserHook";
 import Loader from "../../components/Loader";
 import { useEffect, useState } from "react";
 
-// ProtectedRoute component that checks both authentication and role
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { isLoggedIn, isAdmin, isLoading, initializeAuth } = useUserHook();
   const location = useLocation();
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
 
   useEffect(() => {
-    // Try to initialize auth if not already authenticated
-    if (!isLoggedIn && !isLoading) {
-      initializeAuth()
-        .finally(() => {
-          // Set checkingAuth to false after initialization attempt
-          setCheckingAuth(false);
-        });
-    } else {
-      setCheckingAuth(false);
-    }
-  }, [isLoggedIn, isLoading, initializeAuth]);
+    let isMounted = true;
+    const checkAuth = async () => {
+      await initializeAuth(); // this should verify token/session etc.
+      if (isMounted) setAuthInitialized(true);
+    };
+    checkAuth();
+    return () => { isMounted = false };
+  }, [initializeAuth]);
 
-  // Show loading while checking authentication
-  if (isLoading || checkingAuth) {
+  // Wait until initialization finishes
+  if (isLoading || !authInitialized) {
     return <Loader />;
   }
 
+  // If not logged in, redirect
   if (!isLoggedIn) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
+  // If admin required but not admin
   if (requireAdmin && !isAdmin) {
-    // Show Access Denied page if admin access is required but user is not admin
     return <AccessDenied />;
   }
 

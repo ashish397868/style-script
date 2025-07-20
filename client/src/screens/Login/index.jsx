@@ -29,7 +29,7 @@ const Login = () => {
       const resultAction = await login(values);
       if (resultAction.payload?.success) {
         setMessage(resultAction.payload?.message || "Login successful! Redirecting...");
-        navigate(from);
+        navigate(from, { replace: true });
       } else {
         setMessage(resultAction.payload?.message || "Login failed. Please try again.");
       }

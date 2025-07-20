@@ -1,49 +1,33 @@
 import { useNavigate } from "react-router-dom";
 import colorMap from "../../constants/colorMap";
 
-const ProductCard = ({ product, variants }) => {
+const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
     navigate(`/product/${product.slug}`);
   };
 
-  // Use variants prop if provided, else use product.variants from backend
-  const variantList = Array.isArray(variants) && variants.length > 0
-    ? variants
-    : Array.isArray(product.variants) && product.variants.length > 0
-      ? product.variants
-      : [product];
+  const variantList = Array.isArray(product.variants) && product.variants.length > 0 ? product.variants: [product];
 
-  // Only show variants that are actually available (availableQty > 0)
-  const availableVariants = variantList.filter(v => v.availableQty > 0);
-  
+  const availableVariants = variantList
   // If no variants are available, don't render the card
-  if (availableVariants.length === 0) {
+  if (!availableVariants || availableVariants.length === 0) {
     return null;
   }
 
   // Get unique colors and sizes from available variants only
   const uniqueColors = [...new Set(availableVariants.map(v => v.color).filter(Boolean))];
+  
   // Sort sizes in standard order: XS, S, M, L, XL, XXL, etc.
-  const sizeOrder = [
-    'XXXS', 'XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL',
-    '2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL',
-    '28', '30', '32', '34', '36', '38', '40', '42', '44', '46', '48', '50',
-    'Free', 'One Size'
-  ];
-  const uniqueSizes = [...new Set(availableVariants.map(v => v.size).filter(Boolean))]
-    .sort((a, b) => {
-      const aIndex = sizeOrder.findIndex(size => size.toUpperCase() === String(a).toUpperCase());
-      const bIndex = sizeOrder.findIndex(size => size.toUpperCase() === String(b).toUpperCase());
-      if (aIndex === -1 && bIndex === -1) {
-        // If both are not found, sort alphabetically
-        return String(a).localeCompare(String(b));
-      }
-      if (aIndex === -1) return 1;
-      if (bIndex === -1) return -1;
-      return aIndex - bIndex;
-    });
+  const sizeOrder = ['S', 'M', 'L', 'XL', 'XXL'];
+
+  const sizes = [...new Set(availableVariants.map(v => v.size).filter(Boolean))];
+
+  // bas sizeOrder ke hisaab se sort kar do
+  const uniqueSizes = sizes.sort(
+    (a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b)
+  );
 
   // Calculate total available quantity across all variants
   const totalAvailableQty = availableVariants.reduce((total, variant) => total + variant.availableQty, 0);

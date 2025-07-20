@@ -99,12 +99,10 @@ const CategoryPage = () => {
             
             <div className="flex flex-wrap -m-4">
               {products.map(product => {
-                // Each product already has its variants grouped by the backend
                 return (
                   <ProductCard 
                     key={product._id} 
                     product={product}
-                    // variants are already included in product.variants from backend
                   />
                 );
               })}

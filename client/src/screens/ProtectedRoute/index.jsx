@@ -3,6 +3,9 @@ import AccessDenied from "../AccessDenied";
 import useUserHook from "../../redux/features/user/useUserHook";
 import Loader from "../../components/Loader";
 import { useEffect, useState } from "react";
+import { lazy } from "react";
+const Navbar = lazy(() => import("../Navbar")); // eagerly loaded
+const Footer = lazy(() => import("../Footer")); // eagerly loaded
 
 const ProtectedRoute = ({ children, requireAdmin }) => {
   const { isLoggedIn, isAdmin, isLoading, initializeAuth } = useUserHook();
@@ -31,7 +34,11 @@ const ProtectedRoute = ({ children, requireAdmin }) => {
 
   // If admin required but not admin
   if (requireAdmin && !isAdmin) {
-    return <AccessDenied />;
+    return <>
+    <Navbar />
+    <AccessDenied />;
+    <Footer />
+    </>
   }
 
   return children;

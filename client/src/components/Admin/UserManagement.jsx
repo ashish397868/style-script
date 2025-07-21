@@ -20,7 +20,7 @@ const UserManagement = () => {
       setUsers(response.data);
       setLoading(false);
     } catch (error) {
-      showToast('Error fetching users', 'error');
+      showToast('Error fetching users', error);
       setLoading(false);
     }
   };
@@ -35,7 +35,7 @@ const UserManagement = () => {
       ));
       showToast('User role updated', 'success');
     } catch (error) {
-      showToast('Error updating user', 'error');
+      showToast('Error updating user', error);
     }
   };
 
@@ -46,7 +46,7 @@ const UserManagement = () => {
       setUsers(users.filter(user => user._id !== userId));
       showToast('User deleted', 'success');
     } catch (error) {
-      showToast('Error deleting user', 'error');
+      showToast('Error deleting user', error);
     }
   };
 

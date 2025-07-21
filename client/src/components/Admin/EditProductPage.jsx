@@ -14,6 +14,7 @@ const EditProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [updating, setUpdating] = useState(false); 
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -108,7 +109,7 @@ const EditProductPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setUpdating(true);
     setError("");
     setSuccess(false);
     try {
@@ -122,7 +123,7 @@ const EditProductPage = () => {
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to update product");
     }
-    setLoading(false);
+    setUpdating(true);
   };
 
   if (loading || !form) {
@@ -498,12 +499,12 @@ const EditProductPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={updating}
                   className={`px-4 cursor-pointer py-2 border border-transparent rounded-md font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors ${
-                    loading ? "opacity-70 cursor-not-allowed" : ""
+                    updating ? "opacity-70 cursor-not-allowed" : ""
                   }`}
                 >
-                  {loading ? "Updating..." : "Update Product"}
+                  {updating ? "Updating..." : "Update Product"}
                 </button>
               </div>
             </div>

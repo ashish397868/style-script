@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProducts } from '../../redux/features/product/productSlice';
@@ -19,9 +19,6 @@ const AdminProductList = () => {
     // eslint-disable-next-line
   }, []);
 
-  // For delete, you may still want to call the API and update the store (not handled here)
-  // You can add a store method to remove product from products if needed
-
   // Delete handler
   const handleDelete = async (productId) => {
     if (!productId) return;
@@ -31,7 +28,7 @@ const AdminProductList = () => {
       dispatch(fetchProducts(true)); // Force refresh
       setDeleteConfirm(null);
     } catch (err) {
-      alert('Failed to delete product.');
+      alert('Failed to delete product.',err);
     }
   };
 

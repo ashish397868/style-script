@@ -5,16 +5,12 @@ import { FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
 
 export default function ProductDetails({ product, reviews, color, size }) {
   // Calculate average rating
-  const avgRating = reviews.length > 0 
-    ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1) 
-    : 0;
+  const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1) : 0;
 
   return (
     <div className="mb-4">
       <div className="mb-4">
-        <h2 className="text-sm title-font text-gray-500 tracking-widest uppercase mb-1">
-          {product.brand || "Brand"}
-        </h2>
+        <h2 className="text-sm title-font text-gray-500 tracking-widest uppercase mb-1">{product.brand || "Brand"}</h2>
         <h1 className="text-gray-900 text-2xl md:text-3xl font-bold">
           {product.title} {size && color ? `(${size}/${color})` : ""}
         </h1>
@@ -24,25 +20,25 @@ export default function ProductDetails({ product, reviews, color, size }) {
       <div className="flex items-center mb-4">
         <div className="flex text-pink-400">
           {[...Array(5)].map((_, i) => (
-            <FaStar 
-              key={i} 
-              className={
-                i < Math.round(avgRating) 
-                  ? "w-4 h-4 fill-current" 
-                  : "w-4 h-4 text-gray-300"
-              } 
-            />
+            <FaStar key={i} className={i < Math.round(avgRating) ? "w-4 h-4 fill-current" : "w-4 h-4 text-gray-300"} />
           ))}
         </div>
         <span className="text-gray-600 ml-2 text-sm">({reviews.length} reviews)</span>
         <span className="mx-2 text-gray-300">•</span>
-        <span className={`text-sm font-medium ${product.availableQty > 0 ? "text-green-600" : "text-red-600"}`}>
-          {product.availableQty > 0 ? "In Stock" : "Out of Stock"}
-        </span>
+        <span className={`text-sm font-medium ${product.availableQty > 0 ? "text-green-600" : "text-red-600"}`}>{product.availableQty > 0 ? "In Stock" : "Out of Stock"}</span>
       </div>
 
       <div className="leading-relaxed text-gray-700 mb-6 border-b border-gray-200 pb-6">
-        <p>{product.description}</p>
+        <h3 className="text-lg font-semibold mb-2">Description</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          {product.description
+            ?.split(".") // split by dot
+            .map((point) => point.trim()) // trim spaces
+            .filter((point) => point.length > 0) // remove empty
+            .map((point, idx) => (
+              <li key={idx}>{point}.</li>
+            ))}
+        </ul>
       </div>
 
       {/* Shipping Info */}

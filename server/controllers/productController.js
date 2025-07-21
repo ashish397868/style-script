@@ -205,7 +205,7 @@ exports.getRelatedProducts = async (req, res) => {
 // Create a new product (admin)
 exports.createProduct = async (req, res) => {
   try {
-    const { title, slug, description, price, images, category, brand, size, color, tags, availableQty, isFeatured,themes } = req.body;
+    const { title, slug, description, price, images, category, brand, size, color, tags, availableQty, isFeatured,theme } = req.body;
 
     // Basic validation
     if (!title || !slug || !description || price == null || availableQty == null) {
@@ -231,7 +231,7 @@ exports.createProduct = async (req, res) => {
       tags: tags || [],
       availableQty,
       isFeatured: !!isFeatured,
-      themes: themes || []
+      theme
     });
 
     return res.status(201).json({ message: "Product created.", product });

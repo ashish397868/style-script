@@ -84,7 +84,7 @@ exports.searchProducts = async (req, res) => {
 exports.getProductsByTheme = async (req, res) => {
   try {
     const { theme } = req.params;
-    const products = await Product.find({ themes: theme }).sort({ createdAt: -1 }).lean();
+    const products = await Product.find({ theme: theme }).sort({ createdAt: -1 }).lean();
     const groupedProducts = groupProductsByTitle(products);
     return res.json(groupedProducts);
   } catch (error) {
@@ -205,7 +205,7 @@ exports.getRelatedProducts = async (req, res) => {
 // Create a new product (admin)
 exports.createProduct = async (req, res) => {
   try {
-    const { title, slug, description, price, images, category, brand, size, color, tags, availableQty, isFeatured } = req.body;
+    const { title, slug, description, price, images, category, brand, size, color, tags, availableQty, isFeatured,themes } = req.body;
 
     // Basic validation
     if (!title || !slug || !description || price == null || availableQty == null) {
@@ -231,6 +231,7 @@ exports.createProduct = async (req, res) => {
       tags: tags || [],
       availableQty,
       isFeatured: !!isFeatured,
+      themes: themes || []
     });
 
     return res.status(201).json({ message: "Product created.", product });

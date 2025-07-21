@@ -14,6 +14,9 @@ const ProductSchema = new Schema(
     tags: [String],
     availableQty: { type: Number, required: true },
     isFeatured: { type: Boolean, default: false },
+    
+    // ✅ New field: themes
+    theme: {type: String,lowercase: true},
   },
   { timestamps: true }
 );

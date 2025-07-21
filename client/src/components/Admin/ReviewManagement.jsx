@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { FiTrash2, FiStar } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
 import api from '../../services/api';
 import Loader from '../Loader';
 
@@ -14,7 +13,7 @@ const ReviewManagement = () => {
       setReviews(response.data || []);
       setLoading(false);
     } catch (err) {
-      setError('Failed to fetch reviews');
+      setError('Failed to fetch reviews',err);
       setLoading(false);
     }
   };
@@ -29,7 +28,7 @@ const ReviewManagement = () => {
       await api.delete(`/reviews/${reviewId}`);
       setReviews(reviews.filter((r) => r._id !== reviewId));
     } catch (err) {
-      setError('Failed to delete review');
+      setError('Failed to delete review',err);
     }
   };
 

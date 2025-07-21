@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import api from '../../services/api';
-import { FiTrash2, FiSearch, FiAlertTriangle, FiTruck } from 'react-icons/fi';
+import {  FiSearch, FiAlertTriangle, FiTruck } from 'react-icons/fi';
 import { format } from 'date-fns';
 import showToast from "../..//utils/toastUtils";
 import Loader from '../Loader';

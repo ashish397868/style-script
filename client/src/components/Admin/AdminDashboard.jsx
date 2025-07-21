@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { FiHome, FiUsers, FiSettings, FiLogOut, FiBox, FiShoppingCart, FiCheckCircle, FiXCircle, FiMessageSquare, FiDollarSign, FiList, FiMenu, FiX } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
+import { FiHome, FiUsers, FiLogOut, FiBox, FiShoppingCart, FiCheckCircle, FiXCircle, FiMessageSquare, FiDollarSign, FiList, FiMenu, FiX } from 'react-icons/fi';
 import Loader from '../Loader';
-
 import api from '../../services/api';
 
 const AdminDashboard = () => {
@@ -17,7 +16,7 @@ const AdminDashboard = () => {
     cancelledOrders: 0,
   });
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
   const location = useLocation();
 
   // Handle screen resize to toggle sidebar automatically
@@ -49,6 +48,7 @@ const AdminDashboard = () => {
     if (path.includes('/admin/all-products')) return 'all-products';
     if (path.includes('/admin/users')) return 'users';
     if (path.includes('/admin/reviews')) return 'reviews';
+    if (path.includes('/admin/edit-product')) return 'edit-product';
     return 'dashboard';
   };
 

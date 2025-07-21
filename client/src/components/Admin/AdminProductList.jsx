@@ -15,7 +15,7 @@ const AdminProductList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchProducts());
+    dispatch(fetchProducts(true));
     // eslint-disable-next-line
   }, []);
 

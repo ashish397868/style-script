@@ -42,106 +42,51 @@ const Products = () => {
     { id: "coding", name: "Coding Theme", icon: <MdOutlineLocalOffer className="mr-2" /> },
   ];
 
-  // Calculate available sizes and colors dynamically from products
   const availableSizes = useMemo(() => {
-    if (!products || products.length === 0) return [];
-    
+    if (!products?.length) return [];
+
     const sizeSet = new Set();
-    
-    products.forEach(product => {
-      let sizeArray = [];
-      
-      if (Array.isArray(product.sizes)) {
-        sizeArray = product.sizes;
-      } else if (Array.isArray(product.size)) {
-        sizeArray = product.size;
-      } else if (typeof product.sizes === 'string') {
-        sizeArray = [product.sizes];
-      } else if (typeof product.size === 'string') {
-        sizeArray = [product.size];
-      }
-      
-      sizeArray.forEach(size => {
-        if (size) sizeSet.add(size);
-      });
+
+    products.forEach((p) => {
+      const raw = p.sizes || p.size;
+      const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+      arr.forEach((s) => s && sizeSet.add(s));
     });
-    
-    // Define size order for standard clothing sizes
-    const sizeOrder = {
-      'XS': 1,
-      'S': 2,
-      'M': 3,
-      'L': 4,
-      'XL': 5,
-      'XXL': 6,
-      '2XL': 6,
-      '3XL': 7,
-      'XXXL': 7,
-      '4XL': 8,
-      '5XL': 9,
-    };
-    
+
+    const order = { S: 1, M: 2, L: 3, XL: 4, XXL: 5 };
+
     return Array.from(sizeSet).sort((a, b) => {
-      const aUpper = a.toUpperCase();
-      const bUpper = b.toUpperCase();
-      
-      // If both sizes are in our predefined order
-      if (sizeOrder[aUpper] && sizeOrder[bUpper]) {
-        return sizeOrder[aUpper] - sizeOrder[bUpper];
-      }
-      
-      // If only one size is in our order, prioritize it
-      if (sizeOrder[aUpper]) return -1;
-      if (sizeOrder[bUpper]) return 1;
-      
-      // If both are numeric sizes, sort numerically
-      const aNum = parseInt(a);
-      const bNum = parseInt(b);
-      if (!isNaN(aNum) && !isNaN(bNum)) {
-        return aNum - bNum;
-      }
-      
-      // Otherwise use alphabetical order as fallback
+      const A = a.toUpperCase();
+      const B = b.toUpperCase();
+      if (order[A] && order[B]) return order[A] - order[B];
+      if (order[A]) return -1;
+      if (order[B]) return 1;
       return a.localeCompare(b);
     });
   }, [products]);
 
   const availableColors = useMemo(() => {
-    if (!products || products.length === 0) return [];
-    
+    if (!products?.length) return [];
+
     const colorSet = new Set();
-    const validColorNames = colorMap.map(c => c.name.toLowerCase());
-    
-    products.forEach(product => {
-      let colors = [];
-      
-      if (Array.isArray(product.colors)) {
-        colors = product.colors;
-      } else if (Array.isArray(product.color)) {
-        colors = product.color;
-      } else if (typeof product.colors === 'string') {
-        colors = [product.colors];
-      } else if (typeof product.color === 'string') {
-        colors = [product.color];
-      }
-      
-      colors.forEach(color => {
-        if (color) {
-          const normalizedColor = color.toLowerCase();
-          // Check if the color exists in our colorMap
-          const matchedColor = validColorNames.find(validColor => 
-            normalizedColor === validColor || normalizedColor.includes(validColor)
-          );
-          
-          if (matchedColor) {
-            colorSet.add(matchedColor.charAt(0).toUpperCase() + matchedColor.slice(1));
-          } else {
-            colorSet.add(color.charAt(0).toUpperCase() + color.slice(1).toLowerCase());
-          }
-        }
+    const validNames = colorMap.map((c) => c.name.toLowerCase());
+
+    products.forEach((p) => {
+      const raw = p.colors || p.color;
+      const arr = Array.isArray(raw) ? raw : raw ? [raw] : [];
+
+      arr.forEach((c) => {
+        if (!c) return;
+        const lower = c.toLowerCase();
+
+        // find match in our colorMap
+        const match = validNames.find((name) => lower === name || lower.includes(name));
+
+        const finalName = (match || c).toString();
+        colorSet.add(finalName.charAt(0).toUpperCase() + finalName.slice(1).toLowerCase());
       });
     });
-    
+
     return Array.from(colorSet).sort();
   }, [products]);
 
@@ -151,98 +96,83 @@ const Products = () => {
     }
   }, [dispatch, products]);
 
-  // Filter products based on selections
   const filteredProducts = useMemo(() => {
-    if (!products || products.length === 0) return [];
-    
+    if (!products?.length) return [];
+
     return products.filter((product) => {
-      // Category filter
+      // ✅ Category filter
       if (selectedCategory !== "all" && product.category?.toLowerCase() !== selectedCategory) {
         return false;
       }
 
-      // Price filter
+      // ✅ Price filter
       if (typeof product.price === "number" && (product.price < priceRange[0] || product.price > priceRange[1])) {
         return false;
       }
 
-      // Size filter
-      let prodSizesArr = [];
-      if (Array.isArray(product.sizes)) {
-        prodSizesArr = product.sizes;
-      } else if (Array.isArray(product.size)) {
-        prodSizesArr = product.size;
-      } else if (typeof product.sizes === 'string') {
-        prodSizesArr = [product.sizes];
-      } else if (typeof product.size === 'string') {
-        prodSizesArr = [product.size];
-      }
-      
-      if (selectedSizes.length > 0 && 
-          !selectedSizes.some((size) => prodSizesArr.includes(size))) {
+      // ✅ Helper to normalize field to array
+      const toArray = (val1, val2) => {
+        const raw = val1 || val2;
+        return Array.isArray(raw) ? raw : raw ? [raw] : [];
+      };
+
+      // ✅ Size filter
+      const prodSizes = toArray(product.sizes, product.size);
+      if (selectedSizes.length > 0 && !selectedSizes.some((size) => prodSizes.includes(size))) {
         return false;
       }
 
-      // Color filter
-      let prodColorsArr = [];
-      if (Array.isArray(product.colors)) {
-        prodColorsArr = product.colors;
-      } else if (typeof product.colors === "string") {
-        prodColorsArr = [product.colors];
-      } else if (Array.isArray(product.color)) {
-        prodColorsArr = product.color;
-      } else if (typeof product.color === "string") {
-        prodColorsArr = [product.color];
-      }
-      
+      // ✅ Color filter
+      const prodColors = toArray(product.colors, product.color).map((c) => c.toLowerCase());
       if (selectedColors.length > 0) {
-        const normalizedProdColors = prodColorsArr.map(c => c.toLowerCase());
-        const colorMatch = selectedColors.some(selectedColor => {
-          const normalizedSelectedColor = selectedColor.toLowerCase();
-          return normalizedProdColors.some(prodColor => 
-            prodColor === normalizedSelectedColor || 
-            prodColor.includes(normalizedSelectedColor) ||
-            normalizedSelectedColor.includes(prodColor)
-          );
+        const match = selectedColors.some((sel) => {
+          const selLower = sel.toLowerCase();
+          return prodColors.some((pc) => pc === selLower || pc.includes(selLower) || selLower.includes(pc));
         });
-        
-        if (!colorMatch) return false;
+        if (!match) return false;
       }
 
-      return true;
+      return true; // passed all filters
     });
   }, [products, selectedCategory, priceRange, selectedSizes, selectedColors]);
 
-  // Sort products
+  // ✅ Sort products
   const sortedProducts = useMemo(() => {
-    return [...filteredProducts].sort((a, b) => {
-      if (sortBy === "price-low") return (a.price || 0) - (b.price || 0);
-      if (sortBy === "price-high") return (b.price || 0) - (a.price || 0);
-      if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
-      return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+    const productsCopy = [...filteredProducts];
+    return productsCopy.sort((a, b) => {
+      switch (sortBy) {
+        case "price-low":
+          return (a.price || 0) - (b.price || 0);
+        case "price-high":
+          return (b.price || 0) - (a.price || 0);
+        case "rating":
+          return (b.rating || 0) - (a.rating || 0);
+        default:
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      }
     });
   }, [filteredProducts, sortBy]);
 
-  // Pagination
+  // ✅ Pagination
   const totalPages = Math.ceil(sortedProducts.length / pageSize);
   const paginatedProducts = sortedProducts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  // Reset pagination on filter change
+  // ✅ Reset pagination whenever filters/sort change
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, priceRange, selectedSizes, selectedColors, sortBy]);
 
-  // Handle size selection
+  // ✅ Toggle size selection
   const handleSizeChange = (size) => {
     setSelectedSizes((prev) => (prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]));
   };
 
-  // Handle color selection
+  // ✅ Toggle color selection
   const handleColorChange = (color) => {
     setSelectedColors((prev) => (prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]));
   };
 
-  // Reset all filters
+  // ✅ Reset all filters
   const resetFilters = () => {
     setSelectedCategory("all");
     setPriceRange([0, 5000]);
@@ -250,14 +180,19 @@ const Products = () => {
     setSelectedColors([]);
   };
 
-  // Handle add to cart
+  // ✅ Helper to safely extract size/color
+  const getFirstValue = (main, alt) => {
+    if (Array.isArray(main) && main.length > 0) return main[0];
+    if (Array.isArray(alt) && alt.length > 0) return alt[0];
+    return main || alt || null;
+  };
+
+  // ✅ Handle add to cart
   const handleAddToCart = (product) => {
     setFilterOpen(false);
 
-    let size = product.size;
-    let color = product.color;
-    if (!size && Array.isArray(product.sizes) && product.sizes.length > 0) size = product.sizes[0];
-    if (!color && Array.isArray(product.colors) && product.colors.length > 0) color = product.colors[0];
+    const size = getFirstValue(product.sizes, product.size);
+    const color = getFirstValue(product.colors, product.color);
 
     if (!size || !color) {
       toast.error("No size or color available for this product.");
@@ -385,13 +320,7 @@ const Products = () => {
             {sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {paginatedProducts.map((product) => (
-                  <ProductCard 
-                    key={product._id || product.id} 
-                    product={product} 
-                    categories={categories} 
-                    onAddToCart={handleAddToCart} 
-                    onNavigate={() => setFilterOpen(false)}
-                  />
+                  <ProductCard key={product._id || product.id} product={product} categories={categories} onAddToCart={handleAddToCart} onNavigate={() => setFilterOpen(false)} />
                 ))}
               </div>
             ) : (

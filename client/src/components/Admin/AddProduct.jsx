@@ -32,6 +32,8 @@ const AddProduct = () => {
         setError("");
       } catch (err) {
         setError(err?.response?.data?.message || "Failed to add product");
+      }finally{
+        setSuccess(false);
       }
     },
   });

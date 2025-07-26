@@ -1,4 +1,4 @@
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, Outlet } from "react-router-dom";
 import AccessDenied from "../AccessDenied";
 import useUserHook from "../../redux/features/user/useUserHook";
 import Loader from "../../components/Loader";
@@ -7,7 +7,7 @@ import { lazy } from "react";
 const Navbar = lazy(() => import("../Navbar")); // eagerly loaded
 const Footer = lazy(() => import("../Footer")); // eagerly loaded
 
-const ProtectedRoute = ({ children, requireAdmin }) => {
+const ProtectedRoute = ({  children,requireAdmin }) => {
   const { isLoggedIn, isAdmin, isLoading, initializeAuth } = useUserHook();
   const location = useLocation();
   const [authInitialized, setAuthInitialized] = useState(false);
@@ -41,7 +41,7 @@ const ProtectedRoute = ({ children, requireAdmin }) => {
     </>
   }
 
-  return children;
+  return children ? children : <Outlet />;
 };
 
 export default ProtectedRoute;

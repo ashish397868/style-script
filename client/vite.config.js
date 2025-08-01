@@ -21,6 +21,10 @@ export default defineConfig({
     port: 5173, // specify port (optional)
     open: true, // automatically open browser (optional)
   },
+    preview: {
+    host: true,
+    port: 5173,
+  },
   build: {
     rollupOptions: {
       output: {

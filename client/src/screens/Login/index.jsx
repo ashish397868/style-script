@@ -106,7 +106,7 @@ const Login = () => {
 
               {/* Submit Button */}
               <div>
-                <Button type="submit" loading={isLoading} className="w-full justify-center py-2.5">
+                <Button type="submit" loading={isLoading} className="cursor-pointer w-full justify-center py-2.5">
                   {isLoading ? "Signing in..." : "Sign in"}
                 </Button>
               </div>

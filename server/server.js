@@ -24,7 +24,7 @@ applyMiddleware(app);
 database();
 
 // Public routes (with global rate limiting only)
-app.use("/api/", userRoutes);
+app.use("/api/users/", userRoutes);
 app.use("/api/users/", addressRoutes);
 app.use("/api/", pincodeRoutes);
 app.use("/api/products/", productRoutes);

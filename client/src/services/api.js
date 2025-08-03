@@ -77,10 +77,10 @@ api.interceptors.response.use(
 
 // Auth Routes
 export const authAPI = {
-  login: (credentials) => api.post('/login', credentials),
-  signup: (userData) => api.post('/signup', userData),
-  forgotPassword: (email) => api.post('/forgot-password', { email }),
-  resetPassword: (data) => api.post('/reset-password', data)
+  login: (credentials) => api.post('/users/login', credentials),
+  signup: (userData) => api.post('/users/signup', userData),
+  forgotPassword: (email) => api.post('/users/forgot-password', { email }),
+  resetPassword: (data) => api.post('/users/reset-password', data)
 };
 
 export const userAPI = {

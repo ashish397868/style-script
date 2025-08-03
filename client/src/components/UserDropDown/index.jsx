@@ -51,7 +51,7 @@ const UserDropdown = ({ user, userLinks = [], onLogout }) => {
                 setOpen(false);
                 if (onLogout) onLogout();
               }}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="cursor-pointer block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
             >
               Logout
             </button>

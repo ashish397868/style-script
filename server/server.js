@@ -38,6 +38,11 @@ app.use("/api/payments", apiLimiter, paymentRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+/**
+  Agar aap '127.0.0.1' (localhost) likhoge, to sirf local machine se access milega.
+  Lekin '0.0.0.0' likhne se aapka server network ke kisi bhi IP address se access ho sakta hai — LAN, Wi-Fi, etc.
+ */

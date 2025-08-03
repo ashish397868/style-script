@@ -23,16 +23,17 @@ const apiLimiter = rateLimit({
 
 // CORS configuration
 const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://192.168.1.6:3000',  // Home Wifi
-    'http://192.168.1.6:5173',  // College wifi
-    'http://192.168.2.25:5173',
-    'http://192.168.2.25:3000',  // Add your IP for React
-  'http://192.168.1.7:5173', // ✅ Add this
-  'http://192.168.1.7:3000', // ✅ Just in case
-  ],
+  // origin: [
+  //   'http://localhost:3000',
+  //   'http://localhost:5173',
+  //   'http://192.168.1.6:3000',  // Home Wifi
+  //   'http://192.168.1.6:5173',  // College wifi
+  //   'http://192.168.2.25:5173',
+  //   'http://192.168.2.25:3000',  // Add your IP for React
+  // 'http://192.168.1.7:5173', // ✅ Add this
+  // 'http://192.168.1.7:3000', // ✅ Just in case
+  // ],
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

@@ -2,6 +2,7 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Order = require("../models/Order");
 const sendEmail = require("../utils/sendEmail");
+const { v4: uuidv4 } = require("uuid");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -17,7 +18,7 @@ exports.createPaymentOrder = async (req, res) => {
     }
 
     // generate your own internal order ID (receipt)
-    const receiptId = "order_" + Date.now();
+    const receiptId = "order_" + uuidv4();
 
     // Razorpay expects amount in paise
     const options = {

@@ -13,7 +13,7 @@ const {
 // Public
 router.get("/product/:productId", getReviewsForProduct);
 
-// **Admin-only**: define this before `/:id`
+// **Admin-only**
 router.get("/all", authenticateUser, isAdmin, getAllReviews);
 
 // Now the single-ID route

@@ -18,7 +18,7 @@ export default function ProductTabs({ product, reviews, setReviews }) {
       <div className="border-b border-gray-200">
         <nav className="flex space-x-8">
           <button 
-            className={`py-4 px-1 border-b-2 text-sm font-medium ${
+            className={`cursor-pointer py-4 px-1 border-b-2 text-sm font-medium ${
               activeTab === "description" 
                 ? "border-pink-500 text-pink-600" 
                 : "border-transparent text-gray-500 hover:text-pink-700"
@@ -28,7 +28,7 @@ export default function ProductTabs({ product, reviews, setReviews }) {
             Description
           </button>
           <button 
-            className={`py-4 px-1 border-b-2 text-sm font-medium ${
+            className={`cursor-pointer py-4 px-1 border-b-2 text-sm font-medium ${
               activeTab === "reviews" 
                 ? "border-pink-500 text-pink-600" 
                 : "border-transparent text-gray-500 hover:text-pink-700"

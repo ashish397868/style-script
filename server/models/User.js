@@ -36,10 +36,10 @@ const UserSchema = new Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    active: {
-      type: Boolean,
-      default: true,
-    },
+    // active: {
+    //   type: Boolean,
+    //   default: true,
+    // }, //currently not using this
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
   },
@@ -53,7 +53,7 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-// function to compare password
+// function to compare password , Jab kisi specific document ka data process karna ho to use methods
 UserSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

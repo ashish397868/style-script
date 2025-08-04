@@ -98,10 +98,10 @@ const NewAddressPage = () => {
 
             {/* Buttons */}
             <div className="flex justify-end gap-3 mt-8">
-              <button type="button" onClick={() => navigate("/addresses")} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+              <button type="button" onClick={() => navigate("/addresses")} className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
               </button>
-              <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 flex items-center justify-center" disabled={isSubmitting}>
+              <button type="submit" className="cursor-pointer px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 flex items-center justify-center" disabled={isSubmitting}>
                 {isSubmitting ? "Adding..." : "Add Address"}
               </button>
             </div>

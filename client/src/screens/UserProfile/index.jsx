@@ -149,11 +149,11 @@ const UserProfile = () => {
                     </div>
 
                     <div className="pt-6 border-t border-gray-100 flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
-                      <button onClick={handleEdit} className="flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all duration-300">
+                      <button onClick={handleEdit} className="cursor-pointer flex items-center justify-center px-5 py-2.5 bg-gradient-to-r from-pink-500 to-pink-600 text-white rounded-lg hover:from-pink-600 hover:to-pink-700 transition-all duration-300">
                         <FiEdit2 className="mr-2" />
                         Edit Profile
                       </button>
-                      <button onClick={() => setShowPasswordForm(!showPasswordForm)} className="flex items-center justify-center px-5 py-2.5 bg-white border border-pink-500 text-pink-600 rounded-lg hover:bg-pink-50 transition-colors duration-300">
+                      <button onClick={() => setShowPasswordForm(!showPasswordForm)} className="cursor-pointer flex items-center justify-center px-5 py-2.5 bg-white border border-pink-500 text-pink-600 rounded-lg hover:bg-pink-50 transition-colors duration-300">
                         <FiLock className="mr-2" />
                         Change Password
                       </button>

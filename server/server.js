@@ -10,7 +10,6 @@ const { applyMiddleware, apiLimiter } = require("./middleware");
 const userRoutes = require("./routes/userRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const productRoutes = require("./routes/productRoutes");
-const bulkRoutes = require("./routes/bulkRoutes");
 const mediaRoutes = require("./routes/mediaRoutes");
 const pincodeRoutes = require("./routes/pincodeRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
@@ -28,7 +27,6 @@ app.use("/api/users/", userRoutes);
 app.use("/api/users/", addressRoutes);
 app.use("/api/", pincodeRoutes);
 app.use("/api/products/", productRoutes);
-app.use("/api/products/bulk", bulkRoutes);
 app.use("/api/media/", mediaRoutes);
 
 // Sensitive routes (with stricter rate limiting)

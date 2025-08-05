@@ -56,7 +56,7 @@ const SearchBar = () => {
   const handleSubmitSearch = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/category/all?search=${encodeURIComponent(query)}`);
+      navigate(`/search/?query=${encodeURIComponent(query)}`);
       handleClearSearch();
     }
   };
@@ -78,29 +78,29 @@ const SearchBar = () => {
   return (
     <div ref={searchRef} className="relative">
       <div className="flex items-center w-64">
-        <form onSubmit={handleSubmitSearch} className="flex w-full">
+        <form onSubmit={handleSubmitSearch} className="flex w-full relative">
           <input
             type="text"
             value={query}
             onChange={handleSearch}
             placeholder="Search products..."
-            className="w-full px-3 py-1 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-pink-500 text-gray-800"
+            className="w-full px-3 py-1 pr-8 border border-gray-300 rounded-l-md focus:outline-none focus:border-pink-500 focus:ring-0 text-gray-800"
           />
+          {query && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="cursor-pointer absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
+            >
+              <FiX size={16} />
+            </button>
+          )}
           <button
             type="submit"
             className="px-2 py-1 bg-pink-600 text-white rounded-r-md hover:bg-pink-700"
           >
             <FiSearch />
           </button>
-          {query && (
-            <button
-              type="button"
-              onClick={handleClearSearch}
-              className="ml-2 text-gray-500 hover:text-gray-700"
-            >
-              <FiX />
-            </button>
-          )}
         </form>
       </div>
 
@@ -117,7 +117,7 @@ const SearchBar = () => {
                 className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
               >
                 {product.images && product.images[0] && (
-                  <img src={product.images[0]} alt={product.title} className="h-10  object-contain mr-4" />
+                  <img src={product.images[0]} alt={product.title} className="h-10 w-10 object-contain mr-4" />
                 )}
                 <div>
                   <div className="text-sm font-medium">{product.title}</div>
@@ -138,4 +138,4 @@ const SearchBar = () => {
   );
 };
 
-export default SearchBar; 
+export default SearchBar;

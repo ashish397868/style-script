@@ -39,6 +39,7 @@ import {
   ReturnPolicy,
   NotFound,
   ProtectedRoute,
+  SearchPage
 } from "./routes/lazyImports";
 
 import Navbar from "./screens/Navbar";
@@ -108,6 +109,7 @@ function AppContent() {
           <Route path="/category/:category" element={<CategoryPage />} />
           <Route path="/theme/:theme" element={<ThemesPage />} />
           <Route path="/product/:slug" element={<ProductPage />} />
+          <Route path="/search" element={<SearchPage />} />
 
           {/* User‑protected */}
           <Route element={<ProtectedRoute />}>

@@ -19,6 +19,8 @@ export const NewAddressPage = lazy(() => import("../screens/NewAddressPage"));
 export const CategoryPage = lazy(() => import("../screens/CategoryPage"));
 export const ThemesPage = lazy(() => import("../screens/ThemePage"));
 export const ProductPage = lazy(() => import("../screens/ProductPage"));
+export const SearchPage = lazy(() => import("../screens/SearchPage"));
+
 
 // Checkout
 export const Success = lazy(() => import("../screens/Success"));

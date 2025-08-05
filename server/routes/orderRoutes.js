@@ -12,7 +12,7 @@ const {
     deleteOrder
 } = require("../controllers/orderController");
 
-// Public creation (if guest allowed, omit auth or validate differently)
+// Order creation 
 router.post("/", authenticateUser, createOrder);
 
 // Customer routes

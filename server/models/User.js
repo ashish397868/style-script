@@ -36,10 +36,10 @@ const UserSchema = new Schema(
       enum: ["user", "admin"],
       default: "user",
     },
-    // active: {
-    //   type: Boolean,
-    //   default: true,
-    // }, //currently not using this
+    active: {
+      type: Boolean,
+      default: true,
+    }, 
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
   },

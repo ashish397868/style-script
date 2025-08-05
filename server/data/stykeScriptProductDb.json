@@ -1,0 +1,813 @@
+[
+  {
+    "_id": {"$oid": "6856cfbe81fcf19c3a7ebc8f"},
+    "title": "White Cotton Tee",
+    "slug": "white-cotton-tee",
+    "description": "Premium white cotton tee that's breathable and stylish.",
+    "basePrice": 799,
+    "maxPrice": 799,
+    "images": [
+      "https://m.media-amazon.com/images/I/71tOFBNH2XL._SX569_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "COTTONEASE",
+    "theme": "TSHIRTS",
+    "tags": [
+      "white",
+      "cotton",
+      "comfortable"
+    ],
+    "isFeatured": true,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "S",
+        "color": "white",
+        "price": 799,
+        "availableQty": 50,
+        "sku": "WHI-S-WHI",
+        "images": [
+          "https://m.media-amazon.com/images/I/71tOFBNH2XL._SX569_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-21T15:29:02.101Z"},
+    "updatedAt": {"$date": "2025-06-21T15:29:02.101Z"}
+  },
+  {
+    "_id": {"$oid": "6857edd6c0bfea3cedcab3da"},
+    "title": "Boldfit",
+    "slug": "boldfit-men-t-shirt-red-xxl",
+    "description": "Polyester-blend",
+    "basePrice": 699,
+    "maxPrice": 699,
+    "images": [
+      "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "BOLDFIT",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "red",
+        "price": 699,
+        "availableQty": 12,
+        "sku": "BOL-XXL-RED",
+        "images": [
+          "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-22T11:49:42.968Z"},
+    "updatedAt": {"$date": "2025-06-22T11:49:42.968Z"}
+  },
+  {
+    "_id": {"$oid": "6857edd6c0bfea3cedcab3db"},
+    "title": "Boldfit",
+    "slug": "boldfit-men-t-shirt-l",
+    "description": "Polyester-blend",
+    "basePrice": 699,
+    "maxPrice": 699,
+    "images": [
+      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "BOLDFIT",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": true,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "L",
+        "color": "black",
+        "price": 699,
+        "availableQty": 54,
+        "sku": "BOL-L-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-22T11:49:42.968Z"},
+    "updatedAt": {"$date": "2025-06-22T11:49:42.968Z"}
+  },
+  {
+    "_id": {"$oid": "6857f52ec0bfea3cedcab3f0"},
+    "title": "Van Heusen",
+    "slug": "vanheusen-men-t-shirt-xxl",
+    "description": "80% Cotton, 20% Polyester, Single Jersey",
+    "basePrice": 497,
+    "maxPrice": 497,
+    "images": [
+      "https://m.media-amazon.com/images/I/61rKljNSEUL._AC_UL320_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "VAN HEUSEN",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "maroon",
+        "price": 497,
+        "availableQty": 73,
+        "sku": "VAN-XXL-MAR",
+        "images": [
+          "https://m.media-amazon.com/images/I/61rKljNSEUL._AC_UL320_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-22T12:21:02.293Z"},
+    "updatedAt": {"$date": "2025-06-22T12:21:02.293Z"}
+  },
+  {
+    "_id": {"$oid": "6857f52ec0bfea3cedcab3f4"},
+    "title": "Van Heusen",
+    "slug": "boldfit-men-t-shirt-xxl1243",
+    "description": "Polyester-blend",
+    "basePrice": 699,
+    "maxPrice": 699,
+    "images": [
+      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "BOLDFIT",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "black",
+        "price": 699,
+        "availableQty": 14,
+        "sku": "VAN-XXL-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-22T12:21:02.294Z"},
+    "updatedAt": {"$date": "2025-06-22T12:21:02.294Z"}
+  },
+  {
+    "_id": {"$oid": "6857f52ec0bfea3cedcab3f5"},
+    "title": "Van Heusen",
+    "slug": "boldfit-men-t-shirt-xl1",
+    "description": "Polyester-blend",
+    "basePrice": 699,
+    "maxPrice": 699,
+    "images": [
+      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "BOLDFIT",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "black",
+        "price": 699,
+        "availableQty": 67,
+        "sku": "VAN-XL-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-22T12:21:02.294Z"},
+    "updatedAt": {"$date": "2025-06-22T12:21:02.294Z"}
+  },
+  {
+    "_id": {"$oid": "685e37fd5a046910ec3df0a6"},
+    "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
+    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-black",
+    "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
+    "basePrice": 45,
+    "maxPrice": 45,
+    "images": [
+      "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005061/products/t0htjl6wu5qhmd4cby5c.jpg",
+      "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005075/products/eqy5pu7s4kisskzxsqzd.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "JOCKEY",
+    "theme": "TSHIRTS",
+    "tags": [
+      "men",
+      "jockey",
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "black",
+        "price": 45,
+        "availableQty": 3,
+        "sku": "JOC-XL-BLA",
+        "images": [
+          "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005061/products/t0htjl6wu5qhmd4cby5c.jpg",
+          "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005075/products/eqy5pu7s4kisskzxsqzd.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-27T06:19:42.001Z"},
+    "updatedAt": {"$date": "2025-06-27T11:13:08.259Z"}
+  },
+  {
+    "_id": {"$oid": "685e7f3fef80df6a0ce30e63"},
+    "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
+    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-red",
+    "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\n\n\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
+    "basePrice": 39,
+    "maxPrice": 39,
+    "images": [
+      "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+      "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "JOCKEY",
+    "theme": "TSHIRTS",
+    "tags": [
+      "tshirts",
+      "jockey"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "L",
+        "color": "red",
+        "price": 39,
+        "availableQty": 75,
+        "sku": "JOC-L-RED",
+        "images": [
+          "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+          "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-27T11:23:43.225Z"},
+    "updatedAt": {"$date": "2025-06-27T11:23:43.225Z"}
+  },
+  {
+    "_id": {"$oid": "685e8ab7ef80df6a0ce3109a"},
+    "title": "ADRO Men Hooded Sweatshirt",
+    "slug": "adro-men-hooded-sweatshirt-beige",
+    "description": "Wash Care : Do Not Bleach, Wash it with similar colours, Machine or Hand wash cold, Dry in Shade.\nFit Type : Regular Fit, Full Sleeves Hoodie\nColour : Olive Hoodie, Fabric : 100% Pure Cotton Hoodie (Eco Friendly)\nStyle Point : Hoodies gives a trendy yet Casual look. Durable fabric, stitching and Quality finish makes this Product a must have this Winter.\nOccasion: Gym wear, Winter wear or wear it during cold evening to keep your body warm. Please refer to the \"size chart\" to select your size\n",
+    "basePrice": 85,
+    "maxPrice": 85,
+    "images": [
+      "https://m.media-amazon.com/images/I/61hB0uM6SsL._SX522_.jpg",
+      "https://m.media-amazon.com/images/I/51XelQjqHAL._SX522_.jpg"
+    ],
+    "category": "SWEATSHIRTS",
+    "brand": "ADRO",
+    "theme": "SWEATSHIRTS",
+    "tags": [
+      "sweatshirt"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "M",
+        "color": "olive green",
+        "price": 85,
+        "availableQty": 63,
+        "sku": "ADR-M-OLI",
+        "images": [
+          "https://m.media-amazon.com/images/I/61hB0uM6SsL._SX522_.jpg",
+          "https://m.media-amazon.com/images/I/51XelQjqHAL._SX522_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-06-27T12:12:39.997Z"},
+    "updatedAt": {"$date": "2025-06-27T12:12:39.997Z"}
+  },
+  {
+    "_id": {"$oid": "68623fd5acdbc9cfaed18f34"},
+    "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
+    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-red-m",
+    "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\n\n\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
+    "basePrice": 39,
+    "maxPrice": 39,
+    "images": [
+      "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+      "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "JOCKEY",
+    "theme": "LIFESTYLE",
+    "tags": [
+      "tshirts",
+      "jockey"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "M",
+        "color": "red",
+        "price": 39,
+        "availableQty": 75,
+        "sku": "JOC-M-RED",
+        "images": [
+          "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+          "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
+        ]
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "687e3f1a6e88613c720d8cb1"},
+    "title": "Alan Jones Clothing Men’s Solid Hooded Sweatshirt | Drawstring Hood, Kangaroo Pocket, Ribbed Hem | Regular Fit ",
+    "slug": "alan-jones-clothing-mens-solid-hooded-sweatshirt--drawstring-hood-kangaroo-pocket-ribbed-hem-regular-fit-xl",
+    "description": "Comfortable Cotton Blend Fabric – Made from a premium 60% cotton and 40% polyester blend, this sweatshirt offers warmth, breathability, and all-day comfort.\nClassic Drawstring Hood Design – Adjustable hood with matching drawstrings provides extra protection from cold winds and adds a sporty, stylish touch\nSpacious Kangaroo Pocket – Functional front pocket for warming hands or storing essentials like phone, keys, or wallet with ease.\nRibbed Hems for Shape Retention – Ribbed cuffs and bottom hem ensure a secure fit, prevent heat loss, and help maintain the sweatshirt's shape over time.\nAvailable in Multiple Sizes & Colors – Choose from a wide range of solid colors and inclusive sizes (S to 5XL), offering a perfect fit and look for everyone.\n",
+    "basePrice": 699,
+    "maxPrice": 699,
+    "images": [
+      "https://m.media-amazon.com/images/I/619QFHmxnzL._SY679_.jpg",
+      "https://m.media-amazon.com/images/I/61kUMIM1zkL._SY679_.jpg"
+    ],
+    "category": "SWEATSHIRTS",
+    "brand": "ALAN JONES",
+    "theme": "TRENDING",
+    "tags": [
+      "sweatshirts"
+    ],
+    "isFeatured": true,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "orange",
+        "price": 699,
+        "availableQty": 65,
+        "sku": "ALA-XL-ORA",
+        "images": [
+          "https://m.media-amazon.com/images/I/619QFHmxnzL._SY679_.jpg",
+          "https://m.media-amazon.com/images/I/61kUMIM1zkL._SY679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T13:22:35.038Z"},
+    "updatedAt": {"$date": "2025-07-21T14:19:39.960Z"}
+  },
+  {
+    "_id": {"$oid": "687e60dc6e88613c720d8e72"},
+    "title": "Declare Variables Not War Coding Unisex Hoodie",
+    "slug": "declare-variables-not-war-coding-unisex-hoodie",
+    "description": "Stay stylish and comfortable while showing off your love for coding with the \"Declare variables, not war\" hoodie. Made with a blend of soft and durable materials, this hoodie features the phrase \"Declare variables, not war\" prominently displayed on the front, making a bold statement about your passion for coding and peaceful problem-solving. Perfect for wearing to work, class, or just lounging at home, this hoodie is a must-have for any programmer or computer science student. Available in a variety of colors and sizes, this hoodie is sure to become your go-to for expressing your love for coding and promoting a culture of peace in the tech community.",
+    "basePrice": 999,
+    "maxPrice": 999,
+    "images": [
+      "https://m.media-amazon.com/images/I/6131MewT4ML._SX679_.jpg",
+      "https://m.media-amazon.com/images/I/71y8hV+pv9L._SX522_.jpg"
+    ],
+    "category": "SWEATSHIRTS",
+    "brand": "CODESWEAR",
+    "theme": "PROGRAMMING",
+    "tags": [
+      "sweatshirts"
+    ],
+    "isFeatured": true,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "forest green",
+        "price": 999,
+        "availableQty": 63,
+        "sku": "DEC-XXL-FOR",
+        "images": [
+          "https://m.media-amazon.com/images/I/6131MewT4ML._SX679_.jpg",
+          "https://m.media-amazon.com/images/I/71y8hV+pv9L._SX522_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T15:46:36.073Z"},
+    "updatedAt": {"$date": "2025-07-21T15:46:36.073Z"}
+  },
+  {
+    "_id": {"$oid": "687e61836e88613c720d8e7a"},
+    "title": "CodesWear Broken Developer Sweatshirt | Full Sleeve Sweatshirt for Men",
+    "slug": "codeswear-broken-developer-sweatshirt--full-sleeve-sweatshirt-for-men",
+    "description": "Show off your love for coding with this stylish and comfortable Broken Developer sweatshirt. Made from a soft blend of cotton and polyester, this sweatshirt is perfect for keeping warm while working on projects or hanging out with fellow developers. The design features a broken code with text that reads \"Developer,\" making it a great conversation starter. Whether you're a beginner or a seasoned pro, this sweatshirt is a must-have for any developer.",
+    "basePrice": 855,
+    "maxPrice": 855,
+    "images": [
+      "https://m.media-amazon.com/images/I/51DRkpZ4YTL._SX679_.jpg",
+      "https://m.media-amazon.com/images/I/61no9dMnLrL._SY679_.jpg"
+    ],
+    "category": "SWEATSHIRTS",
+    "brand": "CODESWEAR",
+    "theme": "PROGRAMMING",
+    "tags": [],
+    "isFeatured": true,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "navy blue",
+        "price": 855,
+        "availableQty": 15,
+        "sku": "COD-XL-NAV",
+        "images": [
+          "https://m.media-amazon.com/images/I/51DRkpZ4YTL._SX679_.jpg",
+          "https://m.media-amazon.com/images/I/61no9dMnLrL._SY679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T15:49:23.766Z"},
+    "updatedAt": {"$date": "2025-08-04T08:02:16.948Z"}
+  },
+  {
+    "_id": {"$oid": "687e63236e88613c720d8e82"},
+    "title": "Amazon Brand - Symbol Men's Cotton Rich Solid Polo Tshirt | Collar Tshirts | Half Sleeves | Plain-Regular Fit",
+    "slug": "amazon-brand---symbol-mens-cotton-rich-solid-polo-tshirt--collar-tshirts--half-sleeves--plain-regular-fit",
+    "description": "FABRIC: Cotton-polyester blend for perfect shape retention and easy maintenance.\nPRODUCT DETAILS: Regular fit, featuring a ribbed knit collar and cuff, 2 -button placket, half sleeves and side slits for movement.\nWORKMANSHIP: Crafted with high quality stitching and full Lycra collar & cuff for added comfort and durability.\nSTYLE TIPS: Pair with chinos and loafers for a smart-casual look or dress down with jeans and sneakers.\nFIND YOUR PERFECT FIT: Please refer to the 5th image in our catalogue for a detailed size and fit guide.\nSUSTAINABILITY COMMITMENT: This product is made in a certified factory that is committed to ethical labour practices. We use FSC certified tags and re-cycled packaging.",
+    "basePrice": 966,
+    "maxPrice": 966,
+    "images": [
+      "https://m.media-amazon.com/images/I/81Du0iT+WDL._SX522_.jpg",
+      "https://m.media-amazon.com/images/I/81G1czUtygL._SX522_.jpg"
+    ],
+    "category": "POLOTSHIRTS",
+    "brand": "AMAZON BRAND",
+    "theme": "POLOTSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "maroon",
+        "price": 966,
+        "availableQty": 15,
+        "sku": "AMA-XL-MAR",
+        "images": [
+          "https://m.media-amazon.com/images/I/81Du0iT+WDL._SX522_.jpg",
+          "https://m.media-amazon.com/images/I/81G1czUtygL._SX522_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T15:56:19.288Z"},
+    "updatedAt": {"$date": "2025-07-21T15:56:19.288Z"}
+  },
+  {
+    "_id": {"$oid": "687e63b06e88613c720d8e8a"},
+    "title": "Allen Solly Men's Cotton Regular Fit Polo T-Shirt",
+    "slug": "allen-solly-mens-cotton-regular-fit-polo-t-shirt",
+    "description": "Occasion : Casual\nFit : Regular Fit\nMaterial : 60% Cotton and 40% Polyester\nNeck : Polo Neck; Pattern : Solid\nSleeve Type: Half Sleeve; Closure Type: Button; Material Composition: 60% Cotton, 40% Polyester; Collar Style: Band Collar",
+    "basePrice": 599,
+    "maxPrice": 599,
+    "images": [
+      "https://m.media-amazon.com/images/I/81eVonPUBgL._SX522_.jpg",
+      "https://m.media-amazon.com/images/I/911vkfUygsL._SX522_.jpg"
+    ],
+    "category": "POLOTSHIRTS",
+    "brand": "ALLEN SOLLY",
+    "theme": "POLOTSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "L",
+        "color": "navy blue",
+        "price": 599,
+        "availableQty": 15,
+        "sku": "ALL-L-NAV",
+        "images": [
+          "https://m.media-amazon.com/images/I/81eVonPUBgL._SX522_.jpg",
+          "https://m.media-amazon.com/images/I/911vkfUygsL._SX522_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T15:58:40.113Z"},
+    "updatedAt": {"$date": "2025-07-21T15:58:40.113Z"}
+  },
+  {
+    "_id": {"$oid": "687e64156e88613c720d8e92"},
+    "title": "ARBOUR Men Polo Neck Stripes Half Sleeves Casual Polycotton T-Shirt Comfortable & Stylish Men's T-Shirt",
+    "slug": "arbour-men-polo-neck-stripes-half-sleeves-casual-polycotton-t-shirt-comfortable--stylish-mens-t-shirt",
+    "description": "At Arbour, we redefine casual wear, blending comfort and style seamlessly in every thread. Our T-shirts are more than just garments; they're a statement of relaxed sophistication for the modern man. Crafted with precision and an unwavering commitment to quality, Arbour T-shirts embody the essence of laid-back luxury.",
+    "basePrice": 1200,
+    "maxPrice": 1200,
+    "images": [
+      "https://m.media-amazon.com/images/I/81Rs1NLO9YL._SY679_.jpg",
+      "https://m.media-amazon.com/images/I/71L7TN7CBeL._SY679_.jpg"
+    ],
+    "category": "POLOTSHIRTS",
+    "brand": "ARBOUR",
+    "theme": "POLOTSHIRTS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "tan",
+        "price": 1200,
+        "availableQty": 75,
+        "sku": "ARB-XL-TAN",
+        "images": [
+          "https://m.media-amazon.com/images/I/81Rs1NLO9YL._SY679_.jpg",
+          "https://m.media-amazon.com/images/I/71L7TN7CBeL._SY679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:00:21.504Z"},
+    "updatedAt": {"$date": "2025-07-21T16:00:21.504Z"}
+  },
+  {
+    "_id": {"$oid": "687e65566e88613c720d8e9a"},
+    "title": "CHKOKKO Men Polyester Solid Quick Dry Sports Gym T-Shirt Breathable Moisture-Wicking Half Sleeve Round Crew Neck Regular Fit Active Wear for Running and Training",
+    "slug": "chkokko-men-polyester-solid-quick-dry-sports-gym-t-shirt-breathable-moisture-wicking-half-sleeve-round-crew-neck-regular-fit-active-wear-for-running-and-training",
+    "description": "This sportswear is an actual combination of ease and composure with double stitching at borders. It is fabricated with 100% Polyester which gives allowance to wear in every season. The one who wears this t-shirt will surely get eye-catching attraction from everywhere because of its distinctiveness and eccentric colors. The ultra-soft and natural feel fabric has moisture transport system.The ultra-soft and natural feel fabric has moisture transport system.\nProduct color may slightly vary due to photographic lighting sources or your monitor settings.",
+    "basePrice": 359,
+    "maxPrice": 359,
+    "images": [
+      "https://m.media-amazon.com/images/I/41WhRQDTuvL._SX679_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "CHKOKKO",
+    "theme": "FITNESS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "maroon",
+        "price": 359,
+        "availableQty": 69,
+        "sku": "CHK-XXL-MAR",
+        "images": [
+          "https://m.media-amazon.com/images/I/41WhRQDTuvL._SX679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:05:42.842Z"},
+    "updatedAt": {"$date": "2025-07-21T16:05:42.842Z"}
+  },
+  {
+    "_id": {"$oid": "687e65bc6e88613c720d8ea2"},
+    "title": "Boldfit Gym Regular Fit T Shirt for Men Round Neck Active Tshirt for Men Quick Dry Active Wear T Shirts for Man Dry Fit T Shirts for Men for Gym",
+    "slug": "boldfit-gym-regular-fit-t-shirt-for-men-round-neck-active-tshirt-for-men-quick-dry-active-wear-t-shirts-for-man-dry-fit-t-shirts-for-men-for-gym",
+    "description": "Elevate your Training experience with Boldfit Training Poly-Spandex sports t shirts for men – a perfect fusion of performance and comfort. Crafted with precision from a blend of high-quality polyester and spandex, this tee shirt men is designed to meet the demands of your active lifestyle. The poly-spandex blend offers exceptional breathability, allowing air circulation to keep you cool and focused on your run. Experience the freedom of movement with the spandex component, providing a stretchy and flexible fit that adapts to your body's natural motion. Whether you're sprinting on the track or conquering long distances, this t-shirt for men moves with you, offering unparalleled comfort and support. The moisture-wicking properties of the polyester-spandex blend keep sweat at bay, ensuring a dry and irritation-free Training experience. This gym tshirt's quick-drying feature makes it an excellent choice for those intense training sessions, allowing you to stay comfortable and focused from start to finish.",
+    "basePrice": 1199,
+    "maxPrice": 1199,
+    "images": [
+      "https://m.media-amazon.com/images/I/71z9K9hB5PL._SX679_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "BOLDFIT",
+    "theme": "FITNESS",
+    "tags": [
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "maroon",
+        "price": 1199,
+        "availableQty": 45,
+        "sku": "BOL-XL-MAR",
+        "images": [
+          "https://m.media-amazon.com/images/I/71z9K9hB5PL._SX679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:07:24.377Z"},
+    "updatedAt": {"$date": "2025-07-21T16:07:24.377Z"}
+  },
+  {
+    "_id": {"$oid": "687e663c6e88613c720d8eaa"},
+    "title": "Amazon Brand - Symbol Men's Solid Cotton T Shirt | Round Neck | Half Sleeve | Plain-Regular Fit",
+    "slug": "amazon-brand---symbol-mens-solid-cotton-t-shirt--round-neck--half-sleeve--plain-regular-fit",
+    "description": "Amazon Brand - Symbol Men's Solid Cotton T Shirt | Round Neck | Half Sleeve | Plain-Regular Fit",
+    "basePrice": 700,
+    "maxPrice": 700,
+    "images": [
+      "https://m.media-amazon.com/images/I/71DosJOQtUL._SX569_.jpg"
+    ],
+    "category": "TSHIRTS",
+    "brand": "AMAZON BRAND",
+    "theme": "COMBOOFFERS",
+    "tags": [
+      "combo",
+      "tshirts"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "L",
+        "color": "indigo",
+        "price": 700,
+        "availableQty": 95,
+        "sku": "AMA-L-IND",
+        "images": [
+          "https://m.media-amazon.com/images/I/71DosJOQtUL._SX569_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:09:32.791Z"},
+    "updatedAt": {"$date": "2025-07-21T16:09:32.791Z"}
+  },
+  {
+    "_id": {"$oid": "687e66f06e88613c720d8eb2"},
+    "title": "Boldfit Poly Cotton Hoodies for Men Stylish Sweatshirt for Men Winter Wear for Men Solid Sweatshirts High Neck Winter Sweatshirts for Men",
+    "slug": "boldfit-poly-cotton-hoodies-for-men-stylish-sweatshirt-for-men-winter-wear-for-men-solid-sweatshirts-high-neck-winter-sweatshirts-for-men",
+    "description": "STYLE & ULTIMATE COMFORT HOODIES: Embrace classic style without compromising on comfort with our hoodie for men. It's expertly crafted from a premium cotton blend that not only feels exceptionally soft against your skin but also provides lasting comfort throughout the day. Whether you're stepping out in black hoodies for men or lounging at home, this stylish hoodie for men keeps you cozy and stylish.\nTAILORED FIT & BUILT TO LAST: We've perfected the fit to ensure it's just right for you. This hoodie men boasts a tailored cut that offers a modern, streamlined appearance. Reinforced stitching ensures exceptional durability, so you can rely on it as your go-to hoodie for mens for years to come. Plus, the adjustable drawstring hood allows you to achieve a personalized fit that suits your style.\nWARDROBE VERSATILITY: This hoodie for men is more than just a piece of clothing; it's a wardrobe essential. Pair it effortlessly with jeans, joggers, or shorts for a casual yet polished look. Whether you're going for a relaxed outing with friends or hitting the gym, this versatile mens hoodie adapts to various occasions, giving you style options galore.\nYEAR-ROUND COMFORT: Designed with your comfort in mind all year long, it's perfect for layering during colder seasons, keeping you snug and warm. When the temperature rises, it stands alone as a lightweight outer layer. The ribbed cuffs and hem not only add a touch of style but also help retain warmth, making it a reliable choice as seasons change. Beyond its aesthetics, our winter wear for men hoodie for men blends functionality seamlessly with fashion.",
+    "basePrice": 3000,
+    "maxPrice": 3000,
+    "images": [
+      "https://m.media-amazon.com/images/I/61rFTZzrmHL._SX679_.jpg"
+    ],
+    "category": "HOODIES",
+    "brand": "BOLDFIT",
+    "theme": "HOODIES",
+    "tags": [
+      "hoodies"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XL",
+        "color": "black",
+        "price": 3000,
+        "availableQty": 32,
+        "sku": "BOL-XL-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61rFTZzrmHL._SX679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:12:32.215Z"},
+    "updatedAt": {"$date": "2025-07-21T16:12:32.215Z"}
+  },
+  {
+    "_id": {"$oid": "687e67c46e88613c720d8eba"},
+    "title": "Scott International Men's Cotton Hoodie Sweatshirt",
+    "slug": "scott-international-mens-cotton-hoodie-sweatshirt",
+    "description": "Material - This hoodie for men is made of high-quality Cotton fabric, comfortable and stylish, being less prone to wrinkles and shrinking. Comfortable fleece interior lining for warmth, soft fabric let you coexist with fashion and comfortable.\nFeatures - Warm winter sweatshirt with hood and Kangaroo Pockets, drawstring for adjustability, ribbed elastic hem and cuffs to lock in warmth, and the contrast color makes it look very stylish. The stylish full zip-up hoodies produced with superior materials and sophisticated techniques, keep you cozy whether you’re hanging with friends or lounging at home.\nLong sleeves - The long sleeve is perfect for the colder months, and the hood is made to keep you warm and pair the men hooded sweatshirt up with any fitted jeans or cover them up with a coat.\nOccasion - The hoodies for men is great for Daily Wear, Office, Indoor & Outdoor, Work, Sports, Club, Pub, or Wearing at Home, making it versatile enough for any casual occasion. This hooded sweatshirt is the perfect choice to keep you looking stylish and feeling comfortable.\nSize - Our men’s hooded sweatshirt feature a regular fit style, available in all sizes, ensuring a perfect fit for a variety of body types. Refer size chart for perfect fit hooded sweatshirt.",
+    "basePrice": 4999,
+    "maxPrice": 4999,
+    "images": [
+      "https://m.media-amazon.com/images/I/61vY+TQB-uL._SX679_.jpg"
+    ],
+    "category": "ZIPPERHOODIES",
+    "brand": "SCOTT INTERNATIONAL",
+    "theme": "GAMING",
+    "tags": [
+      "zipper"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "L",
+        "color": "black",
+        "price": 4999,
+        "availableQty": 32,
+        "sku": "SCO-L-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61vY+TQB-uL._SX679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:16:04.892Z"},
+    "updatedAt": {"$date": "2025-07-21T16:16:04.892Z"}
+  },
+  {
+    "_id": {"$oid": "687e685b6e88613c720d8ec2"},
+    "title": "Orixx® Mens Solid Dotted Unique Design Oversized Tshirt for Men - Round Neck Loose Fit Drop Shoulder Mens T-Shirt",
+    "slug": "orixx-mens-solid-dotted-unique-design-oversized-tshirt-for-men---round-neck-loose-fit-drop-shoulder-mens-t-shirt",
+    "description": "Upgrade your wardrobe with the Orixx Men's Oversized T-Shirt, designed for those who love unique fashion and ultimate comfort. This t-shirt features a standout solid and dotted combination design, giving you a fresh take on everyday streetwear. With its loose fit, drop shoulder sleeves, and breathable cotton-blend fabric, it’s perfect for casual days, travel, or hangouts. Whether you're heading out with friends or relaxing at home, this trendy tee delivers effortless style and comfort.",
+    "basePrice": 2999,
+    "maxPrice": 2999,
+    "images": [
+      "https://m.media-amazon.com/images/I/61SyVVIJLLL._SY741_.jpg",
+      "https://m.media-amazon.com/images/I/81QxYqa6mHL._SY741_.jpg"
+    ],
+    "category": "OVERSIZEDTSHIRTS",
+    "brand": "ORIXX",
+    "theme": "FITNESS",
+    "tags": [
+      "fitness",
+      "oversized",
+      "trending"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "black",
+        "price": 2999,
+        "availableQty": 15,
+        "sku": "ORI-XXL-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/61SyVVIJLLL._SY741_.jpg",
+          "https://m.media-amazon.com/images/I/81QxYqa6mHL._SY741_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:18:35.280Z"},
+    "updatedAt": {"$date": "2025-07-21T16:18:35.280Z"}
+  },
+  {
+    "_id": {"$oid": "687e68a66e88613c720d8eca"},
+    "title": "fanideaz Mens Oversized Printed Half Sleeve Branded Cotton T-Shirt for Mens || Back Printed t Shirts for Men || Oversized t Shirts for Men",
+    "slug": "fanideaz-mens-oversized-printed-half-sleeve-branded-cotton-t-shirt-for-mens--back-printed-t-shirts-for-men--oversized-t-shirts-for-men",
+    "description": "The oversized men's graphic printed cotton t-shirt from Fanideaz is a perfect blend of style and comfort. Made with high-quality cotton fabric, this t-shirt ensures a soft and breathable feel, ideal for all-day wear. The oversized fit offers a relaxed and trendy look, making it a versatile choice for casual outings or lounging around.",
+    "basePrice": 999,
+    "maxPrice": 999,
+    "images": [
+      "https://m.media-amazon.com/images/I/610KdL0pbmL._SX679_.jpg"
+    ],
+    "category": "OVERSIZEDTSHIRTS",
+    "brand": "FANIDEAZ",
+    "theme": "GAMING",
+    "tags": [
+      "gaming",
+      "oversized",
+      "trending"
+    ],
+    "isFeatured": false,
+    "isPublished": true,
+    "isOutOfStock": false,
+    "variants": [
+      {
+        "size": "XXL",
+        "color": "black",
+        "price": 999,
+        "availableQty": 45,
+        "sku": "FAN-XXL-BLA",
+        "images": [
+          "https://m.media-amazon.com/images/I/610KdL0pbmL._SX679_.jpg"
+        ]
+      }
+    ],
+    "createdAt": {"$date": "2025-07-21T16:19:50.629Z"},
+    "updatedAt": {"$date": "2025-07-21T16:19:50.629Z"}
+  }
+]

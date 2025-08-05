@@ -9,4 +9,12 @@ const invalidateReviewCache = (productId) => {
   }
 };
 
-module.exports = { cache, invalidateReviewCache };
+// Invalidate cache for products
+const invalidateProductCache = () => {
+  const keys = cache.keys();
+  const productKeys = keys.filter((k) => k.startsWith("product:")); // strict prefix
+  productKeys.forEach((key) => cache.del(key));
+  console.log("❌ Product cache invalidated:", productKeys);
+};
+
+module.exports = { cache, invalidateReviewCache , invalidateProductCache};

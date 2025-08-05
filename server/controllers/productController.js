@@ -1,45 +1,58 @@
 // controllers/productController.js
 const Product = require("../models/Product");
-const NodeCache = require("node-cache");
-const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
-const { groupProductsByTitle } = require("../helper/productHelper");
+const {cache ,invalidateProductCache}=require("../utils/cache")
+let lastProductUpdatedAt = null;
 
-let lastProductUpdatedAt = null; // to track if DB has changed
-
-// Get all products with variants grouped by title (public)
+// GET All Products /products?category=...&brand=...&size=...&color=...&isFeatured=...
 exports.getAllProducts = async (req, res) => {
   try {
     const { category, brand, size, color, isFeatured } = req.query;
-    const filter = {};
+
+    const filter = {
+      isPublished: true,
+      isOutOfStock: false,
+    };
 
     if (category) filter.category = category;
     if (brand) filter.brand = brand;
-    if (size) filter.size = size;
-    if (color) filter.color = color;
     if (isFeatured != null) filter.isFeatured = isFeatured === "true";
 
-    const cacheKey = JSON.stringify(filter);
-
-    const products = await Product.find(filter).sort({ updatedAt: -1 }).lean();
-
-    if (products.length === 0) {
-      return res.json([]); // nothing to group or cache
+    // Filter inside variants
+    if (size || color) {
+      filter.variants = {
+        $elemMatch: {},
+      };
+      if (size) filter.variants.$elemMatch.size = size.toUpperCase();
+      if (color) filter.variants.$elemMatch.color = color.toLowerCase();
     }
 
-    const latestUpdatedAt = new Date(products[0].updatedAt).getTime();
+    // Updated cache key with namespace
+    const cacheKey = "product:" + JSON.stringify(filter);
 
-    if (lastProductUpdatedAt === latestUpdatedAt && cache.has(cacheKey)) {
-      console.log("✔ Using cached data");
+    // Check cache first (if DB hasn't changed)
+    if (lastProductUpdatedAt && cache.has(cacheKey)) {
+      console.log("✔ Using cached product data for:", cacheKey);
       return res.json(cache.get(cacheKey));
     }
 
-    const groupedProducts = groupProductsByTitle(products);
+    //  Fetch from DB
+    const products = await Product.find(filter)
+      .sort({ updatedAt: -1 })
+      .lean();
 
-    cache.set(cacheKey, groupedProducts);
+    if (products.length === 0) {
+      return res.json([]);
+    }
+
+    // Track last update time
+    const latestUpdatedAt = new Date(products[0].updatedAt).getTime();
+
+    // ✅ Cache and update timestamp
+    cache.set(cacheKey, products);
     lastProductUpdatedAt = latestUpdatedAt;
 
-    console.log("📥 DB Fetched and cache updated");
-    return res.json(groupedProducts);
+    console.log("📥 DB Fetched, product cache updated for:", cacheKey);
+    return res.json(products);
   } catch (error) {
     console.error("Get All Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -50,30 +63,46 @@ exports.getAllProducts = async (req, res) => {
 exports.searchProducts = async (req, res) => {
   try {
     const { q } = req.query;
-    
-    if (!q || q.trim() === '') {
+
+    if (!q || q.trim() === "") {
       return res.json([]);
     }
 
     const searchQuery = {
-      $or: [
-        { title: { $regex: q, $options: 'i' } },
-        { description: { $regex: q, $options: 'i' } },
-        { tags: { $regex: q, $options: 'i' } }
-      ]
+      $text: { $search: q }, // using MongoDB's full-text search
+      isPublished: true,
+      isOutOfStock: false,
     };
 
-    const products = await Product.find(searchQuery)
+    /**
+
+        * - `textScore` is a MongoDB feature that ranks documents by how closely they match the search query.
+        *   For example, a product with the word "tshirt" in title and tags will score higher than one that 
+        *   only has it in description.
+        * 
+        * Example request:
+        *    GET /api/products/search?q=tshirt
+        * 
+        * Example response:
+        * [
+        *   {
+        *     "_id": "abc123",
+        *     "title": "Cotton T-Shirt",
+        *     "slug": "cotton-tshirt",
+        *     "score": 3.5,
+        *     "isPublished": true,
+        *     ...
+        *   },
+        *   ...
+        * ]
+    */
+
+    const products = await Product.find(searchQuery, { score: { $meta: "textScore" } })
+      .sort({ score: { $meta: "textScore" }, updatedAt: -1 })
       .limit(20)
-      .sort({ isFeatured: -1, updatedAt: -1 })
       .lean();
 
-    if (products.length === 0) {
-      return res.json([]);
-    }
-
-    const groupedProducts = groupProductsByTitle(products);
-    return res.json(groupedProducts);
+    return res.json(products);
   } catch (error) {
     console.error("Search Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -84,9 +113,16 @@ exports.searchProducts = async (req, res) => {
 exports.getProductsByTheme = async (req, res) => {
   try {
     const { theme } = req.params;
-    const products = await Product.find({ theme: theme }).sort({ createdAt: -1 }).lean();
-    const groupedProducts = groupProductsByTitle(products);
-    return res.json(groupedProducts);
+
+    const products = await Product.find({
+      theme: theme.toUpperCase(),
+      isPublished: true,
+      isOutOfStock: false,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.json(products);
   } catch (error) {
     console.error("Get Products By Theme Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -98,12 +134,15 @@ exports.getProductsByCategory = async (req, res) => {
   try {
     const { category } = req.params;
 
-    const products = await Product.find({ category }).sort({ createdAt: -1 }).lean();
+    const products = await Product.find({
+      category: category.toUpperCase(),
+      isPublished: true,
+      isOutOfStock: false,
+    })
+      .sort({ createdAt: -1 })
+      .lean();
 
-    // Group products by title for variants
-    const groupedProducts = groupProductsByTitle(products);
-
-    return res.json(groupedProducts);
+    return res.json(products);
   } catch (error) {
     console.error("Get Products By Category Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -114,20 +153,19 @@ exports.getProductsByCategory = async (req, res) => {
 exports.getProductBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
-    const product = await Product.findOne({ slug }).lean();
+
+    const product = await Product.findOne({ slug, isPublished: true }).lean();
+
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // Get all variants of this product
-    const variants = await Product.find({
-      title: product.title,
-      availableQty: { $gt: 0 }, // Only available variants
-    }).lean();
+    // Filter in-stock variants only
+    const availableVariants = product.variants.filter((v) => v.availableQty > 0);
 
     return res.json({
       ...product,
-      variants,
+      variants: availableVariants,
     });
   } catch (error) {
     console.error("Get Product By Slug Error:", error);
@@ -139,20 +177,19 @@ exports.getProductBySlug = async (req, res) => {
 exports.getProductById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Find product by ID
     const product = await Product.findById(id).lean();
-    if (!product) {
+    if (!product || !product.isPublished) {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    // Get all variants of this product
-    const variants = await Product.find({
-      title: product.title,
-      availableQty: { $gt: 0 }, // Only available variants
-    }).lean();
+    // Filter out-of-stock variants
+    const availableVariants = product.variants.filter((v) => v.availableQty > 0);
 
     return res.json({
-      ...product,
-      variants,
+      ...product, //jitni bhi produts ki field hai vo aur variants ko availableVariants se replace krdo
+      variants: availableVariants,
     });
   } catch (error) {
     console.error("Get Product By ID Error:", error);
@@ -163,12 +200,17 @@ exports.getProductById = async (req, res) => {
 // Get featured products (public)
 exports.getFeaturedProducts = async (req, res) => {
   try {
-    const featured = await Product.find({ isFeatured: true }).select("_id slug title size price images color availableQty createdAt").sort({ createdAt: -1 }).limit(10).lean();
+    const featured = await Product.find({
+      isFeatured: true,
+      isPublished: true,
+      isOutOfStock: false,
+    })
+      .select("_id slug title basePrice maxPrice images createdAt")
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean();
 
-    // Group featured products by title
-    const groupedFeatured = groupProductsByTitle(featured);
-
-    return res.json(groupedFeatured);
+    return res.json(featured);
   } catch (error) {
     console.error("Get Featured Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -179,37 +221,52 @@ exports.getFeaturedProducts = async (req, res) => {
 exports.getRelatedProducts = async (req, res) => {
   try {
     const { id } = req.params;
-    const baseProduct = await Product.findById(id).select("category tags").lean();
-    if (!baseProduct) return res.status(404).json({ message: "Product not found" });
 
-    // find others in same category or sharing tags, excluding itself
+    // Fetch category and tags of the base product
+    const baseProduct = await Product.findById(id).select("category tags").lean();
+
+    if (!baseProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Fetch related products: same category or overlapping tags
     const related = await Product.find({
-      _id: { $ne: id },
-      availableQty: { $gt: 0 }, // Only available products
+      _id: { $ne: id }, // exclude current product
+      isPublished: true,
+      isOutOfStock: false,
       $or: [{ category: baseProduct.category }, { tags: { $in: baseProduct.tags } }],
     })
-      .limit(8)
       .sort({ createdAt: -1 })
+      .limit(8)
       .lean();
 
-    // Group related products by title
-    const groupedRelated = groupProductsByTitle(related);
-
-    res.json(groupedRelated);
+    return res.json(related);
   } catch (err) {
     console.error("getRelatedProducts error:", err);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
 // Create a new product (admin)
 exports.createProduct = async (req, res) => {
   try {
-    const { title, slug, description, price, images, category, brand, size, color, tags, availableQty, isFeatured,theme } = req.body;
+    const {
+      title,
+      slug,
+      description,
+      images,
+      category,
+      brand,
+      theme,
+      tags,
+      isFeatured,
+      isPublished,
+      variants, // Expecting an array of variants in request
+    } = req.body;
 
     // Basic validation
-    if (!title || !slug || !description || price == null || availableQty == null) {
-      return res.status(400).json({ message: "Required fields are missing." });
+    if (!title || !slug || !description || !Array.isArray(variants) || variants.length === 0) {
+      return res.status(400).json({ message: "Required fields are missing or variants are not valid." });
     }
 
     // Check for existing slug
@@ -218,23 +275,36 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ message: "Slug must be unique." });
     }
 
+    // Compute basePrice and maxPrice from variants
+    const prices = variants.map((v) => v.price);
+    const basePrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    // Determine isOutOfStock
+    const totalQty = variants.reduce((acc, v) => acc + (v.availableQty || 0), 0);
+    const isOutOfStock = totalQty === 0;
+
+    // Create the product
     const product = await Product.create({
       title,
       slug,
       description,
-      price,
       images: images || [],
       category,
       brand,
-      size,
-      color,
+      theme,
       tags: tags || [],
-      availableQty,
       isFeatured: !!isFeatured,
-      theme
+      isPublished: !!isPublished,
+      isOutOfStock,
+      basePrice,
+      maxPrice,
+      variants,
     });
 
-    return res.status(201).json({ message: "Product created.", product });
+    invalidateProductCache();
+
+    return res.status(201).json({ succes: true, message: "Product created.", product });
   } catch (error) {
     console.error("Create Product Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -247,7 +317,7 @@ exports.updateProduct = async (req, res) => {
     const { id } = req.params;
     const updates = { ...req.body };
 
-    // check karo ki koi aur product (jiska _id is product ke id se alag hai) already same slug use kar raha hai ya nahi.
+    // Check for slug uniqueness (excluding the current product)
     if (updates.slug) {
       const existing = await Product.exists({ slug: updates.slug, _id: { $ne: id } });
       if (existing) {
@@ -255,16 +325,27 @@ exports.updateProduct = async (req, res) => {
       }
     }
 
+    // Handle variants update logic
+    if (Array.isArray(updates.variants) && updates.variants.length > 0) {
+      const prices = updates.variants.map((v) => v.price);
+      updates.basePrice = Math.min(...prices);
+      updates.maxPrice = Math.max(...prices);
+
+      const totalQty = updates.variants.reduce((sum, v) => sum + (v.availableQty || 0), 0);
+      updates.isOutOfStock = totalQty === 0;
+    }
+
     const product = await Product.findByIdAndUpdate(id, updates, {
       new: true,
       runValidators: true,
-    }).lean();
+    });
 
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
 
-    return res.json({ message: "Product updated.", product });
+    invalidateProductCache();
+    return res.json({ success: true, message: "Product updated.", product });
   } catch (error) {
     console.error("Update Product Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -279,6 +360,7 @@ exports.deleteProduct = async (req, res) => {
     if (!product) {
       return res.status(404).json({ message: "Product not found." });
     }
+    invalidateProductCache();
     return res.json({ message: "Product deleted." });
   } catch (error) {
     console.error("Delete Product Error:", error);

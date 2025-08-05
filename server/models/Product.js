@@ -1,26 +1,39 @@
-const { Schema, model } = require("mongoose");;
+const { Schema, model } = require("mongoose");
+
+const VariantSchema = new Schema({
+  size: { type: String, required: true, uppercase: true, index: true, trim: true },
+  color: { type: String, required: true, lowercase: true, index: true, trim: true },
+  price: { type: Number, required: true },
+  availableQty: { type: Number, required: true },
+  sku: { type: String, unique: true ,trim : true},
+  /*  SKU stands for Stock Keeping Unit.
+    It’s a unique identifier assigned to each variant of a product (e.g., TSHIRT-M-BLK for a Medium Black T-shirt)
+  */
+  images: { type: [String], default: [] }, // variant-specific images
+});
 
 const ProductSchema = new Schema(
   {
-    price: { type: Number, required: true },
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    description: { type: String, required: true },
-    images: { type: [String], default: [] },
-    category: { type: String, required: true, index: true , lowercase: true ,trim:true},
-    brand: { type: String, index: true, lowercase: true },
-    size: { type: String, index: true, uppercase: true },
-    color: { type: String, index: true, lowercase: true },
-    tags: [String],
-    availableQty: { type: Number, required: true },
+    title: { type: String, required: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    description: { type: String, required: true ,trim: true},
+    basePrice: { type: Number }, // optional, default display
+    maxPrice: { type: Number }, // optional,  default display
+    images: { type: [String]},
+    category: { type: String, required: true, uppercase: true, index: true, trim: true },
+    brand: { type: String, required: true, uppercase: true, index: true, trim: true },
+    theme: { type: String, required: true, uppercase: true, index: true, trim: true },
+    tags: [{ type: String, trim: true, lowercase: true }],
     isFeatured: { type: Boolean, default: false },
-    
-    // ✅ New field: themes
-    theme: {type: String,lowercase: true},
+    isPublished: { type: Boolean, default: false },
+    isOutOfStock: { type: Boolean, default: false },
+
+    variants: [VariantSchema], // ✅ new structure for multiple size/color options
   },
   { timestamps: true }
 );
-// 🔍 Create text index for full-text search
+
+// 🔍 Full-text index
 ProductSchema.index({ title: "text", description: "text", tags: "text" });
 
 module.exports = model("Product", ProductSchema);

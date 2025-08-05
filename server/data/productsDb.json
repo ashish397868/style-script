@@ -38,45 +38,12 @@
   {
     "_id": {"$oid": "6857edd6c0bfea3cedcab3da"},
     "title": "Boldfit",
-    "slug": "boldfit-men-t-shirt-red-xxl",
+    "slug": "boldfit-men-t-shirt",
     "description": "Polyester-blend",
     "basePrice": 699,
     "maxPrice": 699,
     "images": [
-      "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg"
-    ],
-    "category": "TSHIRTS",
-    "brand": "BOLDFIT",
-    "theme": "TSHIRTS",
-    "tags": [
-      "tshirts"
-    ],
-    "isFeatured": false,
-    "isPublished": true,
-    "isOutOfStock": false,
-    "variants": [
-      {
-        "size": "XXL",
-        "color": "red",
-        "price": 699,
-        "availableQty": 12,
-        "sku": "BOL-XXL-RED",
-        "images": [
-          "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg"
-        ]
-      }
-    ],
-    "createdAt": {"$date": "2025-06-22T11:49:42.968Z"},
-    "updatedAt": {"$date": "2025-06-22T11:49:42.968Z"}
-  },
-  {
-    "_id": {"$oid": "6857edd6c0bfea3cedcab3db"},
-    "title": "Boldfit",
-    "slug": "boldfit-men-t-shirt-l",
-    "description": "Polyester-blend",
-    "basePrice": 699,
-    "maxPrice": 699,
-    "images": [
+      "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg",
       "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
     ],
     "category": "TSHIRTS",
@@ -89,6 +56,16 @@
     "isPublished": true,
     "isOutOfStock": false,
     "variants": [
+      {
+        "size": "XXL",
+        "color": "red",
+        "price": 699,
+        "availableQty": 12,
+        "sku": "BOL-XXL-RED",
+        "images": [
+          "https://m.media-amazon.com/images/I/61+hYMNNysL._AC_UL320_.jpg"
+        ]
+      },
       {
         "size": "L",
         "color": "black",
@@ -106,12 +83,13 @@
   {
     "_id": {"$oid": "6857f52ec0bfea3cedcab3f0"},
     "title": "Van Heusen",
-    "slug": "vanheusen-men-t-shirt-xxl",
+    "slug": "vanheusen-men-t-shirt",
     "description": "80% Cotton, 20% Polyester, Single Jersey",
     "basePrice": 497,
-    "maxPrice": 497,
+    "maxPrice": 699,
     "images": [
-      "https://m.media-amazon.com/images/I/61rKljNSEUL._AC_UL320_.jpg"
+      "https://m.media-amazon.com/images/I/61rKljNSEUL._AC_UL320_.jpg",
+      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
     ],
     "category": "TSHIRTS",
     "brand": "VAN HEUSEN",
@@ -132,31 +110,7 @@
         "images": [
           "https://m.media-amazon.com/images/I/61rKljNSEUL._AC_UL320_.jpg"
         ]
-      }
-    ],
-    "createdAt": {"$date": "2025-06-22T12:21:02.293Z"},
-    "updatedAt": {"$date": "2025-06-22T12:21:02.293Z"}
-  },
-  {
-    "_id": {"$oid": "6857f52ec0bfea3cedcab3f4"},
-    "title": "Van Heusen",
-    "slug": "boldfit-men-t-shirt-xxl1243",
-    "description": "Polyester-blend",
-    "basePrice": 699,
-    "maxPrice": 699,
-    "images": [
-      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
-    ],
-    "category": "TSHIRTS",
-    "brand": "BOLDFIT",
-    "theme": "TSHIRTS",
-    "tags": [
-      "tshirts"
-    ],
-    "isFeatured": false,
-    "isPublished": true,
-    "isOutOfStock": false,
-    "variants": [
+      },
       {
         "size": "XXL",
         "color": "black",
@@ -166,31 +120,7 @@
         "images": [
           "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
         ]
-      }
-    ],
-    "createdAt": {"$date": "2025-06-22T12:21:02.294Z"},
-    "updatedAt": {"$date": "2025-06-22T12:21:02.294Z"}
-  },
-  {
-    "_id": {"$oid": "6857f52ec0bfea3cedcab3f5"},
-    "title": "Van Heusen",
-    "slug": "boldfit-men-t-shirt-xl1",
-    "description": "Polyester-blend",
-    "basePrice": 699,
-    "maxPrice": 699,
-    "images": [
-      "https://m.media-amazon.com/images/I/61jHUtxcplL._AC_UL320_.jpg"
-    ],
-    "category": "TSHIRTS",
-    "brand": "BOLDFIT",
-    "theme": "TSHIRTS",
-    "tags": [
-      "tshirts"
-    ],
-    "isFeatured": false,
-    "isPublished": true,
-    "isOutOfStock": false,
-    "variants": [
+      },
       {
         "size": "XL",
         "color": "black",
@@ -202,19 +132,21 @@
         ]
       }
     ],
-    "createdAt": {"$date": "2025-06-22T12:21:02.294Z"},
+    "createdAt": {"$date": "2025-06-22T12:21:02.293Z"},
     "updatedAt": {"$date": "2025-06-22T12:21:02.294Z"}
   },
   {
     "_id": {"$oid": "685e37fd5a046910ec3df0a6"},
     "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
-    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-black",
+    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt",
     "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
-    "basePrice": 45,
+    "basePrice": 39,
     "maxPrice": 45,
     "images": [
       "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005061/products/t0htjl6wu5qhmd4cby5c.jpg",
-      "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005075/products/eqy5pu7s4kisskzxsqzd.jpg"
+      "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005075/products/eqy5pu7s4kisskzxsqzd.jpg",
+      "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+      "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
     ],
     "category": "TSHIRTS",
     "brand": "JOCKEY",
@@ -238,33 +170,7 @@
           "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005061/products/t0htjl6wu5qhmd4cby5c.jpg",
           "https://res.cloudinary.com/drx1qxkjk/image/upload/v1751005075/products/eqy5pu7s4kisskzxsqzd.jpg"
         ]
-      }
-    ],
-    "createdAt": {"$date": "2025-06-27T06:19:42.001Z"},
-    "updatedAt": {"$date": "2025-06-27T11:13:08.259Z"}
-  },
-  {
-    "_id": {"$oid": "685e7f3fef80df6a0ce30e63"},
-    "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
-    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-red",
-    "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\n\n\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
-    "basePrice": 39,
-    "maxPrice": 39,
-    "images": [
-      "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
-      "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
-    ],
-    "category": "TSHIRTS",
-    "brand": "JOCKEY",
-    "theme": "TSHIRTS",
-    "tags": [
-      "tshirts",
-      "jockey"
-    ],
-    "isFeatured": false,
-    "isPublished": true,
-    "isOutOfStock": false,
-    "variants": [
+      },
       {
         "size": "L",
         "color": "red",
@@ -275,9 +181,20 @@
           "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
           "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
         ]
+      },
+      {
+        "size": "M",
+        "color": "red",
+        "price": 39,
+        "availableQty": 75,
+        "sku": "JOC-M-RED",
+        "images": [
+          "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+          "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
+        ]
       }
     ],
-    "createdAt": {"$date": "2025-06-27T11:23:43.225Z"},
+    "createdAt": {"$date": "2025-06-27T06:19:42.001Z"},
     "updatedAt": {"$date": "2025-06-27T11:23:43.225Z"}
   },
   {
@@ -315,41 +232,6 @@
     ],
     "createdAt": {"$date": "2025-06-27T12:12:39.997Z"},
     "updatedAt": {"$date": "2025-06-27T12:12:39.997Z"}
-  },
-  {
-    "_id": {"$oid": "68623fd5acdbc9cfaed18f34"},
-    "title": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
-    "slug": "jockey-2726-mens-super-combed-cotton-rich-solid-regular-fit-v-neck-half-sleeve-t-shirt-red-m",
-    "description": "Jockey Men's Cotton T-Shirt\nThis Jockey T-shirt for Men is made of Cotton that provides superior comfort with good absorbent and breathable properties. Polyester provides greater strength to this Tshirt.\n\nFeatures\n\n\nFabric Details : ,80% Cotton, 20% Polyester\nPremium Combed Cotton rich fabric\nModern fit\nRibbed v-neck prevents sagging\nAuthentic Jockey logo label\nTo be worn as loungewear, leisurewear, sportswear and innerwear",
-    "basePrice": 39,
-    "maxPrice": 39,
-    "images": [
-      "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
-      "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
-    ],
-    "category": "TSHIRTS",
-    "brand": "JOCKEY",
-    "theme": "LIFESTYLE",
-    "tags": [
-      "tshirts",
-      "jockey"
-    ],
-    "isFeatured": false,
-    "isPublished": true,
-    "isOutOfStock": false,
-    "variants": [
-      {
-        "size": "M",
-        "color": "red",
-        "price": 39,
-        "availableQty": 75,
-        "sku": "JOC-M-RED",
-        "images": [
-          "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
-          "https://m.media-amazon.com/images/I/61nnmTYAweL._SX569_.jpg"
-        ]
-      }
-    ]
   },
   {
     "_id": {"$oid": "687e3f1a6e88613c720d8cb1"},

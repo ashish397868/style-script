@@ -57,7 +57,15 @@ const ProductCard = ({ product }) => {
           {product.category} {product.brand && `| ${product.brand}`}
         </h3>
         <h2 className="text-gray-900 title-font text-lg font-medium">{product.title?.length > 42 ? product.title.substring(0, 42) + "..." : product.title}</h2>
-        <p className="mt-1 font-semibold">₹{displayVariant.price}</p>
+        
+        <div className="mt-1">
+          {/* Original price (15% more) with strikethrough */}
+          <span className="text-gray-500 text-sm line-through mr-2">₹{Math.round(displayVariant.price * 1.15)}</span>
+
+          {/* Final discounted price */}
+          <span className="text-green-600 font-semibold">₹{displayVariant.price}</span>
+        </div>
+
         <p className="text-gray-600 text-xs mb-1">{product.description.substring(0, 100)}...</p>
 
         {/* Color swatches - only show available colors */}
@@ -91,7 +99,7 @@ const ProductCard = ({ product }) => {
           <span className="text-green-600 font-medium">
             In Stock ({totalAvailableQty} {availableVariants.length > 1 ? "total" : "available"})
           </span>
-          {availableVariants.length > 1 && <span className="text-gray-500 text-xs block">{availableVariants.length} variants available</span>}
+          {/* {availableVariants.length > 1 && <span className="text-gray-500 text-xs block">{availableVariants.length} variants available</span>} */}
         </div>
       </div>
     </div>

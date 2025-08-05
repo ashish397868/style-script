@@ -3,10 +3,18 @@ const Product = require("../models/Product");
 const {cache ,invalidateProductCache}=require("../utils/cache")
 let lastProductUpdatedAt = null;
 
-// GET All Products /products?category=...&brand=...&size=...&color=...&isFeatured=...
+// GET All Products /products?category=...&brand=...&size=...&color=...&isFeatured=...l;
 exports.getAllProducts = async (req, res) => {
   try {
-    const { category, brand, size, color, isFeatured } = req.query;
+    const {
+      category,
+      brand,
+      size,
+      color,
+      isFeatured,
+      page = 1,
+      limit = 12,
+    } = req.query;
 
     const filter = {
       isPublished: true,
@@ -17,42 +25,54 @@ exports.getAllProducts = async (req, res) => {
     if (brand) filter.brand = brand;
     if (isFeatured != null) filter.isFeatured = isFeatured === "true";
 
-    // Filter inside variants
     if (size || color) {
-      filter.variants = {
-        $elemMatch: {},
-      };
+      filter.variants = { $elemMatch: {} };
       if (size) filter.variants.$elemMatch.size = size.toUpperCase();
       if (color) filter.variants.$elemMatch.color = color.toLowerCase();
     }
 
-    // Updated cache key with namespace
-    const cacheKey = "product:" + JSON.stringify(filter);
+    // Parse pagination values
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
 
-    // Check cache first (if DB hasn't changed)
+    // Cache key includes pagination now
+    const cacheKey = "product:" + JSON.stringify({ filter, pageNum, limitNum });
+
     if (lastProductUpdatedAt && cache.has(cacheKey)) {
       console.log("✔ Using cached product data for:", cacheKey);
       return res.json(cache.get(cacheKey));
     }
 
-    //  Fetch from DB
-    const products = await Product.find(filter)
-      .sort({ updatedAt: -1 })
-      .lean();
+    // Parallel DB calls for data + count
+    const [products, totalCount] = await Promise.all([
+      Product.find(filter)  //first Promise 
+      .sort({ updatedAt: -1 })  // Latest updated product first
+      .skip(skip)   // e.g., skip 5 items for page 2
+      .limit(limitNum)  // e.g., get 5 items
+      .lean(),
+      Product.countDocuments(filter), // Second Promise Total matching items (all pages)
+    ]);
 
     if (products.length === 0) {
       return res.json([]);
     }
 
-    // Track last update time
+    const totalPages = Math.ceil(totalCount / limitNum);
     const latestUpdatedAt = new Date(products[0].updatedAt).getTime();
 
-    // ✅ Cache and update timestamp
-    cache.set(cacheKey, products);
+    const response = {
+      products,
+      totalPages,
+      currentPage: pageNum,
+      totalProducts: totalCount,
+    };
+
+    cache.set(cacheKey, response);
     lastProductUpdatedAt = latestUpdatedAt;
 
     console.log("📥 DB Fetched, product cache updated for:", cacheKey);
-    return res.json(products);
+    return res.json(response);
   } catch (error) {
     console.error("Get All Products Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

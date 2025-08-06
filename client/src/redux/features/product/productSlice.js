@@ -4,13 +4,15 @@ import { productAPI } from '../../../services/api';
 export const fetchProducts = createAsyncThunk(
   'fetchProducts',
   async (force = false, { getState, rejectWithValue }) => {
-    const { products } = getState().product;
-    if (!force && products && products.length > 0) {
-      return products;
-    }
+    const { filters } = getState().product;
     try {
-      const response = await productAPI.getAllProducts(getState().product.filters);
-      return Array.isArray(response.data) ? response.data : response.data.products || [];
+      const response = await productAPI.getAllProducts(filters);
+      return {
+        products: response.data.products || [],
+        totalPages: response.data.totalPages || 1,
+        currentPage: response.data.currentPage || 1,
+        totalProducts: response.data.totalProducts || 0
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
     }
@@ -55,6 +57,8 @@ const initialState = {
     limit: 12,
   },
   totalPages: 1,
+  currentPage: 1,
+  totalProducts: 0,
 };
 
 const productSlice = createSlice({
@@ -81,8 +85,10 @@ const productSlice = createSlice({
         state.loading = true;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.products = action.payload;
-        state.totalPages = 1;
+        state.products = action.payload.products;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
+        state.totalProducts = action.payload.totalProducts;
         state.loading = false;
       })
       .addCase(fetchProducts.rejected, (state, action) => {

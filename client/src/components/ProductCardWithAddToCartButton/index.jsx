@@ -3,17 +3,33 @@ import { FaStar, FaShoppingCart } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 const ProductCard = ({ 
-  product, 
-  categories,
+  product,
+  selectedSize,
+  selectedColor,
   onAddToCart,
   onNavigate
 }) => {
   const navigate = useNavigate();
-  const image = product.image || (Array.isArray(product.images) ? product.images[0] : null);
-  const name = product.name || product.title || "Product";
-  const description = product.description || "";
-  const categoryLabel = categories.find((c) => c.id === (product.category?.toLowerCase() || product.category))?.name || product.category || "Fashion";
+  
+  // Get the main product image or first variant image
+  const image = product.images?.[0] || 
+    (product.variants?.[0]?.images?.[0]);
+  
+  const title = product.title;
+  const description = product.description;
+  const category = product.category;
   const slug = product.slug;
+
+  // Get the price based on selected variant or base price
+  const price = React.useMemo(() => {
+    if (selectedSize && selectedColor) {
+      const variant = product.variants.find(
+        v => v.size === selectedSize && v.color === selectedColor
+      );
+      return variant?.price;
+    }
+    return product.basePrice;
+  }, [product, selectedSize, selectedColor]);
 
   const handleCardClick = () => {
     if (slug) {
@@ -42,10 +58,17 @@ const ProductCard = ({
     >
       <div className="relative">
         {image ? (
-          <img src={image} alt={name} className="w-full h-64 object-contain md:h-72 lg:h-80 rounded-t-xl transition-transform duration-300 hover:scale-105" />
+          <img src={image} alt={title} className="w-full h-64 object-contain md:h-72 lg:h-80 rounded-t-xl transition-transform duration-300 hover:scale-105" />
         ) : (
           <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-64 flex items-center justify-center">
             <span className="text-gray-500">No Image</span>
+          </div>
+        )}
+        
+        {/* Show out of stock overlay if all variants are out of stock */}
+        {product.isOutOfStock && (
+          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-t-xl">
+            <span className="text-white font-semibold text-lg">Out of Stock</span>
           </div>
         )}
 

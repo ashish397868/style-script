@@ -66,7 +66,7 @@ const AdminDashboard = () => {
         setStats({
           totalSales,
           totalOrders: orders.length,
-          totalProducts: productsRes.data.length,
+          totalProducts: productsRes.data.totalProducts,
           totalUsers: usersRes.data.length,
           deliveredOrders: orders.filter(
             (order) => order.deliveryStatus === 'delivered'

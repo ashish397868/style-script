@@ -3,10 +3,16 @@ import { productAPI } from '../../../services/api';
 
 export const fetchProducts = createAsyncThunk(
   'fetchProducts',
-  async (force = false, { getState, rejectWithValue }) => {
+  async (params = {}, { getState, rejectWithValue }) => {
     const { filters } = getState().product;
     try {
-      const response = await productAPI.getAllProducts(filters);
+      const queryParams = {
+        ...filters,
+        ...params,
+        page: params.page || 1,
+        limit: params.limit || 12,
+      };
+      const response = await productAPI.getAllProducts(queryParams);
       return {
         products: response.data.products || [],
         totalPages: response.data.totalPages || 1,

@@ -12,23 +12,36 @@ const AdminProductList = () => {
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchProducts(true));
-    // eslint-disable-next-line
-  }, []);
+    dispatch(fetchProducts({ 
+      page,
+      limit,
+      includeUnpublished: true, // For admin view, we want to see all products
+      includeOutOfStock: true
+    }));
+  }, [dispatch, page, limit]);
 
   // Delete handler
   const handleDelete = async (productId) => {
     if (!productId) return;
     try {
-      // Optionally show a loading state here
       await api.delete(`/products/${productId}`);
-      dispatch(fetchProducts(true)); // Force refresh
+      // Refresh the current page
+      dispatch(fetchProducts({ 
+        page,
+        limit,
+        includeUnpublished: true,
+        includeOutOfStock: true
+      }));
       setDeleteConfirm(null);
     } catch (err) {
-      alert('Failed to delete product.',err);
+      const errorMessage = err.response?.data?.message || 'Failed to delete product';
+      alert(errorMessage);
+      console.error('Delete product error:', err);
     }
   };
 
@@ -226,29 +239,16 @@ const AdminProductList = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">₹{product.price.toFixed(2)}</div>
+                      <div className="text-sm font-medium text-gray-900">₹{product.basePrice.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
-                           style={{
-                             backgroundColor: product.availableQty > 10 
-                               ? '#f0fdf4' 
-                               : product.availableQty > 0 
-                                 ? '#fffbeb' 
-                                 : '#fef2f2',
-                             color: product.availableQty > 10 
-                               ? '#166534' 
-                               : product.availableQty > 0 
-                                 ? '#854d0e' 
-                                 : '#b91c1c'
-                           }}
                       >
-                        {product.availableQty > 0 ? (
+                        {product.isOutOfStock === false ? (
                           <>
-                            <span className={`h-2 w-2 rounded-full mr-2 ${
-                              product.availableQty > 10 ? 'bg-green-500' : 'bg-yellow-500'
+                            <span className={`h-2 w-2 rounded-full mr-2
                             }`}></span>
-                            {product.availableQty} in stock
+                           In stock
                           </>
                         ) : (
                           <>
@@ -296,6 +296,29 @@ const AdminProductList = () => {
           </table>
         </div>
 
+        {/* Pagination */}
+        <div className="px-4 py-3 flex items-center justify-between border-t border-gray-200">
+          <div className="flex-1 flex justify-between items-center">
+            <button
+              onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+              disabled={page === 1 || loading}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="text-sm text-gray-700">
+              Page {page}
+            </span>
+            <button
+              onClick={() => setPage(prev => prev + 1)}
+              disabled={products.length < limit || loading}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
         {/* Mobile Product Cards */}
         <div className="md:hidden">
           {filteredProducts.length === 0 ? (
@@ -341,7 +364,7 @@ const AdminProductList = () => {
                     <div className="ml-4 flex-grow">
                       <div className="font-medium text-gray-900">{product.title}</div>
                       <div className="text-sm text-gray-500">{product.brand || 'No brand'}</div>
-                      <div className="text-sm font-medium text-gray-900 mt-1">₹{product.price.toFixed(2)}</div>
+                      <div className="text-sm font-medium text-gray-900 mt-1">₹{product.basePrice.toFixed(2)}</div>
                       
                       <div className="flex items-center justify-between mt-2">
                         <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"

@@ -175,6 +175,10 @@ export default function ProductDetailPage() {
     navigate("/checkout");
   };
 
+  const selectedVariant = currentProduct && variants.length > 0
+    ? variants.find((v) => v.size === size && v.color === color)
+    : null;
+
   if (productLoading) {
     return <Loader />;
   }
@@ -187,14 +191,20 @@ export default function ProductDetailPage() {
     return <div className="text-center text-red-500 text-lg mt-10">Product not found.</div>;
   }
 
-  return (
+   return (
     <section className="text-gray-800 body-font overflow-hidden">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="container px-5 py-10 mx-auto">
         <ProductBreadcrumb product={currentProduct} />
         
         <div className="lg:w-4/5 mx-auto flex flex-wrap">
-          <ProductGallery product={currentProduct} />
+          <ProductGallery 
+            product={
+              selectedVariant && selectedVariant.images 
+                ? { ...currentProduct, images: selectedVariant.images }
+                : currentProduct.variants[0]
+            } 
+          />
           
           <div className="lg:w-1/2 w-full lg:pl-10 mt-6 lg:mt-0">
             <ProductDetails 

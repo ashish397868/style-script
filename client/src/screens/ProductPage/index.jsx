@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import Loader from "../../components/Loader";
-import {  reviewAPI } from "../../services/api";
+import { reviewAPI } from "../../services/api";
 import { useDispatch, useSelector } from "react-redux";
 import useCart from "../../redux/features/cart/useCartHook";
-import { fetchProducts } from "../../redux/features/product/productSlice";
+import { fetchProductBySlug } from "../../redux/features/product/productSlice";
 import ProductGallery from "../../components/ProductPage/ProductGallery";
 import ProductDetails from "../../components/ProductPage/ProductDetails";
-import ColorAndSizeSelector from    "../../components/ProductPage/ColorAndSizeSelector";
+import ColorAndSizeSelector from "../../components/ProductPage/ColorAndSizeSelector";
 import ProductTabs from "../../components/ProductPage/ProductTabs";
 import "react-toastify/dist/ReactToastify.css";
 import ProductBreadcrumb from "../../components/ProductPage/BreadCrumb";
@@ -18,51 +18,41 @@ export default function ProductDetailPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const products = useSelector((state) => state.product.products);
-  const productsLoading = useSelector((state) => state.product.loading);
+  
+  // Get current product and loading state from Redux
+  const currentProduct = useSelector((state) => state.product.currentProduct);
+  const productLoading = useSelector((state) => state.product.loading);
+  const productError = useSelector((state) => state.product.error);
   const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
 
-  const [product, setProduct] = useState(null);
   const [variants, setVariants] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [reviews, setReviews] = useState([]);
   const { addItem } = useCart();
 
-  // Fetch product + variants
+  // Fetch product by slug
   useEffect(() => {
-    if (!products || products.length === 0) {
-      dispatch(fetchProducts());
+    if (slug) {
+      dispatch(fetchProductBySlug(slug));
     }
-  }, [dispatch, products]);
+  }, [dispatch, slug]);
 
+  // Update variants and initial color/size when product loads
   useEffect(() => {
-    let foundProduct = null;
-    if (products && products.length > 0) {
-      foundProduct = products.find((p) => p.slug === slug);
-    }
-    if (foundProduct) {
-      setProduct(foundProduct);
-      setColor(foundProduct.color || "");
-      setSize(foundProduct.size || "");
-      setError(null);
-      setIsLoading(false);
+    if (currentProduct) {
+      setColor(currentProduct.color || "");
+      setSize(currentProduct.size || "");
       
-      if (Array.isArray(foundProduct.variants) && foundProduct.variants.length > 0) {
-        setVariants(foundProduct.variants);
+      // Set variants - either from product.variants or find products with same title
+      if (Array.isArray(currentProduct.variants) && currentProduct.variants.length > 0) {
+        setVariants(currentProduct.variants);
       } else {
-        setVariants(products.filter((v) => v.title === foundProduct.title));
+        // If no variants array, treat current product as the only variant
+        setVariants([currentProduct]);
       }
-    } else if (products && products.length > 0) {
-      setError("Product not found.");
-      setProduct(null);
-      setIsLoading(false);
-    } else {
-      setIsLoading(true);
     }
-  }, [slug, products]);
+  }, [currentProduct]);
 
   // Update product when color changes
   const handleColorChange = (newColor) => {
@@ -71,37 +61,36 @@ export default function ProductDetailPage() {
     // Find variant with the selected color
     if (variants && variants.length > 0) {
       const colorVariant = variants.find(
-        (v) => v.color === newColor && v.title === product.title
+        (v) => v.color === newColor && v.title === currentProduct.title
       );
       
       if (colorVariant) {
-        // Update product data with the selected color variant
-        setProduct({
-          ...colorVariant,
-          variants: variants // Keep the variants array
-        });
+        // You might want to update Redux state or just handle this locally
+        // For now, we'll keep the current product but update local color state
+        console.log("Color variant found:", colorVariant);
       }
     }
   };
 
   // When color changes, set size to valid size
   useEffect(() => {
-    if (!color || !variants.length) return;
+    if (!color || !variants.length || !currentProduct) return;
+    
     const validSizes = variants
-      .filter((v) => v.color === color && v.title === product?.title && v.availableQty > 0)
+      .filter((v) => v.color === color && v.title === currentProduct.title && v.availableQty > 0)
       .map((v) => v.size);
       
     if (validSizes.length && !validSizes.includes(size)) {
       setSize(validSizes[0]);
     }
-  }, [color, variants, product?.title]);
+  }, [color, variants, currentProduct?.title]);
 
   // Fetch reviews
   useEffect(() => {
     async function fetchReviews() {
       try {
-        if (product && product._id) {
-          const { data: reviews } = await reviewAPI.getProductReviews(product._id);
+        if (currentProduct && currentProduct._id) {
+          const { data: reviews } = await reviewAPI.getProductReviews(currentProduct._id);
           setReviews(reviews);
         }
       } catch (error) {
@@ -109,35 +98,39 @@ export default function ProductDetailPage() {
       }
     }
 
-    if (product) {
+    if (currentProduct) {
       fetchReviews();
     }
-  }, [product]);
+  }, [currentProduct]);
 
   const handleAddToCart = () => {
-    if (!product || !size || !color) {
+    if (!currentProduct || !size || !color) {
       toast.error("Please select size and color.");
       return;
     }
-    const key = `${product._id}-${size}-${color}`;
+    
+    const key = `${currentProduct._id}-${size}-${color}`;
+    
     // Find the selected variant
-    const selectedVariant = (product.variants || []).find(
+    const selectedVariant = variants.find(
       (v) => v.size === size && v.color === color
     );
+    
     if (!selectedVariant) {
       toast.error("Selected variant not found.");
       return;
     }
+    
     addItem(
       key,
       1,
       {
         price: selectedVariant.price,
-        name: product.title,
+        name: currentProduct.title,
         size,
         color,
-        image: selectedVariant.images?.[0] || product.images?.[0],
-        productId: product._id,
+        image: selectedVariant.images?.[0] || currentProduct.images?.[0],
+        productId: currentProduct._id,
       },
     );
     toast.success("Added to cart!");
@@ -149,60 +142,70 @@ export default function ProductDetailPage() {
       navigate("/login", { state: { from: location.pathname } });
       return;
     }
-    if (!product || !size || !color) {
+    
+    if (!currentProduct || !size || !color) {
       toast.error("Please select size and color.");
       return;
     }
-    const key = `${product._id}-${size}-${color}`;
+    
+    const key = `${currentProduct._id}-${size}-${color}`;
+    
     // Find the selected variant
-    const selectedVariant = (product.variants || []).find(
+    const selectedVariant = variants.find(
       (v) => v.size === size && v.color === color
     );
+    
     if (!selectedVariant) {
       toast.error("Selected variant not found.");
       return;
     }
+    
     addItem(
       key,
       1,
       {
         price: selectedVariant.price,
-        name: product.title,
+        name: currentProduct.title,
         size,
         color,
-        image: selectedVariant.images?.[0] || product.images?.[0],
-        productId: product._id,
+        image: selectedVariant.images?.[0] || currentProduct.images?.[0],
+        productId: currentProduct._id,
       },
     );
     navigate("/checkout");
   };
 
-  if (isLoading || productsLoading) {
+  if (productLoading) {
     return <Loader />;
   }
 
-  if (error) return <div className="text-center text-red-500 text-lg mt-10">{error}</div>;
-  if (!product) return null;
+  if (productError) {
+    return <div className="text-center text-red-500 text-lg mt-10">{productError}</div>;
+  }
+
+  if (!currentProduct) {
+    return <div className="text-center text-red-500 text-lg mt-10">Product not found.</div>;
+  }
 
   return (
     <section className="text-gray-800 body-font overflow-hidden">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="container px-5 py-10 mx-auto">
-        <ProductBreadcrumb product={product} />
+        <ProductBreadcrumb product={currentProduct} />
         
         <div className="lg:w-4/5 mx-auto flex flex-wrap">
-          <ProductGallery product={product} />
+          <ProductGallery product={currentProduct} />
           
           <div className="lg:w-1/2 w-full lg:pl-10 mt-6 lg:mt-0">
             <ProductDetails 
-              product={product} 
+              product={currentProduct} 
               reviews={reviews}
               color={color}
               size={size}
             />
             
             <ColorAndSizeSelector 
-              product={product}
+              product={currentProduct}
               variants={variants}
               color={color}
               size={size}
@@ -211,7 +214,7 @@ export default function ProductDetailPage() {
             />
             
             <ProductActions 
-              product={product}
+              product={currentProduct}
               color={color}
               size={size}
               variants={variants}
@@ -222,7 +225,7 @@ export default function ProductDetailPage() {
         </div>
 
         <ProductTabs 
-          product={product} 
+          product={currentProduct} 
           reviews={reviews}
           setReviews={setReviews}
         />

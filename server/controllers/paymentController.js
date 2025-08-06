@@ -3,6 +3,7 @@ const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const { v4: uuidv4 } = require("uuid");
 const Order = require("../models/Order");
+const Product = require("../models/Product");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -43,27 +44,25 @@ exports.createPaymentOrder = async (req, res) => {
   }
 };
 
+// Verify Payment
 exports.verifyPayment = async (req, res) => {
   try {
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      receipt, // your internal orderId
+      receipt,
     } = req.body;
 
-    // 1️⃣ Basic validation
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !receipt) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // 2️⃣ Fetch your order by internal orderId (receipt)
     const order = await Order.findOne({ orderId: receipt });
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // 3️⃣ Verify Razorpay Signature
     const expectedSignature = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -73,11 +72,10 @@ exports.verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Invalid payment signature" });
     }
 
-    // 4️⃣ Fetch payment from Razorpay (double-check)
     const payment = await razorpay.payments.fetch(razorpay_payment_id);
-    const paidAmount = payment.amount / 100; // convert paise → ₹
+    const paidAmount = payment.amount / 100;
 
-    // 5️⃣ Update order with confirmed amount & status
+    // ✅ 1. Update Order Info
     order.status = "Paid";
     order.amount = paidAmount;
     order.paymentInfo = {
@@ -88,7 +86,34 @@ exports.verifyPayment = async (req, res) => {
 
     await order.save();
 
-    return res.json({ success: true, message: "Payment verified successfully", order });
+    // ✅ 2. Decrement stock for each product variant
+    for (let item of order.products) {
+      const { productId, variantId, qty } = item;
+
+      const product = await Product.findOne({
+        _id: productId,
+        "variants._id": variantId,
+      });
+
+      if (!product) continue; // product not found (edge case)
+
+      const variant = product.variants.id(variantId);
+      if (!variant) continue; // variant not found (edge case)
+
+      if (variant.availableQty >= qty) {
+        variant.availableQty -= qty;
+      } else {
+        console.warn(`⚠️ Not enough stock for variant ${variantId}`);
+      }
+
+      await product.save(); // save after update
+    }
+
+    return res.json({
+      success: true,
+      message: "Payment verified & stock updated",
+      order,
+    });
   } catch (err) {
     console.error("verifyPayment error:", err);
     return res.status(500).json({ message: "Payment verification failed", error: err.message });

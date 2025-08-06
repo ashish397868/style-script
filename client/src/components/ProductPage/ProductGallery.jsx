@@ -1,7 +1,7 @@
 // src/pages/components/ProductGallery.jsx
 import { useState } from "react";
 
-export default function ProductGallery({ product }) {
+export default function ProductGallery({ images }) {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   return (
@@ -10,8 +10,8 @@ export default function ProductGallery({ product }) {
         <div className="mb-4 rounded-lg overflow-hidden shadow-md bg-white p-4 flex items-center justify-center" 
           style={{ minHeight: 400, minWidth: 400, maxHeight: 400, maxWidth: 400 }}>
           <img 
-            src={product.images?.[selectedImageIndex] || "/placeholder-image.jpg"} 
-            alt={product.title} 
+            src={images?.[selectedImageIndex] || "/placeholder-image.jpg"} 
+            alt="product-image"
             className="w-full h-full object-contain" 
             style={{ maxWidth: 400, maxHeight: 400, minWidth: 400, minHeight: 400, background: "#fff" }} 
           />
@@ -19,7 +19,7 @@ export default function ProductGallery({ product }) {
 
         {/* Thumbnail Gallery */}
         <div className="flex space-x-3 overflow-x-auto py-2 px-1">
-          {product.images?.map((img, index) => (
+          {images?.map((img, index) => (
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}

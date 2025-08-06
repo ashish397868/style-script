@@ -9,7 +9,7 @@ import useUser from "../../redux/features/user/useUserHook";
 
 export default function ReviewOrder() {
   const cartHook = useCartHook();
-  const { addItem, removeItem, clearCart, cart ,subTotal } = cartHook;
+  const { addItem, removeItem, clearItems, cart ,subTotal } = cartHook;
 
   const selectedAddress = useSelector((state) => state.checkout.selectedAddress);
   const { user, isAuthenticated, initializeAuth } = useUser();
@@ -102,19 +102,30 @@ const handleBuy = async () => {
     
     receiptId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
+    console.log("Cart at the time of checkout:", cart);
+
     // build products array from cart
     const productsArr = Object.values(cart).map((item) => ({
-      productId: item._id,
+      _id: item.productId,             // Use _id as expected by the server
+      productId: item.productId,       // Also include productId for compatibility
+      size: item.size.toUpperCase().trim(),  // Server expects uppercase size
+      color: item.color.toLowerCase().trim(), // Server expects lowercase color
+      quantity: Number(item.qty),
       name: item.name,
-      price: item.price,
-      quantity: item.qty,
-      size: item.size,
-      color: item.color,
-      image: item.image,
+      price: Number(item.price),
+      image: item.image || ''
     }));
     if (!productsArr.length) {
       throw new Error("No products in cart");
     }
+    
+    // Validate each product has required fields
+    productsArr.forEach(item => {
+      console.log(item);
+      if (!item._id || !item.size || !item.color || item.quantity <= 0) {
+        throw new Error("Missing required product details");
+      }
+    });
 
     // ensure phone exists
     const phone = selectedAddress.phone || user?.phone;
@@ -142,6 +153,8 @@ const handleBuy = async () => {
       amount: orderTotal,
     });
 
+    console.log("Order created:", orderRes.data);
+
     // 2b️⃣ – ask your backend to create the Razorpay order (receipt: receiptId)
     paymentOrderRes = await paymentAPI.createPaymentIntent({
       amount: orderTotal,
@@ -149,8 +162,8 @@ const handleBuy = async () => {
       receipt: receiptId,
     });
 
-    console.log("Order created:", orderRes.data);
-    console.log("Razorpay Order:", paymentOrderRes.data.order);
+
+    console.log("Razorpay Order:", paymentOrderRes.data.razorpayOrder);
   } catch (err) {
     console.error(err);
     alert(err.message || "Failed to create order. Please try again.");
@@ -159,7 +172,7 @@ const handleBuy = async () => {
   }
 
   // 3️⃣ Build Razorpay checkout options
-  const { order: rzOrder } = paymentOrderRes.data;
+  const { razorpayOrder: rzOrder } = paymentOrderRes.data;
   const options = {
     key: import.meta.env.VITE_RAZORPAY_KEY_ID,
     amount: rzOrder.amount,
@@ -182,7 +195,7 @@ const handleBuy = async () => {
           receipt: receiptId, // always use the original receiptId
           email: user.email,
         });
-        clearCart();
+        clearItems();
         navigate(`/success/${orderRes.data.order._id}`);
       } catch (verifyErr) {
         console.error(verifyErr);
@@ -360,7 +373,7 @@ const handleBuy = async () => {
             <button
               onClick={handleBuy}
               disabled={Object.keys(cart).length === 0 || isPaying}
-              className={`w-full mt-8 py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
+              className={`cursor-pointer w-full mt-8 py-3 rounded-xl font-bold text-lg flex items-center justify-center ${
                 Object.keys(cart).length === 0 || isPaying ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-pink-600 to-purple-600 text-white hover:from-pink-700 hover:to-purple-700 shadow-lg"
               }`}
             >

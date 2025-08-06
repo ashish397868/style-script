@@ -19,7 +19,7 @@ exports.createPaymentOrder = async (req, res) => {
     }
 
     // Generate unique internal orderId (receipt)
-    const receipt = "order_" + uuidv4();
+    const receipt = uuidv4().slice(0, 20); // max 40 chars, 20 is enough
 
     // Create Razorpay Order
     const razorOrder = await razorpay.orders.create({

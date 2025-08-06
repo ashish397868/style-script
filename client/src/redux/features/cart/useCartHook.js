@@ -3,7 +3,8 @@ import { useCallback } from "react";
 import {
   addToCart,
   removeFromCart,
-  clearCart
+  clearCart,
+  updateCartItemQty
 } from "./cartSlice";
 
 const useCart = () => {
@@ -14,11 +15,27 @@ const useCart = () => {
 
   // wrap all dispatches with useCallback
   const addItem = useCallback((key, qty, itemDetails) => {
+    if (!key || !qty || !itemDetails) {
+      console.error("Missing required parameters for adding item to cart");
+      return;
+    }
     dispatch(addToCart({ key, qty, itemDetails }));
   }, [dispatch]);
 
-  const removeItem = useCallback((key, qty) => {
+  const removeItem = useCallback((key, qty = 1) => {
+    if (!key) {
+      console.error("Missing key for removing item from cart");
+      return;
+    }
     dispatch(removeFromCart({ key, qty }));
+  }, [dispatch]);
+
+  const updateItemQty = useCallback((key, qty) => {
+    if (!key || qty < 1) {
+      console.error("Invalid parameters for updating cart item quantity");
+      return;
+    }
+    dispatch(updateCartItemQty({ key, qty }));
   }, [dispatch]);
 
   const clearItems = useCallback(() => {

@@ -1,234 +1,198 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import Loader from "../../components/Loader";
-import { reviewAPI } from "../../services/api";
-import { useDispatch, useSelector } from "react-redux";
-import useCart from "../../redux/features/cart/useCartHook";
-import { fetchProducts, fetchProductBySlug } from "../../redux/features/product/productSlice";
-import ProductGallery from "../../components/ProductPage/ProductGallery";
-import ProductDetails from "../../components/ProductPage/ProductDetails";
-import ColorAndSizeSelector from "../../components/ProductPage/ColorAndSizeSelector";
-import ProductTabs from "../../components/ProductPage/ProductTabs";
-import "react-toastify/dist/ReactToastify.css";
-import ProductBreadcrumb from "../../components/ProductPage/BreadCrumb";
-import ProductActions from "../../components/ProductPage/ProductActions";
+import { useEffect } from "react";
 
-export default function ProductDetailPage() {
-  const { slug } = useParams();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const products = useSelector((state) => state.product.products);
-  const productsLoading = useSelector((state) => state.product.loading);
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
-  const currentProduct = useSelector((state) => state.product.currentProduct);
+export default function ColorAndSizeSelector({ 
+  product, 
+  variants, 
+  color, 
+  size, 
+  setColor, 
+  setSize 
+}) {
+  // Define standard sizes
+  const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  
+  // Get all available variants (including current product)
+  const allVariants = [...variants];
+  if (product && !allVariants.find(v => v._id === product._id)) {
+    allVariants.push(product);
+  }
 
-  const [product, setProduct] = useState(null);
-  const [variants, setVariants] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [color, setColor] = useState("");
-  const [size, setSize] = useState("");
-  const [reviews, setReviews] = useState([]);
-  const { addItem } = useCart();
+  // For colors: Only show colors that actually exist in variants
+  const colorOptions = Array.from(
+    new Set(allVariants.map(v => v.color).filter(Boolean)
+  ))
 
-  // Fetch product + variants
-  useEffect(() => {
-    if (!products || products.length === 0) {
-      dispatch(fetchProducts());
-    }
-  }, [dispatch, products]);
+  // For sizes: Show all standard sizes
+  const sizeOptions = STANDARD_SIZES;
 
-  useEffect(() => {
-    dispatch(fetchProductBySlug(slug));
-  }, [dispatch, slug]);
-
-  useEffect(() => {
-    if (currentProduct) {
-      setProduct(currentProduct);
-      
-      // Set initial color and size to first available variant only
-      const availableVariants = currentProduct.variants?.filter(v => v.availableQty > 0) || [];
-      if (availableVariants.length > 0) {
-        setColor(availableVariants[0].color || "");
-        setSize(availableVariants[0].size || "");
-      }
-      
-      setVariants(currentProduct.variants || []);
-      setIsLoading(false);
-    }
-  }, [currentProduct]);
-
-  const selectedVariant = variants.find(
-    (v) => v.color === color && v.size === size
-  );
-
-  // Get available colors only
-  const availableColors = [...new Set(
-    variants
-      .filter(v => v.availableQty > 0)
-      .map(v => v.color)
-  )];
-
-  // Get available sizes for current color only
-  const availableSizes = variants
-    .filter(v => v.color === color && v.availableQty > 0)
-    .map(v => v.size);
-
-  // Update product when color changes
-  const handleColorChange = (newColor) => {
-    // Only allow changing to available colors
-    const isColorAvailable = availableColors.includes(newColor);
-    if (!isColorAvailable) {
-      toast.error("This color is not available");
-      return;
-    }
-
-    setColor(newColor);
-
-    // Find variant with the selected color
-    if (variants && variants.length > 0) {
-      const colorVariant = variants.find((v) => v.color === newColor && v.availableQty > 0);
-
-      if (colorVariant) {
-        // Update product data with the selected color variant
-        setProduct({
-          ...product,
-          ...colorVariant,
-          variants: variants, // Keep the variants array
-          images: colorVariant.images || product.images, // Use variant images if available
-        });
-      }
-    }
+  // Function to check if a color-size combination is available
+  const isVariantAvailable = (selectedColor, selectedSize) => {
+    const variant = allVariants.find(v => 
+      v.color === selectedColor && 
+      v.size === selectedSize && 
+      v.availableQty > 0
+    );
+    return !!variant;
   };
 
-  // Handle size change with availability check
-  const handleSizeChange = (newSize) => {
-    const isSizeAvailable = availableSizes.includes(newSize);
-    if (!isSizeAvailable) {
-      toast.error("This size is not available for selected color");
-      return;
-    }
-    setSize(newSize);
+  // Function to get variant for a specific color-size combination
+  const getVariant = (selectedColor, selectedSize) => {
+    return allVariants.find(v => 
+      v.color === selectedColor && 
+      v.size === selectedSize
+    );
   };
 
-  // When color changes, set size to valid available size
+  // When color changes, set size to a valid size for that color
   useEffect(() => {
     if (!color || !variants.length) return;
-    const validSizes = variants.filter((v) => v.color === color && v.availableQty > 0).map((v) => v.size);
-
+    const validSizes = variants
+      .filter((v) => v.color === color && v.title === product?.title && v.availableQty > 0)
+      .map((v) => v.size);
+      
     if (validSizes.length && !validSizes.includes(size)) {
       setSize(validSizes[0]);
     }
-  }, [color, variants, size]);
-
-  // Fetch reviews
-  useEffect(() => {
-    async function fetchReviews() {
-      try {
-        if (product && product._id) {
-          const { data: reviews } = await reviewAPI.getProductReviews(product._id);
-          setReviews(reviews);
-        }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-      }
-    }
-
-    if (product) {
-      fetchReviews();
-    }
-  }, [product]);
-
-  const handleAddToCart = () => {
-    if (!product || !size || !color) {
-      toast.error("Please select size and color.");
-      return;
-    }
-
-    // Additional check for variant availability
-    if (!selectedVariant || selectedVariant.availableQty <= 0) {
-      toast.error("Selected variant is not available");
-      return;
-    }
-
-    const key = `${product._id}-${size}-${color}`;
-    addItem(key, 1, {
-      price: product.price,
-      name: product.title,
-      size,
-      color,
-      image: product.images?.[0],
-      productId: product._id,
-    });
-    toast.success("Added to cart!");
-  };
-
-  const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      // Save the current path to navigate back after login
-      navigate("/login", { state: { from: location.pathname } });
-      return;
-    }
-    if (!product || !size || !color) {
-      toast.error("Please select size and color.");
-      return;
-    }
-
-    // Additional check for variant availability
-    if (!selectedVariant || selectedVariant.availableQty <= 0) {
-      toast.error("Selected variant is not available");
-      return;
-    }
-
-    const key = `${product._id}-${size}-${color}`;
-    addItem(key, 1, {
-      price: product.price,
-      name: product.title,
-      size,
-      color,
-      image: product.images?.[0],
-      productId: product._id,
-    });
-    navigate("/checkout");
-  };
-
-  if (isLoading || productsLoading) {
-    return <Loader />;
-  }
-
-  if (error) return <div className="text-center text-red-500 text-lg mt-10">{error}</div>;
-  if (!product) return null;
+  }, [color, variants, product?.title]);
 
   return (
-    <section className="text-gray-800 body-font overflow-hidden">
-      <ToastContainer position="top-right" autoClose={3000} />
-      <div className="container px-5 py-10 mx-auto">
-        <ProductBreadcrumb product={product} />
-
-        <div className="lg:w-4/5 mx-auto flex flex-wrap">
-         <ProductGallery images={selectedVariant?.images || []} />
-
-          <div className="lg:w-1/2 w-full lg:pl-10 mt-6 lg:mt-0">
-            <ProductDetails product={product} reviews={reviews} color={color} size={size} />
-
-            <ColorAndSizeSelector 
-              product={product} 
-              variants={variants} 
-              color={color} 
-              size={size} 
-              setColor={handleColorChange} 
-              setSize={handleSizeChange}
-              availableColors={availableColors}
-              availableSizes={availableSizes}
+    <div className="py-6 border-b border-gray-200 mb-6">
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-3">Color</h3>
+        <div className="flex flex-wrap gap-2">
+          {colorOptions.map((c) => (
+            <ColorButton
+              key={c} 
+              color={c} 
+              isActive={color === c} 
+              onClick={() => setColor(c)}
             />
-
-            <ProductActions product={product} color={color} size={size} variants={variants} onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} />
-          </div>
+          ))}
         </div>
-
-        <ProductTabs product={product} reviews={reviews} setReviews={setReviews} />
       </div>
-    </section>
+
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-3">Size</h3>
+        <div className="flex flex-wrap gap-2">
+          <SizeSelect 
+            sizes={sizeOptions} 
+            value={size} 
+            onChange={(e) => setSize(e.target.value)}
+            selectedColor={color}
+            isVariantAvailable={isVariantAvailable}
+            getVariant={getVariant}
+            allVariants={allVariants}
+          />
+        </div>
+      </div>
+
+      <AvailabilityMessage 
+        color={color} 
+        size={size} 
+        isVariantAvailable={isVariantAvailable}
+        getVariant={getVariant}
+      />
+    </div>
   );
+}
+
+// Sub-components for ColorAndSizeSelector
+function ColorButton({ 
+  color: buttonColor, 
+  isActive, 
+  onClick
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`
+        px-4 py-2 rounded-md border-2 text-sm font-medium transition-all
+        ${isActive 
+          ? 'border-pink-500 bg-pink-50 text-pink-700' 
+          : 'border-gray-300 hover:border-pink-300 text-gray-700'}
+      `}
+    >
+      {buttonColor}
+    </button>
+  );
+}
+
+function SizeSelect({ 
+  sizes, 
+  value, 
+  onChange, 
+  selectedColor,
+  isVariantAvailable,
+  getVariant,
+  allVariants
+}) {
+  return (
+    <select 
+      value={value} 
+      onChange={onChange}
+      className="border border-gray-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-pink-500"
+    >
+      <option value="">Select Size</option>
+      {sizes.map(s => {
+        const available = selectedColor 
+          ? isVariantAvailable(selectedColor, s) 
+          : allVariants.some(v => v.size === s);
+          
+        const exists = selectedColor 
+          ? getVariant(selectedColor, s) 
+          : allVariants.some(v => v.size === s);
+        
+        let label = s;
+        if (selectedColor && exists && !available) {
+          label += ' - Out of Stock';
+        } else if (selectedColor && !exists) {
+          label += ' - Currently Unavailable';
+        }
+        
+        return (
+          <option 
+            key={s} 
+            value={s}
+            disabled={selectedColor && !exists}
+          >
+            {label}
+          </option>
+        );
+      })}
+    </select>
+  );
+}
+
+function AvailabilityMessage({ 
+  color, 
+  size, 
+  isVariantAvailable,
+  getVariant
+}) {
+  if (!color || !size) return null;
+  
+  const available = isVariantAvailable(color, size);
+  const exists = getVariant(color, size);
+  
+  if (available) {
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-4">
+        <p className="text-green-800 text-sm font-medium">✓ In Stock - Ready to ship</p>
+      </div>
+    );
+  } else if (exists) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-3 mt-4">
+        <p className="text-red-800 text-sm font-medium">Currently out of stock</p>
+        <p className="text-red-600 text-xs mt-1">We don't know when or if this item will be back in stock</p>
+      </div>
+    );
+  } else {
+    return (
+      <div className="bg-gray-50 border border-gray-200 rounded-md p-3 mt-4">
+        <p className="text-gray-700 text-sm font-medium">Currently unavailable</p>
+        <p className="text-gray-600 text-xs mt-1">We don't know when or if this item will be back in stock</p>
+      </div>
+    );
+  }
 }

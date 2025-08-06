@@ -7,7 +7,27 @@ import { RxCrossCircled } from "react-icons/rx";
 const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCart, subTotal }) => {
   if (!isOpen) return null;
 
-  // const cartCount = Object.keys(cart).reduce((total, key) => total + cart[key].qty, 0);
+  console.log("Cart items:", cart);
+
+  const handleAddToCart = (key, qty) => {
+    const item = cart[key];
+    console.log("Adding to cart:", item);
+    if (!item) return;
+    addToCart(key, qty, {
+      productId: item.productId,
+      price: item.price, // Use the stored variant price
+      name: item.name,
+      size: item.variantInfo.size,
+      color: item.variantInfo.color,
+      image: item.image,
+      sku: item.sku,
+      variantInfo: item.variantInfo
+    });
+  };
+
+  const handleRemoveFromCart = (key, qty) => {
+    removeFromCart(key, qty);
+  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -33,21 +53,24 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                           <div className="ml-4 flex-1 flex flex-col">
                             <div className="flex justify-between text-base font-medium text-gray-900">
                               <h3>
-                                {cart[key].name} ({cart[key].size}/{cart[key].color})
+                                {cart[key].name} ({cart[key].variantInfo.size}/{cart[key].variantInfo.color})
                               </h3>
-                              <p>₹{cart[key].price * cart[key].qty}</p>
+                              <div className="text-right">
+                                <p className="font-medium">₹{cart[key].price * cart[key].qty}</p>
+                                <p className="text-sm text-gray-500">₹{cart[key].price} each</p>
+                              </div>
                             </div>
                             <div className="flex-1 flex items-end justify-between text-sm">
                               <div className="flex items-center">
-                                <button onClick={() => removeFromCart(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleRemoveFromCart(key, 1)} className="text-gray-500 hover:text-gray-700">
                                   <AiFillMinusCircle className="h-5 w-5" />
                                 </button>
                                 <span className="mx-2 text-gray-500">{cart[key].qty}</span>
-                                <button onClick={() => addToCart(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleAddToCart(key, 1)} className="text-gray-500 hover:text-gray-700">
                                   <AiFillPlusCircle className="h-5 w-5" />
                                 </button>
                               </div>
-                              <button onClick={() => removeFromCart(key, cart[key].qty)} className="text-red-600 hover:text-red-500">
+                              <button onClick={() => handleRemoveFromCart(key, cart[key].qty)} className="text-red-600 hover:text-red-500">
                                 <AiFillDelete className="h-5 w-5" />
                               </button>
                             </div>

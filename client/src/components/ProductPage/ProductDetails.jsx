@@ -3,7 +3,7 @@ import { FaStar } from "react-icons/fa";
 import PincodeChecker from "../PincodeChecker";
 import { FaTruck, FaShieldAlt, FaExchangeAlt } from "react-icons/fa";
 
-export default function ProductDetails({ product, reviews, color, size }) {
+export default function ProductDetails({ product, reviews, color, size, availableQty }) {
   // Calculate average rating
   const avgRating = reviews.length > 0 ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1) : 0;
 
@@ -24,8 +24,18 @@ export default function ProductDetails({ product, reviews, color, size }) {
           ))}
         </div>
         <span className="text-gray-600 ml-2 text-sm">({reviews.length} reviews)</span>
-        <span className="mx-2 text-gray-300">•</span>
-        <span className={`text-sm font-medium ${product.availableQty > 0 ? "text-green-600" : "text-red-600"}`}>{product.availableQty > 0 ? "In Stock" : "Out of Stock"}</span>
+        {/* <span className="mx-2 text-gray-300">•</span>
+        {color && size ? (
+          <span className={`text-sm font-medium ${availableQty > 0 ? "text-green-600" : "text-red-600"}`}>
+            {availableQty > 0 ? (
+              <>In Stock ({availableQty} available)</>
+            ) : (
+              "Out of Stock"
+            )}
+          </span>
+        ) : (
+          <span className="text-sm text-gray-600">Select color and size to check availability</span>
+        )} */}
       </div>
 
       <div className="leading-relaxed text-gray-700 mb-6 border-b border-gray-200 pb-6">

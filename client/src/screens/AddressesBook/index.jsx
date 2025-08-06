@@ -62,9 +62,14 @@ const AddressBook = () => {
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <Loader />}
 
-      <div className="min-h-[500px] flex justify-center items-center">
-        {addresses.length === 0 && <div className="text-gray-600 text-3xl mb-4">No addresses found. Create a new address.</div>}
-      </div>
+      {addresses.length === 0 && (
+        <div className="min-h-[500px] flex justify-center items-center">
+          <div className="text-gray-600 text-3xl mb-4">
+            No addresses found. Create a new address.
+          </div>
+        </div>
+      )}
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {addresses.map((address) => (

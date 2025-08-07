@@ -1,23 +1,16 @@
 import axios from 'axios';
 
-// Create a custom event for authentication errors
-export const AUTH_EVENTS = {
-  UNAUTHORIZED: 'auth:unauthorized',
-  AUTH_ERROR: 'auth:error'
-};
-
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  // baseURL : 'http://192.168.1.7:5000/api', // Home wifi
-  // baseURL : 'http://192.168.2.25:5000/api', // Replace with your actual IP
+  baseURL: import.meta.env.VITE_API_BASE_URL
+,
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true,
+  withCredentials: true, //ensures cookies are sent with requests.
 });
 
-// Request interceptor
-api.interceptors.request.use(
+// Request interceptor , This runs before every request.
+api.interceptors.request.use( 
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -68,7 +61,7 @@ api.interceptors.response.use(
       if (isAuthEndpoint) {
         localStorage.removeItem('token');
         // Dispatch a custom event for authentication errors
-        window.dispatchEvent(new CustomEvent(AUTH_EVENTS.UNAUTHORIZED));
+        window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }
     }
     return Promise.reject(error);
@@ -110,7 +103,6 @@ export const productAPI = {
   getProductsByCategory: (category) => api.get(`/products/category/${category}`),
   getProductsByTheme: (theme) => api.get(`/products/theme/${theme}`),
   searchProducts: (query) => api.get(`/products/search`, { params: { q: query } }),
-  getProductReviews: (productId) => api.get(`/products/${productId}/reviews`),
   createProduct: (productData) => api.post('/products', productData),
   deleteProduct: (productId) => api.delete(`/products/${productId}`),
   updateProduct: (productId, productData) => api.put(`/products/${productId}`, productData),
@@ -131,7 +123,6 @@ export const reviewAPI = {
   createReview: (productId, reviewData) => api.post(`/reviews/${productId}`, reviewData),
   updateReview: (reviewId, reviewData) => api.put(`/reviews/${reviewId}`, reviewData),
   deleteReview: (reviewId) => api.delete(`/reviews/${reviewId}`),
-  getMyReviews: () => api.get('/reviews/my'),
   getProductReviews: (productId) => api.get(`/reviews/product/${productId}`),
 };
 

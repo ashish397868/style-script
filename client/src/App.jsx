@@ -5,7 +5,6 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./components/HomePage";
 import useUserHook from "./redux/features/user/useUserHook";
 import Loader from "./components/Loader";
-import { AUTH_EVENTS } from "./services/api";
 
 import {
   Login,
@@ -39,14 +38,14 @@ import {
   ReturnPolicy,
   NotFound,
   ProtectedRoute,
-  SearchPage
+  SearchPage,
 } from "./routes/lazyImports";
 
 import Navbar from "./screens/Navbar";
 import Footer from "./screens/Footer";
 
 function AppContent() {
-  const location = useLocation();
+  const location = useLocation(); // useLocation se current URL ka path milta hai.
   const { initializeAuth, logoutUser } = useUserHook();
 
   // Initialize authentication on app load
@@ -64,10 +63,10 @@ function AppContent() {
       logoutUser();
     };
 
-    window.addEventListener(AUTH_EVENTS.UNAUTHORIZED, handleUnauthorized);
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
 
     return () => {
-      window.removeEventListener(AUTH_EVENTS.UNAUTHORIZED, handleUnauthorized);
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
     };
   }, [logoutUser]);
 

@@ -106,8 +106,8 @@ const handleBuy = async () => {
 
     // build products array from cart
     const productsArr = Object.values(cart).map((item) => ({
-      _id: item.productId,             // Use _id as expected by the server
-      productId: item.productId,       // Also include productId for compatibility
+      productId: item.productId,
+      variantId: item.variantId,       // Also include productId for compatibility
       size: item.size.toUpperCase().trim(),  // Server expects uppercase size
       color: item.color.toLowerCase().trim(), // Server expects lowercase color
       quantity: Number(item.qty),
@@ -122,7 +122,7 @@ const handleBuy = async () => {
     // Validate each product has required fields
     productsArr.forEach(item => {
       console.log(item);
-      if (!item._id || !item.size || !item.color || item.quantity <= 0) {
+      if (!item.productId || !item.size || !item.color || item.quantity <= 0) {
         throw new Error("Missing required product details");
       }
     });

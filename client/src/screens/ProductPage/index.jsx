@@ -129,8 +129,9 @@ export default function ProductDetailPage() {
         name: currentProduct.title,
         size,
         color,
-        image: selectedVariant.images?.[0] || currentProduct.images?.[0],
+        image: selectedVariant.images?.[0],
         productId: currentProduct._id,
+        variantId: selectedVariant._id, // Store variant ID 
       },
     );
     toast.success("Added to cart!");

@@ -23,7 +23,7 @@ exports.createOrder = async (req, res) => {
 
     const updatedProducts = await Promise.all(
       products.map(async (item) => {
-        const productId = item._id || item.productId;
+        const productId = item.productId;
         const { size, color, quantity = 1 } = item;
 
         if (!productId || !size || !color || quantity <= 0) {
@@ -41,7 +41,7 @@ exports.createOrder = async (req, res) => {
         if (!variant) throw new Error(`Variant not found for ${size} / ${color}`);
 
         if (quantity > variant.availableQty) {
-          throw new Error(`Insufficient stock for ${size} / ${color}`);
+          throw new Error(`Insufficient stock for ${variant.title} ${size} / ${color}`);
         }
 
         const subTotal = variant.price * quantity;
@@ -49,6 +49,7 @@ exports.createOrder = async (req, res) => {
 
         return {
           productId,
+          variantId: variant._id,
           name: dbProduct.title,
           image: variant.images?.[0] || dbProduct.images?.[0] || "",
           size: variant.size,

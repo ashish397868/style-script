@@ -47,12 +47,7 @@ exports.createPaymentOrder = async (req, res) => {
 // Verify Payment
 exports.verifyPayment = async (req, res) => {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      receipt,
-    } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, receipt } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !receipt) {
       return res.status(400).json({ message: "Missing required fields" });
@@ -63,10 +58,7 @@ exports.verifyPayment = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
+    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
 
     if (expectedSignature !== razorpay_signature) {
       return res.status(400).json({ message: "Invalid payment signature" });
@@ -86,27 +78,9 @@ exports.verifyPayment = async (req, res) => {
 
     await order.save();
 
-    // ✅ 2. Decrement stock for each product variant
     for (let item of order.products) {
-      const { productId, variantId, qty } = item;
-
-      const product = await Product.findOne({
-        _id: productId,
-        "variants._id": variantId,
-      });
-
-      if (!product) continue; // product not found (edge case)
-
-      const variant = product.variants.id(variantId);
-      if (!variant) continue; // variant not found (edge case)
-
-      if (variant.availableQty >= qty) {
-        variant.availableQty -= qty;
-      } else {
-        console.warn(`⚠️ Not enough stock for variant ${variantId}`);
-      }
-
-      await product.save(); // save after update
+      const qty = Number(item.quantity);
+      await Product.updateOne({ _id: item.productId, "variants._id": item.variantId }, { $inc: { "variants.$.availableQty": -qty } });
     }
 
     return res.json({
@@ -119,7 +93,6 @@ exports.verifyPayment = async (req, res) => {
     return res.status(500).json({ message: "Payment verification failed", error: err.message });
   }
 };
-
 
 /**
   ❗ Important Notes:

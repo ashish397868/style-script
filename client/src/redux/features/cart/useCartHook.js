@@ -3,8 +3,7 @@ import { useCallback } from "react";
 import {
   addToCart,
   removeFromCart,
-  clearCart,
-  updateCartItemQty
+  clearCart
 } from "./cartSlice";
 
 const useCart = () => {
@@ -28,14 +27,6 @@ const useCart = () => {
       return;
     }
     dispatch(removeFromCart({ key, qty }));
-  }, [dispatch]);
-
-  const updateItemQty = useCallback((key, qty) => {
-    if (!key || qty < 1) {
-      console.error("Invalid parameters for updating cart item quantity");
-      return;
-    }
-    dispatch(updateCartItemQty({ key, qty }));
   }, [dispatch]);
 
   const clearItems = useCallback(() => {

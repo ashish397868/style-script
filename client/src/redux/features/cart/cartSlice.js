@@ -7,8 +7,10 @@ const getInitialCart = () => {
       const parsed = JSON.parse(cart);
       return parsed;
     }
-  } catch {}
-  return {};
+  } catch {
+    console.warn("Corrupted cart data in localStorage, resetting.");
+  }
+  return {}
 };
 
 const calculateSubTotal = (cart) => {
@@ -26,18 +28,14 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+
     addToCart: (state, action) => {
       const { key, qty, itemDetails } = action.payload;
-      // Validate itemDetails has all required fields
-      if (!itemDetails.productId || !itemDetails.size || !itemDetails.color) {
-        console.error("Invalid item details provided to cart");
-        return;
-      }
       
       if (state.cart[key]) {
-        state.cart[key].qty += qty;
+        state.cart[key].qty += qty; //increase the quantity
       } else {
-        state.cart[key] = {
+        state.cart[key] = { //create new cart item
           ...itemDetails,
           qty,
           variantInfo: {
@@ -46,6 +44,7 @@ const cartSlice = createSlice({
           }
         };
       }
+
       state.subTotal = calculateSubTotal(state.cart);
       localStorage.setItem("cart", JSON.stringify(state.cart));
     },
@@ -64,15 +63,6 @@ const cartSlice = createSlice({
       localStorage.setItem("cart", JSON.stringify(state.cart));
     },
 
-    updateCartItemQty: (state, action) => {
-      const { key, qty } = action.payload;
-      if (state.cart[key] && qty > 0) {
-        state.cart[key].qty = qty;
-        state.subTotal = calculateSubTotal(state.cart);
-        localStorage.setItem("cart", JSON.stringify(state.cart));
-      }
-    },
-
     clearCart: (state) => {
       state.cart = {};
       state.subTotal = 0;
@@ -82,5 +72,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addToCart, removeFromCart, clearCart , updateCartItemQty} = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

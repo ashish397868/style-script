@@ -14,6 +14,7 @@ const OrderSchema = new Schema(
     products: [
       {
         productId: { type: Schema.Types.ObjectId, ref: "Product" },
+        variantId: { type: Schema.Types.ObjectId, required: true },
         sku:{ type: String },
         image: { type: String }, // Store first image of product at order time
         name: { type: String, required: true, trim: true },

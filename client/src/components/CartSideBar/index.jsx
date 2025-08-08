@@ -7,25 +7,26 @@ import { RxCrossCircled } from "react-icons/rx";
 const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCart, subTotal }) => {
   if (!isOpen) return null;
 
-  console.log("Cart items:", cart);
+  // console.log("Cart items:", cart);
 
-  const handleAddToCart = (key, qty) => {
+  const handleIncrement = (key, qty) => {
     const item = cart[key];
     console.log("Adding to cart:", item);
     if (!item) return;
+
     addToCart(key, qty, {
       productId: item.productId,
+      variantId: item.variantId,
       price: item.price, // Use the stored variant price
       name: item.name,
       size: item.variantInfo.size,
       color: item.variantInfo.color,
       image: item.image,
-      sku: item.sku,
       variantInfo: item.variantInfo
     });
   };
 
-  const handleRemoveFromCart = (key, qty) => {
+  const handleDecrement = (key, qty) => {
     removeFromCart(key, qty);
   };
 
@@ -50,6 +51,18 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                     <ul className="-my-6 divide-y divide-gray-200">
                       {Object.keys(cart).map((key) => (
                         <li key={key} className="py-6 flex">
+                          {/* Product Image */}
+                          <div className="flex-shrink-0 w-24 h-24 border border-gray-200 rounded-md overflow-hidden">
+                            <img
+                              src={cart[key].image}
+                              alt={cart[key].name}
+                              className="w-full h-full object-center object-contain"
+                              onError={(e) => {
+                                e.target.src = '/placeholder-image.jpg'; // Fallback image
+                              }}
+                            />
+                          </div>
+
                           <div className="ml-4 flex-1 flex flex-col">
                             <div className="flex justify-between text-base font-medium text-gray-900">
                               <h3>
@@ -62,15 +75,15 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                             </div>
                             <div className="flex-1 flex items-end justify-between text-sm">
                               <div className="flex items-center">
-                                <button onClick={() => handleRemoveFromCart(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleDecrement(key, 1)} className="text-gray-500 hover:text-gray-700">
                                   <AiFillMinusCircle className="h-5 w-5" />
                                 </button>
                                 <span className="mx-2 text-gray-500">{cart[key].qty}</span>
-                                <button onClick={() => handleAddToCart(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleIncrement(key, 1)} className="text-gray-500 hover:text-gray-700">
                                   <AiFillPlusCircle className="h-5 w-5" />
                                 </button>
                               </div>
-                              <button onClick={() => handleRemoveFromCart(key, cart[key].qty)} className="text-red-600 hover:text-red-500">
+                              <button onClick={() => handleDecrement(key, cart[key].qty)} className="text-red-600 hover:text-red-500">
                                 <AiFillDelete className="h-5 w-5" />
                               </button>
                             </div>

@@ -14,7 +14,7 @@ const loginValidationSchema = Yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error, clearUserError } = useUserHook();
+  const { login, isLoading, error } = useUserHook();
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -33,8 +33,8 @@ const Login = () => {
       } else {
         setMessage(resultAction.payload?.message || "Login failed. Please try again.");
       }
-    } catch (err) {
-      setMessage("Login failed. Please try again.", err);
+    } catch {
+      setMessage("Login failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -48,53 +48,42 @@ const Login = () => {
         {(error || message) && <div className={`p-3 rounded-md ${message.includes("success") ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{error || message}</div>}
 
         <Formik initialValues={{ email: "", password: "" }} validationSchema={loginValidationSchema} onSubmit={handleSubmit}>
-          {({ handleChange, values }) => (
+          {({ getFieldProps , isValid}) => (
             <Form className="space-y-4 md:space-y-6">
-              <div className="space-y-4">
-                {/* Email */}
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email address
-                  </label>
-                  <Field
-                    id="email"
-                    name="email"
-                    type="email"
-                    onChange={(e) => {
-                      handleChange(e);
-                      if (error) clearUserError();
-                    }}
-                    value={values.email}
-                    className="appearance-none relative block w-full px-3 py-2.5 border border-gray-300 focus:ring-pink-500 focus:border-pink-500 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm"
-                    placeholder="Email address"
-                  />
-                  <ErrorMessage name="email" component="p" className="mt-1 text-sm text-red-600" />
-                </div>
+              {/* Email */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Email address
+                </label>
+                <Field
+                  id="email"
+                  type="email"
+                  placeholder="Email address"
+                  {...getFieldProps("email")}
+                  className="appearance-none relative block w-full px-3 py-2.5 border border-gray-300 focus:ring-pink-500 focus:border-pink-500 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm"
+                />
+                <ErrorMessage name="email" component="p" className="mt-1 text-sm text-red-600" />
+              </div>
 
-                {/* Password */}
-                <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <Field
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      onChange={(e) => {
-                        handleChange(e);
-                        if (error) clearUserError();
-                      }}
-                      value={values.password}
-                      className="appearance-none relative block w-full px-3 py-2.5 border border-gray-300 focus:ring-pink-500 focus:border-pink-500 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm pr-10"
-                      placeholder="Password"
-                    />
-                    <button type="button" onClick={togglePasswordVisibility} className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                      {showPassword ? <AiOutlineEyeInvisible className="h-5 w-5 text-gray-400 hover:text-gray-500" /> : <AiOutlineEye className="h-5 w-5 text-gray-400 hover:text-gray-500" />}
-                    </button>
-                  </div>
-                  <ErrorMessage name="password" component="p" className="mt-1 text-sm text-red-600" />
+              {/* Password */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <Field
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    {...getFieldProps("password")}
+                    // onFocus={clearUserError}
+                    className="appearance-none relative block w-full px-3 py-2.5 border border-gray-300 focus:ring-pink-500 focus:border-pink-500 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 sm:text-sm pr-10"
+                  />
+                  <button type="button" onClick={togglePasswordVisibility} className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                    {showPassword ? <AiOutlineEyeInvisible className="cursor-pointer h-5 w-5 text-gray-400 hover:text-gray-500" /> : <AiOutlineEye className="cursor-pointer h-5 w-5 text-gray-400 hover:text-gray-500" />}
+                  </button>
                 </div>
+                <ErrorMessage name="password" component="p" className="mt-1 text-sm text-red-600" />
               </div>
 
               {/* Forgot Password Link */}
@@ -105,11 +94,9 @@ const Login = () => {
               </div>
 
               {/* Submit Button */}
-              <div>
-                <Button type="submit" loading={isLoading} className="cursor-pointer w-full justify-center py-2.5">
-                  {isLoading ? "Signing in..." : "Sign in"}
-                </Button>
-              </div>
+              <Button disabled={!isValid || isLoading} type="submit" loading={isLoading} >
+                {isLoading ? "Signing in..." : "Sign in"}
+              </Button>
 
               {/* Signup Link */}
               <div className="text-center">

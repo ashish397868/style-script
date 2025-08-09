@@ -81,3 +81,23 @@ const useUser = () => {
 };
 
 export default useUser;
+
+
+/*
+  Why use unwrap() here?
+
+  - Normally, dispatch(someThunk()) returns a Promise that ALWAYS resolves,
+    even if the thunk was rejected. This means .catch() will NOT run for errors.
+  
+  - unwrap() changes this behavior:
+      ✔ If thunk is fulfilled → returns the actual data (resolved value).
+      ✔ If thunk is rejected → throws an error (rejected Promise), so .catch() will run.
+  
+  - This is useful when you want try/catch or .then/.catch to handle API errors directly.
+  
+  Example:
+    dispatch(loginUser(credentials))
+      .unwrap()
+      .then(data => console.log("Success:", data))
+      .catch(err => console.log("Error:", err));
+*/

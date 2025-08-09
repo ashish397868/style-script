@@ -11,7 +11,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
 
   const handleIncrement = (key, qty) => {
     const item = cart[key];
-    console.log("Adding to cart:", item);
+    // console.log("Adding to cart:", item);
     if (!item) return;
 
     addToCart(key, qty, {
@@ -41,7 +41,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                 {/* Header with Cart Button (used as close) */}
                 <div className="flex items-start justify-between">
                   <h2 className="text-lg font-medium text-gray-900">Shopping Cart</h2>
-                  <RxCrossCircled onClick={onClose} className="text-gray-500 hover:text-gray-700 w-8 h-8"/>
+                  <RxCrossCircled onClick={onClose} className="cursor-pointer text-gray-500 hover:text-gray-700 w-8 h-8"/>
                 </div>
 
                 <div className="mt-8">
@@ -75,15 +75,15 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                             </div>
                             <div className="flex-1 flex items-end justify-between text-sm">
                               <div className="flex items-center">
-                                <button onClick={() => handleDecrement(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleDecrement(key, 1)} className="cursor-pointer text-gray-500 hover:text-gray-700">
                                   <AiFillMinusCircle className="h-5 w-5" />
                                 </button>
                                 <span className="mx-2 text-gray-500">{cart[key].qty}</span>
-                                <button onClick={() => handleIncrement(key, 1)} className="text-gray-500 hover:text-gray-700">
+                                <button onClick={() => handleIncrement(key, 1)} className="cursor-pointer text-gray-500 hover:text-gray-700">
                                   <AiFillPlusCircle className="h-5 w-5" />
                                 </button>
                               </div>
-                              <button onClick={() => handleDecrement(key, cart[key].qty)} className="text-red-600 hover:text-red-500">
+                              <button onClick={() => handleDecrement(key, cart[key].qty)} className="cursor-pointer text-red-600 hover:text-red-500">
                                 <AiFillDelete className="h-5 w-5" />
                               </button>
                             </div>
@@ -107,7 +107,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                     to="/checkout"
                     onClick={onClose}
                     className={`w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white ${
-                      Object.keys(cart).length === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700"
+                      Object.keys(cart).length === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700 cursor-pointer"
                     }`}
                   >
                     <BsFillBagCheckFill className="mr-2" />
@@ -119,7 +119,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                     disabled={Object.keys(cart).length === 0}
                     onClick={clearCart}
                     className={`w-full flex justify-center items-center px-6 py-3 rounded-md shadow-sm text-base font-medium text-white ${
-                      Object.keys(cart).length === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700"
+                      Object.keys(cart).length === 0 ? "bg-gray-300 cursor-not-allowed" : "bg-pink-600 hover:bg-pink-700 cursor-pointer"
                     }`}
                   >
                     <AiFillDelete className="mr-2" />

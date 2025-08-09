@@ -30,7 +30,7 @@ const Dropdown = ({ label, items, buttonClass = "", itemClass = "" }) => {
       {open && (
         <div className="absolute mt-2 w-40 bg-white shadow-md rounded z-50">
           {items.map(({ path, label }, idx) => (
-            <Link key={idx} to={path} className={`block px-4 py-2 ${itemClass}`} onClick={() => setOpen(false)}>
+            <Link key={idx} to={path} className={`block px-4 py-2  hover:bg-gray-100 ${itemClass}`} onClick={() => setOpen(false)}>
               {label}
             </Link>
           ))}

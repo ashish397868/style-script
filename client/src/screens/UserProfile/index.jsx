@@ -24,7 +24,7 @@ const PasswordSchema = Yup.object().shape({
 });
 
 const UserProfile = () => {
-  const { user, isLoading: userLoading, error: userError, fetchProfile, updateProfile, changePassword } = useUserProfile();
+  const { user, authLoading: userLoading, error: userError, fetchProfile, updateProfile, changePassword } = useUserProfile();
 
   const [editMode, setEditMode] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);

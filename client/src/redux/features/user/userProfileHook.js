@@ -5,7 +5,7 @@ import { userAPI } from '../../../services/api';
 
 const useUserProfile = () => {
   const dispatch = useDispatch();
-  const { user, isLoading, error } = useSelector(state => state.user);
+  const { user, authLoading, error } = useSelector(state => state.user);
 
   // Fetch user profile from backend
   const fetchProfile = useCallback(async () => {
@@ -41,7 +41,7 @@ const useUserProfile = () => {
 
   return {
     user,
-    isLoading,
+    authLoading,
     error,
     fetchProfile,
     updateProfile,

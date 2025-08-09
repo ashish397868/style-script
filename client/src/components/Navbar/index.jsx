@@ -11,8 +11,8 @@ import CartSidebar from "../CartSidebar";
 import SearchBar from "../SearchBar";
 
 // ✅ Memoized Auth Components to prevent unnecessary re-renders
-const AuthComponent = memo(({ isLoading, isAuthenticated, user, onLogout, userLinks }) => {
-  if (isLoading || isAuthenticated === null) {
+const AuthComponent = memo(({ authLoading, isAuthenticated, user, onLogout, userLinks }) => {
+  if (authLoading || isAuthenticated === null) {
     return (
       <div className="w-24 flex justify-center items-center py-2">
         <BeatLoader color="#C70039" size={8} />
@@ -36,8 +36,8 @@ const AuthComponent = memo(({ isLoading, isAuthenticated, user, onLogout, userLi
   );
 });
 
-const MobileAuthComponent = memo(({ isLoading, isAuthenticated, user, onLogout, userLinks }) => {
-  if (isLoading || isAuthenticated === null) {
+const MobileAuthComponent = memo(({ authLoading, isAuthenticated, user, onLogout, userLinks }) => {
+  if (authLoading || isAuthenticated === null) {
     return (
       <div className="w-16 flex justify-center items-center py-1">
         <BeatLoader color="#C70039" size={6} />
@@ -78,7 +78,7 @@ const Navbar = ({
   const menuRef = useRef(null);
   const hamburgerRef = useRef(null);
 
-  const { user, isAuthenticated, logoutUser, isLoading } = useUserHook();
+  const { user, isAuthenticated, logoutUser, authLoading } = useUserHook();
   const { cart, subTotal, addItem, removeItem, clearItems, totalItems } = useCartHook();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -160,7 +160,7 @@ const Navbar = ({
               <Dropdown label="Tshirts" items={tshirtItems} buttonClass={`${textColor} ${hoverColor} font-semibold`} />
 
               {/* Authentication Links */}
-              <AuthComponent {...{ isLoading, isAuthenticated, user, onLogout: handleLogout, userLinks }} />
+              <AuthComponent {...{ authLoading, isAuthenticated, user, onLogout: handleLogout, userLinks }} />
 
               <CartButton count={totalItems} onClick={() => setSidebarOpen(true)} iconClass={`${cartIconColor} ${cartIconHover}`} />
             </div>
@@ -168,7 +168,7 @@ const Navbar = ({
             {/* Mobile Controls */}
             <div className="md:hidden flex items-center space-x-2">
               {/* Authentication Links */}
-              <MobileAuthComponent {...{ isLoading, isAuthenticated, user, onLogout: handleLogout, userLinks }} />
+              <MobileAuthComponent {...{ authLoading, isAuthenticated, user, onLogout: handleLogout, userLinks }} />
               <CartButton count={totalItems} onClick={() => setSidebarOpen(true)} iconClass={`${cartIconColor} ${cartIconHover}`} />
               <button ref={hamburgerRef} onClick={() => setMenuOpen(!menuOpen)} className={`p-2 rounded-full ${textColor} ${hoverColor}`}>
                 <FiMenu className="text-2xl" />

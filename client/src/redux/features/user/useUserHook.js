@@ -16,7 +16,8 @@ const useUser = () => {
   // Get all user state values
   const {
     user,
-    isLoading,
+    authLoading,
+    passwordLoading,
     error,
     isAuthenticated
   } = useSelector(state => state.user);
@@ -58,7 +59,8 @@ const useUser = () => {
   return {
     // State
     user,
-    isLoading,
+    authLoading,
+    passwordLoading,
     error,
     isAuthenticated,
     

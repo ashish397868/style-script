@@ -14,7 +14,7 @@ const loginValidationSchema = Yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, error } = useUserHook();
+  const { login, authLoading, error } = useUserHook();
 
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -94,8 +94,8 @@ const Login = () => {
               </div>
 
               {/* Submit Button */}
-              <Button disabled={!isValid || isLoading} type="submit" loading={isLoading} >
-                {isLoading ? "Signing in..." : "Sign in"}
+              <Button disabled={!isValid || authLoading} type="submit" loading={authLoading} >
+                {authLoading ? "Signing in..." : "Sign in"}
               </Button>
 
               {/* Signup Link */}

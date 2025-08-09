@@ -8,7 +8,7 @@ const Navbar = lazy(() => import("../Navbar")); // eagerly loaded
 const Footer = lazy(() => import("../Footer")); // eagerly loaded
 
 const ProtectedRoute = ({  children,requireAdmin }) => {
-  const { isLoggedIn, isAdmin, isLoading, initializeAuth } = useUserHook();
+  const { isLoggedIn, isAdmin, authLoading, initializeAuth } = useUserHook();
   const location = useLocation();
   const [authInitialized, setAuthInitialized] = useState(false);
 
@@ -23,7 +23,7 @@ const ProtectedRoute = ({  children,requireAdmin }) => {
   }, [initializeAuth]);
 
   // Wait until initialization finishes
-  if (isLoading || !authInitialized) {
+  if (authLoading || !authInitialized) {
     return <Loader />;
   }
 

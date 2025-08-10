@@ -89,7 +89,7 @@ exports.getOrderById = async (req, res) => {
     const { id } = req.params;
 
     const order = await Order.findById(id)
-      .select("orderId products amount status deliveryStatus createdAt userId")
+      .select("orderId products amount status deliveryStatus createdAt userId address")
       .populate("userId", "name email")
       .populate("products.productId", "title slug images") // still valid
       .lean();

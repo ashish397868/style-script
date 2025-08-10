@@ -2,23 +2,20 @@ import { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiMapPin, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/Loader";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import { addressAPI } from "../../services/api";
 
 const AddressBook = () => {
-  const { user, fetchProfile, updateProfile } = useUserProfile();
+  const { user, fetchUserProfile , setUserState} = useUserHook();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-  if (user?.addresses?.length) {
-    setAddresses(user.addresses);
-    return;
-  }
+useEffect(() => {
+  if (!user) {
     setLoading(true);
-    fetchProfile()
+    fetchUserProfile()
       .then((res) => {
         setAddresses(res.addresses || []);
         setError("");
@@ -28,7 +25,10 @@ const AddressBook = () => {
         setError("Failed to load addresses");
       })
       .finally(() => setLoading(false));
-  }, [user,fetchProfile]);
+  } else {
+    setAddresses(user.addresses || []);
+  }
+}, [user]);
 
   const handleAddAddress = () => {
     navigate("/addresses/new");
@@ -44,7 +44,7 @@ const AddressBook = () => {
       const updated = addresses.filter((addr) => addr._id !== id);
       await addressAPI.deleteAddress(id);
       setAddresses(updated);
-      await updateProfile({ addresses: updated });
+      setUserState({ ...user, addresses: updated });
     } catch {
       setError("Failed to remove address");
     } 

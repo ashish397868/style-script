@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FiMapPin } from "react-icons/fi";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import { addressAPI } from "../../services/api";
 import { addressInitialValues, addressValidationSchema } from "../../utils/formConfig/addressFormConfig";
 
 const EditAddressPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, fetchProfile, updateProfile } = useUserProfile();
+  const { user, fetchUserProfile, updateUserProfile, setUserState } = useUserHook();
 
   const [initialValues, setInitialValues] = useState(addressInitialValues);
   const [loading, setLoading] = useState(true);
@@ -17,37 +17,25 @@ const EditAddressPage = () => {
   const [error, setError] = useState("");
 
   // ✅ Load address data
-  useEffect(() => {
-    const loadAddress = async () => {
-      setLoading(true);
-      try {
-        let found;
-        if (user?.addresses?.length) {
-          found = user.addresses.find((a) => String(a._id) === String(id));
-        }
-        if (!found) {
-          const profileData = await fetchProfile();
-          found = profileData.addresses?.find((a) => String(a._id) === String(id));
-        }
-        if (found) {
-          // overwrite initial values with found address data
-          setInitialValues({
-            ...addressInitialValues,
-            ...found,
-          });
-        } else {
-          setError("Address not found");
-        }
-      } catch (err) {
-        console.error("Error loading address", err);
-        setError("Failed to load address");
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  if (!user?.addresses?.length) {
+    setError("No addresses found");
+    setLoading(false);
+    return;
+  }
 
-    loadAddress();
-  }, [id, user, fetchProfile]);
+  const found = user.addresses.find((a) => String(a._id) === String(id));
+  if (found) {
+    setInitialValues({
+      ...addressInitialValues,
+      ...found,
+    });
+  } else {
+    setError("Address not found");
+  }
+  setLoading(false);
+}, [id, user]);
+
 
   // ✅ Submit handler
   const handleSubmit = async (values) => {
@@ -57,7 +45,7 @@ const EditAddressPage = () => {
       await addressAPI.updateAddress(id, values);
 
       // Optimistic update Redux store
-      await updateProfile({
+      await updateUserProfile({
         addresses: user.addresses.map((a) => (String(a._id) === String(id) ? { ...a, ...values } : a)),
       });
 

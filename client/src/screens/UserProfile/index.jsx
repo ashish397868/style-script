@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { FiUser } from "react-icons/fi";
 import Loader from "../../components/Loader";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import ProfileView from "./ProfileView";
 import ProfileEditForm from "./ProfileEditForm";
 import ChangePasswordForm from "./ChangePasswordForm";
 
 const UserProfile = () => {
-  const { user, authLoading, error: userError, fetchProfile, updateProfile, changePassword } = useUserProfile();
+  const { user, authLoading, error: userError, fetchUserProfile, updateUserProfile, changeUserPassword } = useUserHook();
 
   const [editMode, setEditMode] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -24,19 +24,19 @@ const UserProfile = () => {
       setInitialLoading(false);
     } else {
       setInitialLoading(true);
-      fetchProfile()
+      fetchUserProfile()
         .then(() => setError(""))
         .catch(() => setError("Failed to load profile. Please try again later."))
         .finally(() => setInitialLoading(false));
     }
-  }, [user, fetchProfile]);
+  }, [user, fetchUserProfile]);
 
   const handleProfileUpdate = async (values, { setSubmitting }) => {
     setUpdateLoading(true);
     setError("");
     setSuccess("");
     try {
-      await updateProfile(values);
+      await updateUserProfile(values);
       setEditMode(false);
       setSuccess("Profile updated successfully!");
     } catch (err) {
@@ -52,7 +52,7 @@ const UserProfile = () => {
     setPasswordError("");
     setPasswordSuccess("");
     try {
-      await changePassword({
+      await changeUserPassword({
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });

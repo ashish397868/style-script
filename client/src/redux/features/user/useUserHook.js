@@ -7,7 +7,11 @@ import {
   forgotPassword, 
   resetPassword, 
   logout, 
-  clearError 
+  clearError ,
+  fetchProfile,
+  updateProfile,
+  changePassword,
+  setUser
 } from './userSlice'; 
 
 const useUser = () => {
@@ -55,6 +59,22 @@ const useUser = () => {
     dispatch(clearError());
   }, [dispatch]);
 
+  const fetchUserProfile = useCallback(() => {
+    return dispatch(fetchProfile());
+  }, [dispatch]);
+
+  const updateUserProfile = useCallback((data) => {
+    return dispatch(updateProfile(data));
+  }, [dispatch]);
+
+  const changeUserPassword = useCallback((data) => {
+    return dispatch(changePassword(data));
+  }, [dispatch]);
+
+  const setUserState = useCallback((userData) => {
+  dispatch(setUser(userData));
+}, [dispatch]);
+
   // Return all state and actions
   return {
     // State
@@ -72,7 +92,11 @@ const useUser = () => {
     resetUserPassword,
     logoutUser,
     clearUserError,
-    
+    fetchUserProfile,
+    updateUserProfile,
+    changeUserPassword,
+    setUserState,
+
     // Computed values (optional - add more as needed)
     isLoggedIn: isAuthenticated && user !== null,
     isAdmin: user?.role === 'admin',

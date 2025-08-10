@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { addressAPI } from "../../services/api";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import { addressInitialValues, addressValidationSchema } from "../../utils/formConfig/addressFormConfig";
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
-  const { user, updateProfile } = useUserProfile();
+  const { user, updateUserProfile } = useUserHook();
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
@@ -15,7 +15,7 @@ const NewAddressPage = () => {
       const newAddress = res?.data || values;
 
       // update redux user profile with new address
-      await updateProfile({
+      await updateUserProfile({
         addresses: [...(user?.addresses || []), newAddress],
       });
 

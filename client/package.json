@@ -28,6 +28,7 @@
     "react-router-dom": "^7.6.2",
     "react-spinners": "^0.17.0",
     "react-toastify": "^11.0.5",
+    "redux-persist": "^6.0.0",
     "tailwindcss": "^4.1.9",
     "vite-plugin-compression": "^0.5.1",
     "yup": "^1.6.1"

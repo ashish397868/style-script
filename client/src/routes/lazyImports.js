@@ -26,7 +26,7 @@ export const SearchPage = lazy(() => import("../screens/SearchPage"));
 export const Success = lazy(() => import("../screens/Success"));
 export const Checkout = lazy(() => import("../screens/Checkout/AddressSelection"));
 export const ReviewOrder = lazy(() => import("../components/ReviewOrder"));
-export const Products = lazy(() => import("../components/Products"));
+// export const Products = lazy(() => import("../components/Products"));
 
 // Admin
 export const AdminDashboard = lazy(() => import("../components/Admin/AdminDashboard"));

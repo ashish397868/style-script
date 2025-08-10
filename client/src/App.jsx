@@ -22,7 +22,7 @@ import {
   Success,
   Checkout,
   ReviewOrder,
-  Products,
+  // Products,
   AdminDashboard,
   UserManagement,
   ReviewManagement,
@@ -104,7 +104,7 @@ function AppContent() {
           <Route path="/return-policy" element={<ReturnPolicy />} />
 
           {/* Products & categories */}
-          <Route path="/products" element={<Products />} />
+          {/* <Route path="/products" element={<Products />} /> */}
           <Route path="/category/:category" element={<CategoryPage />} />
           <Route path="/theme/:theme" element={<ThemesPage />} />
           <Route path="/product/:slug" element={<ProductPage />} />

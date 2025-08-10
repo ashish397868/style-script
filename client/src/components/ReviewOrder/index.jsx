@@ -232,7 +232,7 @@ const handleBuy = async () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
-        <button onClick={() => navigate("/checkout")} className="flex items-center text-pink-600 hover:text-pink-800">
+        <button onClick={() => navigate("/checkout")} className="cursor-pointer flex items-center text-pink-600 hover:text-pink-800">
           <FiArrowLeft className="mr-2" /> Back to Checkout
         </button>
         <h1 className="text-3xl font-bold ml-4">Review Your Order</h1>
@@ -248,7 +248,7 @@ const handleBuy = async () => {
                 <FiTruck className="text-pink-600 mr-2" />
                 Delivery Address
               </h2>
-              <button onClick={() => navigate("/checkout")} className="text-pink-600 hover:text-pink-800 text-sm font-medium">
+              <button onClick={() => navigate("/checkout")} className="cursor-pointer text-pink-600 hover:text-pink-800 text-sm font-medium">
                 Change Address
               </button>
             </div>
@@ -303,11 +303,11 @@ const handleBuy = async () => {
 
                         <div className="flex flex-col items-end">
                           <div className="flex items-center border border-gray-200 rounded-lg">
-                            <button onClick={() => handleDecrease(key)} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg">
+                            <button onClick={() => handleDecrease(key)} className="cursor-pointer px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-l-lg">
                               <FiMinus />
                             </button>
                             <span className="px-3 py-1">{item.qty}</span>
-                            <button onClick={() => handleIncrease(key, item)} className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg">
+                            <button onClick={() => handleIncrease(key, item)} className="cursor-pointer px-3 py-1 text-gray-600 hover:bg-gray-100 rounded-r-lg">
                               <FiPlus />
                             </button>
                           </div>
@@ -316,7 +316,7 @@ const handleBuy = async () => {
                       </div>
 
                       <div className="mt-4">
-                        <button onClick={() => handleRemove(key)} className="text-red-600 hover:text-red-800 flex items-center text-sm">
+                        <button onClick={() => handleRemove(key)} className="cursor-pointer text-red-600 hover:text-red-800 flex items-center text-sm">
                           <FiTrash2 className="mr-1" /> Remove
                         </button>
                       </div>

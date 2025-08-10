@@ -1,44 +1,88 @@
-// ProductActions.jsx
 function ProductActions({ product, color, size, variants, onAddToCart, onBuyNow }) {
-  // Helper function to check variant availability
-  const isVariantAvailable = (selectedColor, selectedSize) => {
-    return variants.some(v => 
-      v.color === selectedColor && 
-      v.size === selectedSize && 
-      v.availableQty > 0
-    );
-  };
+  // Find the variant matching current selection
+  const selectedVariant = color && size ? variants.find((v) => v.color === color && v.size === size) : null;
 
-  const currentSelectionAvailable = color && size ? isVariantAvailable(color, size) : false;
-  
+  // Price helper fallback
+  const getVariantPrice = () => selectedVariant?.price || product.basePrice;
+
+  // const handleAddToCart = () => {
+  //   if (!product || !selectedVariant) return;
+
+  //   const key = `${product._id}-${size}-${color}`;
+  //   const price = getVariantPrice();
+
+  //   onAddToCart(key, 1, {
+  //     productId: product._id,
+  //     price,
+  //     name: product.title,
+  //     image: selectedVariant.images?.[0] || product.images?.[0],
+  //     sku: selectedVariant.sku,
+  //     brand: product.brand,
+  //     category: product.category,
+  //     variantInfo: {
+  //       size,
+  //       color,
+  //       price,
+  //       sku: selectedVariant.sku,
+  //       availableQty: selectedVariant.availableQty,
+  //     },
+  //   });
+  // };
+
+  // const handleBuyNow = () => {
+  //   if (!product || !selectedVariant) return;
+
+  //   const key = `${product._id}-${size}-${color}`;
+  //   const price = getVariantPrice();
+
+  //   onBuyNow(key, 1, {
+  //     productId: product._id,
+  //     price,
+  //     name: product.title,
+  //     image: selectedVariant.images?.[0] || product.images?.[0],
+  //     sku: selectedVariant.sku,
+  //     brand: product.brand,
+  //     category: product.category,
+  //     variantInfo: {
+  //       size,
+  //       color,
+  //       price,
+  //       sku: selectedVariant.sku,
+  //       availableQty: selectedVariant.availableQty,
+  //     },
+  //   });
+  // };
+
   return (
     <div className="mb-8">
       <div className="flex items-center mb-6">
-        <span className="text-3xl font-bold text-gray-900">₹{product.price.toLocaleString()}</span>
-        {product.originalPrice && (
-          <>
-            <span className="ml-3 text-xl text-gray-500 line-through">₹{product.originalPrice.toLocaleString()}</span>
-            <span className="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">
-              {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
-            </span>
-          </>
-        )}
+        <div className="flex items-center">
+          {/* Original price (15% more) with strikethrough */}
+          <span className="text-gray-500 text-xl line-through mr-3">₹{Math.round(getVariantPrice() * 1.15).toLocaleString()}</span>
+
+          {/* Final discounted price */}
+          <span className="text-3xl font-bold text-green-600">₹{getVariantPrice().toLocaleString()}</span>
+
+          {/* Discount percentage */}
+          <span className="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">15% OFF</span>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button
-          disabled={!currentSelectionAvailable || !color || !size}
+          disabled={!color || !size}
           onClick={onAddToCart}
-          className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="cursor-pointer flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Add to Cart'}
+          {!color || !size ? "Select Options" : "Add to Cart"}
         </button>
+
         <button
-          disabled={!currentSelectionAvailable || !color || !size}
+          disabled={!color || !size}
           onClick={onBuyNow}
-          className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="cursor-pointer flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Buy Now'}
+          {!color || !size ? "Select Options" : "Buy Now"}
         </button>
       </div>
     </div>

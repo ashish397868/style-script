@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import { productAPI, mediaAPI } from "../../services/api";
-import { initialValues, validationSchema } from "../../utils/formConfig/productFormConfig";
+import { initialValues, validationSchema, generateSKU } from "../../utils/formConfig/productFormConfig";
 import colorMap from "../../constants/colorMap";
 
 const AddProduct = () => {
@@ -10,18 +10,32 @@ const AddProduct = () => {
   const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [variantImageInputs, setVariantImageInputs] = useState([""]);
+  const [variantUploading, setVariantUploading] = useState(null);
 
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
       try {
-        // Convert string numbers to actual numbers
+        // Generate variants data with SKU
+        const variants = values.variants.map(variant => ({
+          ...variant,
+          price: Number(variant.price),
+          availableQty: Number(variant.availableQty),
+          sku: variant.sku || generateSKU(
+            values.title, 
+            variant.size, 
+            variant.color
+          )
+        }));
+
         const productData = {
           ...values,
-          price: Number(values.price),
-          availableQty: Number(values.availableQty),
-          theme: values.theme || null, // will be null if not selected
+          images: values.images,
+          tags: values.tags,
+          variants,
+          theme: values.theme || null,
         };
 
         await productAPI.createProduct(productData);
@@ -29,10 +43,11 @@ const AddProduct = () => {
         formik.resetForm();
         setTagInput("");
         setImageInput("");
+        setVariantImageInputs([""]);
         setError("");
       } catch (err) {
         setError(err?.response?.data?.message || "Failed to add product");
-      }finally{
+      } finally {
         setSuccess(false);
       }
     },
@@ -48,6 +63,106 @@ const AddProduct = () => {
       formik.setFieldValue("slug", generatedSlug);
     }
   }, [formik.values.title, formik.values.slug]);
+
+  // Auto-generate SKUs when variant fields change
+  useEffect(() => {
+    formik.values.variants.forEach((variant, index) => {
+      if (variant.size && variant.color && formik.values.title) {
+        const newSKU = generateSKU(
+          formik.values.title,
+          variant.size,
+          variant.color
+        );
+        
+        // Only update if it's different from current value
+        if (variant.sku !== newSKU) {
+          formik.setFieldValue(`variants[${index}].sku`, newSKU);
+        }
+      }
+    });
+  }, [
+    formik.values.title,
+    formik.values.variants.map(v => `${v.size}-${v.color}`).join(',')
+  ]);
+
+  // Variant management
+  const addVariant = () => {
+    formik.setFieldValue("variants", [
+      ...formik.values.variants,
+      { 
+        size: "", 
+        color: "", 
+        price: "", 
+        availableQty: "", 
+        sku: "", 
+        images: [] 
+      }
+    ]);
+    setVariantImageInputs([...variantImageInputs, ""]);
+  };
+
+  const removeVariant = (index) => {
+    const variants = [...formik.values.variants];
+    variants.splice(index, 1);
+    formik.setFieldValue("variants", variants);
+    
+    const newInputs = [...variantImageInputs];
+    newInputs.splice(index, 1);
+    setVariantImageInputs(newInputs);
+  };
+
+  const updateVariant = (index, field, value) => {
+    const variants = [...formik.values.variants];
+    variants[index][field] = value;
+    formik.setFieldValue("variants", variants);
+  };
+
+  // Variant image management
+  const addVariantImage = (variantIndex, e) => {
+    e.preventDefault();
+    const url = variantImageInputs[variantIndex]?.trim();
+    if (url) {
+      const newVariants = [...formik.values.variants];
+      newVariants[variantIndex].images = [...newVariants[variantIndex].images, url];
+      formik.setFieldValue("variants", newVariants);
+      
+      const newInputs = [...variantImageInputs];
+      newInputs[variantIndex] = "";
+      setVariantImageInputs(newInputs);
+    }
+  };
+
+  const removeVariantImage = (variantIndex, imageIndex) => {
+    const newVariants = [...formik.values.variants];
+    newVariants[variantIndex].images = newVariants[variantIndex].images.filter(
+      (_, i) => i !== imageIndex
+    );
+    formik.setFieldValue("variants", newVariants);
+  };
+
+  const handleVariantFileUpload = async (variantIndex, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setVariantUploading(variantIndex);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      const res = await mediaAPI.uploadImage(formData);
+      const imageUrl = res.data?.url || res.data?.imageUrl || res.data?.path;
+      if (imageUrl) {
+        const newVariants = [...formik.values.variants];
+        newVariants[variantIndex].images = [
+          ...newVariants[variantIndex].images, 
+          imageUrl
+        ];
+        formik.setFieldValue("variants", newVariants);
+      }
+    } catch (err) {
+      setError("Variant image upload failed");
+    }
+    setVariantUploading(null);
+  };
 
   const addTag = (e) => {
     e.preventDefault();
@@ -93,7 +208,7 @@ const AddProduct = () => {
         formik.setFieldValue("images", [...formik.values.images, imageUrl]);
       }
     } catch (err) {
-      setError("Image upload failed", err);
+      setError("Image upload failed");
     }
     setUploading(false);
   };
@@ -175,46 +290,6 @@ const AddProduct = () => {
                   {formik.touched.description && formik.errors.description && <div className="text-red-500 text-xs mt-1">{formik.errors.description}</div>}
                 </div>
 
-                {/* Price & Quantity */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 md:mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">₹</div>
-                      <input
-                        name="price"
-                        type="number"
-                        value={formik.values.price}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        placeholder="0.00"
-                        min="0"
-                        step="0.01"
-                        className={`w-full outline-none pl-7 md:pl-8 pr-3 md:pr-4 py-2 md:py-3 border ${
-                          formik.touched.price && formik.errors.price ? "border-red-500" : "border-gray-300"
-                        } rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition`}
-                      />
-                    </div>
-                    {formik.touched.price && formik.errors.price && <div className="text-red-500 text-xs mt-1">{formik.errors.price}</div>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
-                    <input
-                      name="availableQty"
-                      type="number"
-                      value={formik.values.availableQty}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      placeholder="0"
-                      min="0"
-                      className={`w-full outline-none px-3 md:px-4 py-2 md:py-3 border ${
-                        formik.touched.availableQty && formik.errors.availableQty ? "border-red-500" : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition`}
-                    />
-                    {formik.touched.availableQty && formik.errors.availableQty && <div className="text-red-500 text-xs mt-1">{formik.errors.availableQty}</div>}
-                  </div>
-                </div>
-
                 {/* Category & Brand */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4 md:mb-6">
                   <div>
@@ -249,103 +324,54 @@ const AddProduct = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand *</label>
                     <input
                       name="brand"
                       value={formik.values.brand}
                       onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
                       placeholder="e.g. Nike, Apple"
-                      className="w-full outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className={`w-full outline-none px-3 md:px-4 py-2 md:py-3 border ${
+                        formik.touched.brand && formik.errors.brand ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition`}
                     />
+                    {formik.touched.brand && formik.errors.brand && <div className="text-red-500 text-xs mt-1">{formik.errors.brand}</div>}
                   </div>
                 </div>
 
-                {/* Size & Color */}
-                <div className="grid grid-cols-2 gap-4 mb-4 md:mb-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Size</label>
-                    <div className="relative">
-                      <select
-                        name="size"
-                        value={formik.values.size}
-                        onChange={formik.handleChange}
-                        className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
-                      >
-                        <option value="">Select size</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Color</label>
-                    <div className="relative">
-                      <select
-                        name="color"
-                        value={formik.values.color}
-                        onChange={formik.handleChange}
-                        className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
-                      >
-                        <option value="">Select color</option>
-                        {colorMap.map((color) => (
-                          <option key={color.name} value={color.name}>
-                            {color.name
-                              .split(" ")
-                              .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                              .join(" ")}
+                {/* Theme */}
+                <div className="mb-4 md:mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Themes
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="theme"
+                      value={formik.values.theme || ''}
+                      onChange={formik.handleChange}
+                      className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
+                    >
+                      <option value="">Select theme (optional)</option>
+                      <option value="Combo Offers">Combo Offers</option>
+                      <option value="Gaming">Gaming</option>
+                      <option value="Fitness">Fitness</option>
+                      <option value="Lifestyle">Lifestyle</option>
+                      <option value="Programming">Programming</option>
+                      <option value="Trending">Trending</option>
+                      {formik.values.theme && 
+                        !["Combo Offers", "Gaming", "Fitness", "Lifestyle", "Programming", "Trending"].includes(formik.values.theme) && (
+                          <option value={formik.values.theme}>
+                            {formik.values.theme}
                           </option>
-                        ))}
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                        </svg>
-                      </div>
+                      )}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
                     </div>
                   </div>
                 </div>
-
-                {/* {theme} */}
-                            <div className="mb-4 md:mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Themes
-              </label>
-              <div className="relative">
-                <select
-                  name="theme"
-                  value={formik.values.theme || ''}
-                  onChange={formik.handleChange}
-                  className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
-                >
-                  <option value="">Select theme (optional)</option>
-                  <option value="Combo Offers">Combo Offers</option>
-                  <option value="Gaming">Gaming</option>
-                  <option value="Fitness">Fitness</option>
-                  <option value="Lifestyle">Lifestyle</option>
-                  <option value="Programming">Programming</option>
-                  <option value="Trending">Trending</option>
-                  {formik.values.theme && 
-                    !["Combo Offers", "Gaming", "Fitness", "Lifestyle", "Programming", "Trending"].includes(formik.values.theme) && (
-                      <option value={formik.values.theme}>
-                        {formik.values.theme}
-                      </option>
-                  )}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-            </div>
 
                 {/* Tags */}
                 <div className="mb-4 md:mb-6">
@@ -366,7 +392,7 @@ const AddProduct = () => {
                       value={tagInput}
                       onChange={(e) => setTagInput(e.target.value)}
                       placeholder="Enter tag and press Add"
-                      className="flex-grow outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="flex-grow outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-md focus:outline-none focus:border-pink-500 focus:ring-0 text-gray-800"
                       onKeyPress={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
@@ -379,23 +405,10 @@ const AddProduct = () => {
                     </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Column */}
-              <div>
-                {/* Featured Switch */}
+                {/* Product Images */}
                 <div className="mb-4 md:mb-6">
-                  <div className="flex items-center">
-                    <input type="checkbox" id="isFeatured" name="isFeatured" checked={formik.values.isFeatured} onChange={formik.handleChange} className="h-4 outline-none w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded" />
-                    <label htmlFor="isFeatured" className="ml-2 block text-sm text-gray-900">
-                      Feature this product on homepage
-                    </label>
-                  </div>
-                </div>
-
-                {/* Images */}
-                <div className="mb-4 md:mb-6">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URLs or Upload</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Images</label>
                   {formik.touched.images && formik.errors.images && <div className="text-red-500 text-xs mb-1">{formik.errors.images}</div>}
                   <div className="flex flex-wrap gap-2 mb-3">
                     {formik.values.images.map((img, index) => (
@@ -422,7 +435,7 @@ const AddProduct = () => {
                       value={imageInput}
                       onChange={(e) => setImageInput(e.target.value)}
                       placeholder="Enter image URL"
-                      className="flex-grow outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                      className="flex-grow outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-md focus:outline-none focus:border-pink-500 focus:ring-0 text-gray-800 transition"
                     />
                     <button type="button" onClick={addImage} className="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-800 rounded-r-lg hover:bg-gray-300 transition">
                       Add URL
@@ -465,6 +478,258 @@ const AddProduct = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Right Column */}
+              <div>
+                {/* Featured Switch */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex items-center">
+                    <input type="checkbox" id="isFeatured" name="isFeatured" checked={formik.values.isFeatured} onChange={formik.handleChange} className="h-4 outline-none w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded" />
+                    <label htmlFor="isFeatured" className="ml-2 block text-sm text-gray-900">
+                      Feature this product on homepage
+                    </label>
+                  </div>
+                </div>
+
+                {/* Published Switch */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex items-center">
+                    <input type="checkbox" id="isPublished" name="isPublished" checked={formik.values.isPublished} onChange={formik.handleChange} className="h-4 outline-none w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded" />
+                    <label htmlFor="isPublished" className="ml-2 block text-sm text-gray-900">
+                      Publish product immediately
+                    </label>
+                  </div>
+                </div>
+
+                {/* Variants Section */}
+                <div className="mb-4 md:mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-medium text-gray-700">Variants *</label>
+                    <button
+                      type="button"
+                      onClick={addVariant}
+                      className="text-sm bg-pink-600 hover:bg-pink-700 text-white px-3 py-1 rounded-md"
+                    >
+                      + Add Variant
+                    </button>
+                  </div>
+
+                  {formik.values.variants.length === 0 && (
+                    <p className="text-sm text-gray-500 italic">No variants added</p>
+                  )}
+
+                  {formik.values.variants.map((variant, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-3 mb-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Size */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Size *</label>
+                          <select
+                            value={variant.size}
+                            onChange={(e) => updateVariant(index, "size", e.target.value)}
+                            className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
+                          >
+                            <option value="">Select size</option>
+                            <option value="S">S</option>
+                            <option value="M">M</option>
+                            <option value="L">L</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                          </select>
+                          {formik.touched.variants?.[index]?.size && formik.errors.variants?.[index]?.size && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.variants[index].size}</div>
+                          )}
+                        </div>
+
+                        {/* Color */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+                          <select
+                            value={variant.color}
+                            onChange={(e) => updateVariant(index, "color", e.target.value)}
+                            className="w-full appearance-none outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition pr-8"
+                          >
+                            <option value="">Select color</option>
+                            {colorMap.map((color) => (
+                              <option key={color.name} value={color.name}>
+                                {color.name
+                                  .split(" ")
+                                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                                  .join(" ")}
+                              </option>
+                            ))}
+                          </select>
+                          {formik.touched.variants?.[index]?.color && formik.errors.variants?.[index]?.color && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.variants[index].color}</div>
+                          )}
+                        </div>
+
+                        {/* Price */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">₹</div>
+                            <input
+                              type="number"
+                              value={variant.price}
+                              onChange={(e) => updateVariant(index, "price", e.target.value)}
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              className="w-full outline-none pl-7 md:pl-8 pr-3 md:pr-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                            />
+                          </div>
+                          {formik.touched.variants?.[index]?.price && formik.errors.variants?.[index]?.price && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.variants[index].price}</div>
+                          )}
+                        </div>
+
+                        {/* Quantity */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Quantity *</label>
+                          <input
+                            type="number"
+                            value={variant.availableQty}
+                            onChange={(e) => updateVariant(index, "availableQty", e.target.value)}
+                            placeholder="0"
+                            min="0"
+                            className="w-full outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                          />
+                          {formik.touched.variants?.[index]?.availableQty && formik.errors.variants?.[index]?.availableQty && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.variants[index].availableQty}</div>
+                          )}
+                        </div>
+
+                        {/* SKU */}
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+                          <input
+                            value={variant.sku}
+                            onChange={(e) => updateVariant(index, "sku", e.target.value)}
+                            className="w-full outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition"
+                          />
+                          {formik.touched.variants?.[index]?.sku && formik.errors.variants?.[index]?.sku && (
+                            <div className="text-red-500 text-xs mt-1">{formik.errors.variants[index].sku}</div>
+                          )}
+                          <p className="mt-1 text-xs text-gray-500">
+                            Auto-generated: {generateSKU(formik.values.title, variant.size, variant.color)}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Variant Images */}
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Variant Images
+                        </label>
+                        
+                        {/* Image previews */}
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {variant.images.map((img, imgIndex) => (
+                            <div key={imgIndex} className="relative">
+                              <img 
+                                src={img} 
+                                alt={`Variant ${index} preview ${imgIndex}`} 
+                                className="w-14 h-14 md:w-16 md:h-16 object-contain rounded-xl border-2 border-dashed"
+                              />
+                              <button 
+                                type="button" 
+                                onClick={() => removeVariantImage(index, imgIndex)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Image URL Input */}
+                        <div className="flex mb-3">
+                          <input
+                            type="text"
+                            value={variantImageInputs[index] || ""}
+                            onChange={(e) => {
+                              const newInputs = [...variantImageInputs];
+                              newInputs[index] = e.target.value;
+                              setVariantImageInputs(newInputs);
+                            }}
+                            placeholder="Enter image URL"
+                            className="flex-grow outline-none px-3 md:px-4 py-2 md:py-3 border border-gray-300 rounded-l-md focus:outline-none focus:border-pink-500 focus:ring-0 text-gray-800"
+                          />
+                          <button 
+                            type="button" 
+                            onClick={(e) => addVariantImage(index, e)}
+                            className="px-3 md:px-4 py-2 md:py-3 bg-gray-200 text-gray-800 rounded-r-lg hover:bg-gray-300 transition"
+                          >
+                            Add URL
+                          </button>
+                        </div>
+                        
+                        {/* Image Upload */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500 mb-1">
+                            Or upload an image:
+                          </label>
+                          <div className="relative">
+                            <input 
+                              type="file" 
+                              onChange={(e) => handleVariantFileUpload(index, e)} 
+                              accept="image/*" 
+                              className="sr-only" 
+                              id={`variant-file-upload-${index}`} 
+                            />
+                            <label
+                              htmlFor={`variant-file-upload-${index}`}
+                              className={`flex items-center justify-center w-full px-4 py-3 border-2 border-dashed rounded-lg ${
+                                variantUploading === index 
+                                  ? "bg-gray-100 border-gray-300" 
+                                  : "border-gray-300 hover:border-gray-400"
+                              } cursor-pointer`}
+                            >
+                              {variantUploading === index ? (
+                                <div className="flex items-center">
+                                  <svg className="animate-spin h-5 w-5 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                  <span className="text-gray-500">Uploading...</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center">
+                                  <svg className="h-6 w-6 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                    ></path>
+                                  </svg>
+                                  <span className="text-gray-500">Click to upload image</span>
+                                </div>
+                              )}
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => removeVariant(index)}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                          Remove Variant
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Variants array error */}
+                  {formik.touched.variants && formik.errors.variants && typeof formik.errors.variants === 'string' && (
+                    <div className="text-red-500 text-xs mt-1">{formik.errors.variants}</div>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
@@ -498,6 +763,7 @@ const AddProduct = () => {
                     formik.resetForm();
                     setTagInput("");
                     setImageInput("");
+                    setVariantImageInputs([""]);
                     setError("");
                     setSuccess(false);
                   }}
@@ -540,6 +806,7 @@ const AddProduct = () => {
               <h3 className="text-sm font-medium text-pink-800">Product Information</h3>
               <div className="mt-2 text-sm text-pink-700">
                 <p>All fields marked with * are required. The slug will be automatically generated from the title but can be customized.</p>
+                <p className="mt-1">Each product must have at least one variant with size, color, price, and quantity. SKUs will be auto-generated.</p>
               </div>
             </div>
           </div>

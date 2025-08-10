@@ -5,137 +5,120 @@ import { productAPI } from '../../services/api';
 
 const SearchBar = () => {
   const [query, setQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [show, setShow] = useState(false);
+
   const searchRef = useRef(null);
+  const timeoutRef = useRef(null);
   const navigate = useNavigate();
-  const searchTimeout = useRef(null);
+
+  const fetchResults = async (value) => {
+    setLoading(true);
+    try {
+      const { data } = await productAPI.searchProducts(value);
+      setResults(data);
+      setShow(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setQuery(value);
 
-    // Clear previous timeout
-    if (searchTimeout.current) {
-      clearTimeout(searchTimeout.current);
-    }
+    clearTimeout(timeoutRef.current);
 
-    if (value.trim() === '') {
-      setSearchResults([]);
-      setShowResults(false);
+    if (!value.trim()) {
+      setResults([]);
+      setShow(false);
       return;
     }
 
-    // Debounce search API call
-    searchTimeout.current = setTimeout(async () => {
-      setIsLoading(true);
-      try {
-        const response = await productAPI.searchProducts(value);
-        setSearchResults(response.data);
-        setShowResults(true);
-      } catch (error) {
-        console.error('Search error:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    }, 300);
+    timeoutRef.current = setTimeout(() => fetchResults(value), 300);
   };
 
-  const handleClearSearch = () => {
+  const clearSearch = () => {
     setQuery('');
-    setSearchResults([]);
-    setShowResults(false);
+    setResults([]);
+    setShow(false);
   };
 
-  const handleSelectProduct = (slug) => {
-    navigate(`/product/${slug}`);
-    handleClearSearch();
-  };
-
-  const handleSubmitSearch = (e) => {
+  const goToSearchPage = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/category/all?search=${encodeURIComponent(query)}`);
-      handleClearSearch();
+      navigate(`/search/?query=${encodeURIComponent(query)}`);
+      clearSearch();
     }
   };
 
-  // Close search results when clicking outside
+  const selectProduct = (slug) => {
+    navigate(`/product/${slug}`);
+    clearSearch();
+  };
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowResults(false);
+    const closeOnOutsideClick = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShow(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener('mousedown', closeOnOutsideClick);
+    return () => document.removeEventListener('mousedown', closeOnOutsideClick);
   }, []);
 
   return (
     <div ref={searchRef} className="relative">
-      <div className="flex items-center w-64">
-        <form onSubmit={handleSubmitSearch} className="flex w-full">
-          <input
-            type="text"
-            value={query}
-            onChange={handleSearch}
-            placeholder="Search products..."
-            className="w-full px-3 py-1 border border-gray-300 rounded-l-md focus:outline-none focus:ring-1 focus:ring-pink-500 text-gray-800"
-          />
+      <form onSubmit={goToSearchPage} className="flex w-64 relative">
+        <input
+          type="text"
+          value={query}
+          onChange={handleSearch}
+          placeholder="Search products..."
+          className="w-full px-3 py-1 pr-8 border border-gray-300 rounded-l-md focus:outline-none focus:border-pink-500 text-gray-800"
+        />
+        {query && (
           <button
-            type="submit"
-            className="px-2 py-1 bg-pink-600 text-white rounded-r-md hover:bg-pink-700"
+            type="button"
+            onClick={clearSearch}
+            className="absolute right-10 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
           >
-            <FiSearch />
+            <FiX size={16} />
           </button>
-          {query && (
-            <button
-              type="button"
-              onClick={handleClearSearch}
-              className="ml-2 text-gray-500 hover:text-gray-700"
-            >
-              <FiX />
-            </button>
-          )}
-        </form>
-      </div>
+        )}
+        <button type="submit" className="px-2 py-1 bg-pink-600 text-white rounded-r-md hover:bg-pink-700">
+          <FiSearch />
+        </button>
+      </form>
 
-      {/* Search results dropdown */}
-      {showResults && searchResults.length > 0 && (
+      {show && (
         <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
-          {isLoading ? (
+          {loading ? (
             <div className="p-4 text-center text-gray-500">Loading...</div>
-          ) : (
-            searchResults.map((product) => (
+          ) : results.length > 0 ? (
+            results.map((p) => (
               <div
-                key={product._id}
-                onClick={() => handleSelectProduct(product.slug)}
+                key={p._id}
+                onClick={() => selectProduct(p.slug)}
                 className="p-2 hover:bg-gray-100 cursor-pointer flex items-center"
               >
-                {product.images && product.images[0] && (
-                  <img src={product.images[0]} alt={product.title} className="h-10  object-contain mr-4" />
-                )}
+                {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="h-10 w-10 object-contain mr-4" />}
                 <div>
-                  <div className="text-sm font-medium">{product.title}</div>
-                  <div className="text-xs text-gray-500">{product.category}</div>
+                  <div className="text-sm font-medium">{p.title}</div>
+                  <div className="text-xs text-gray-500">{p.category}</div>
                 </div>
               </div>
             ))
+          ) : (
+            query && <div className="p-3 text-center text-gray-500">No products found</div>
           )}
-        </div>
-      )}
-
-      {showResults && query && searchResults.length === 0 && !isLoading && (
-        <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-50 p-3 text-center text-gray-500">
-          No products found
         </div>
       )}
     </div>
   );
 };
 
-export default SearchBar; 
+export default SearchBar;

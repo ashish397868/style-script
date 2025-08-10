@@ -58,10 +58,10 @@ const AddressCard = ({
       <div className="mt-4 pt-4 border-t border-gray-100">
         <button 
           onClick={(e) => {
-            e.stopPropagation();
-            onEdit(address);
+            e.stopPropagation();// Event ka travel parent tak rok deta hai
+            onEdit(address);  // Sirf edit wala kaam karega
           }} 
-          className="text-pink-600 hover:text-pink-800 flex items-center text-sm"
+          className="cursor-pointer text-pink-600 hover:text-pink-800 flex items-center text-sm"
         >
           <FiEdit2 className="mr-1" /> Edit address
         </button>

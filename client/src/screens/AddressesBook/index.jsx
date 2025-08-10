@@ -2,23 +2,20 @@ import { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiMapPin, FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Loader from "../../components/Loader";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import { addressAPI } from "../../services/api";
 
 const AddressBook = () => {
-  const { user, fetchProfile, updateProfile } = useUserProfile();
+  const { user, fetchUserProfile , setUserState} = useUserHook();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  useEffect(() => {
-  if (user?.addresses?.length) {
-    setAddresses(user.addresses);
-    return;
-  }
+useEffect(() => {
+  if (!user) {
     setLoading(true);
-    fetchProfile()
+    fetchUserProfile()
       .then((res) => {
         setAddresses(res.addresses || []);
         setError("");
@@ -28,7 +25,10 @@ const AddressBook = () => {
         setError("Failed to load addresses");
       })
       .finally(() => setLoading(false));
-  }, [user,fetchProfile]);
+  } else {
+    setAddresses(user.addresses || []);
+  }
+}, [user]);
 
   const handleAddAddress = () => {
     navigate("/addresses/new");
@@ -44,23 +44,32 @@ const AddressBook = () => {
       const updated = addresses.filter((addr) => addr._id !== id);
       await addressAPI.deleteAddress(id);
       setAddresses(updated);
-      await updateProfile({ addresses: updated });
+      setUserState({ ...user, addresses: updated });
     } catch {
       setError("Failed to remove address");
     } 
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+    <div className="min-h-screen max-w-4xl mx-auto p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Your Addresses</h1>
-        <button onClick={handleAddAddress} className="flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition-colors">
+        <button onClick={handleAddAddress} className="cursor-pointer flex items-center px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-md transition-colors">
           <FiPlus className="mr-2" /> Add address
         </button>
       </div>
 
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <Loader />}
+
+      {addresses.length === 0 && (
+        <div className="min-h-[500px] flex justify-center items-center">
+          <div className="text-gray-600 text-3xl mb-4">
+            No addresses found. Create a new address.
+          </div>
+        </div>
+      )}
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {addresses.map((address) => (

@@ -7,8 +7,10 @@ const getInitialCart = () => {
       const parsed = JSON.parse(cart);
       return parsed;
     }
-  } catch {}
-  return {};
+  } catch {
+    console.warn("Corrupted cart data in localStorage, resetting.");
+  }
+  return {}
 };
 
 const calculateSubTotal = (cart) => {
@@ -26,13 +28,23 @@ const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+
     addToCart: (state, action) => {
       const { key, qty, itemDetails } = action.payload;
+      
       if (state.cart[key]) {
-        state.cart[key].qty += qty; //agr vo product cart mein hai to , uski quantity plus krdo
+        state.cart[key].qty += qty; //increase the quantity
       } else {
-        state.cart[key] = { ...itemDetails, qty }; //nhi to new product add krdo cart mein
+        state.cart[key] = { //create new cart item
+          ...itemDetails,
+          qty,
+          variantInfo: {
+            size: itemDetails.size,
+            color: itemDetails.color
+          }
+        };
       }
+
       state.subTotal = calculateSubTotal(state.cart);
       localStorage.setItem("cart", JSON.stringify(state.cart));
     },
@@ -40,9 +52,11 @@ const cartSlice = createSlice({
     removeFromCart: (state, action) => {
       const { key, qty } = action.payload;
       if (state.cart[key]) {
-        state.cart[key].qty -= qty;
-        if (state.cart[key].qty <= 0) { //agr quantity zero se kam hai to us item ko delete krdo cart se
+        const newQty = state.cart[key].qty - qty;
+        if (newQty <= 0) {
           delete state.cart[key];
+        } else {
+          state.cart[key].qty = newQty;
         }
       }
       state.subTotal = calculateSubTotal(state.cart);

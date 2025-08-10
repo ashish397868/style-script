@@ -1,0 +1,41 @@
+{
+    "687e61836e88613c720d8e7a-XL-navy blue": {
+        "price": 855,
+        "name": "CodesWear Broken Developer Sweatshirt | Full Sleeve Sweatshirt for Men",
+        "size": "XL",
+        "color": "navy blue",
+        "image": "https://m.media-amazon.com/images/I/51DRkpZ4YTL._SX679_.jpg",
+        "productId": "687e61836e88613c720d8e7a",
+        "qty": 3,
+        "variantInfo": {
+            "size": "XL",
+            "color": "navy blue"
+        }
+    },
+    "685e37fd5a046910ec3df0a6-M-red": {
+        "price": 399,
+        "name": "Jockey 2726 Men's Super Combed Cotton Rich Solid Regular Fit V Neck Half Sleeve T-Shirt",
+        "size": "M",
+        "color": "red",
+        "image": "https://m.media-amazon.com/images/I/61q8raq+FkL._SX569_.jpg",
+        "productId": "685e37fd5a046910ec3df0a6",
+        "qty": 1,
+        "variantInfo": {
+            "size": "M",
+            "color": "red"
+        }
+    },
+    "687e67c46e88613c720d8eba-L-black": {
+        "price": 4999,
+        "name": "Scott International Men's Cotton Hoodie Sweatshirt",
+        "size": "L",
+        "color": "black",
+        "image": "https://m.media-amazon.com/images/I/61vY+TQB-uL._SX679_.jpg",
+        "productId": "687e67c46e88613c720d8eba",
+        "qty": 1,
+        "variantInfo": {
+            "size": "L",
+            "color": "black"
+        }
+    }
+}

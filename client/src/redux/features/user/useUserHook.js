@@ -7,7 +7,11 @@ import {
   forgotPassword, 
   resetPassword, 
   logout, 
-  clearError 
+  clearError ,
+  fetchProfile,
+  updateProfile,
+  changePassword,
+  setUser
 } from './userSlice'; 
 
 const useUser = () => {
@@ -16,7 +20,8 @@ const useUser = () => {
   // Get all user state values
   const {
     user,
-    isLoading,
+    authLoading,
+    passwordLoading,
     error,
     isAuthenticated
   } = useSelector(state => state.user);
@@ -54,11 +59,28 @@ const useUser = () => {
     dispatch(clearError());
   }, [dispatch]);
 
+  const fetchUserProfile = useCallback(() => {
+    return dispatch(fetchProfile());
+  }, [dispatch]);
+
+  const updateUserProfile = useCallback((data) => {
+    return dispatch(updateProfile(data));
+  }, [dispatch]);
+
+  const changeUserPassword = useCallback((data) => {
+    return dispatch(changePassword(data));
+  }, [dispatch]);
+
+  const setUserState = useCallback((userData) => {
+  dispatch(setUser(userData));
+}, [dispatch]);
+
   // Return all state and actions
   return {
     // State
     user,
-    isLoading,
+    authLoading,
+    passwordLoading,
     error,
     isAuthenticated,
     
@@ -70,7 +92,11 @@ const useUser = () => {
     resetUserPassword,
     logoutUser,
     clearUserError,
-    
+    fetchUserProfile,
+    updateUserProfile,
+    changeUserPassword,
+    setUserState,
+
     // Computed values (optional - add more as needed)
     isLoggedIn: isAuthenticated && user !== null,
     isAdmin: user?.role === 'admin',
@@ -81,3 +107,23 @@ const useUser = () => {
 };
 
 export default useUser;
+
+
+/*
+  Why use unwrap() here?
+
+  - Normally, dispatch(someThunk()) returns a Promise that ALWAYS resolves,
+    even if the thunk was rejected. This means .catch() will NOT run for errors.
+  
+  - unwrap() changes this behavior:
+      ✔ If thunk is fulfilled → returns the actual data (resolved value).
+      ✔ If thunk is rejected → throws an error (rejected Promise), so .catch() will run.
+  
+  - This is useful when you want try/catch or .then/.catch to handle API errors directly.
+  
+  Example:
+    dispatch(loginUser(credentials))
+      .unwrap()
+      .then(data => console.log("Success:", data))
+      .catch(err => console.log("Error:", err));
+*/

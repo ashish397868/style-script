@@ -23,7 +23,7 @@ export default defineConfig({
   },
     preview: {
     host: true,
-    port: 5173,
+    port: 5173,  // yeah production build dekhne ke liye use hoti hai
   },
   build: {
     rollupOptions: {
@@ -36,7 +36,7 @@ export default defineConfig({
       },
     },
     // Optimize build for production
-    minify: 'terser',
+    minify: 'terser', // JavaScript ko compress karta hai for faster loading.
     terserOptions: {
       compress: {
         drop_console: true, // Remove console logs in production

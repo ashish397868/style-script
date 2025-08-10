@@ -17,9 +17,7 @@ export default function Orders() {
         setOrders(res.data || []);
         setError(null);
       } catch (err) {
-        setError(
-          err?.response?.data?.message || "Failed to fetch orders. Please try again later."
-        );
+        setError(err?.response?.data?.message || "Failed to fetch orders. Please try again later.");
       } finally {
         setLoading(false);
       }
@@ -28,17 +26,11 @@ export default function Orders() {
   }, []);
 
   if (loading) {
-    return (
- <Loader />
-    );
+    return <Loader />;
   }
 
   if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">
-        {error}
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">{error}</div>;
   }
 
   return (
@@ -52,20 +44,14 @@ export default function Orders() {
         {orders.length === 0 ? (
           <div className="bg-white rounded-xl shadow p-8 text-center">
             <p className="text-lg text-gray-600 mb-4">You have not placed any orders yet.</p>
-            <Link
-              to="/"
-              className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
-            >
+            <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium">
               Shop Now
             </Link>
           </div>
         ) : (
           <div className="space-y-8">
             {orders.map((order) => (
-              <div
-                key={order._id}
-                className="bg-white rounded-xl shadow flex flex-col md:flex-row items-center md:items-stretch p-6 gap-6 border border-gray-100"
-              >
+              <div key={order._id} className="bg-white rounded-xl shadow flex flex-col md:flex-row items-center md:items-stretch p-6 gap-6 border border-gray-100">
                 <div className="flex-1">
                   <div className="flex flex-wrap gap-2 mb-2">
                     {order.products?.slice(0, 3).map((product) => (
@@ -74,12 +60,13 @@ export default function Orders() {
                         src={product.image || "/placeholder.png"}
                         alt={product.name || "Product image"}
                         className="w-16 h-16 object-contain rounded-lg border bg-gray-100"
-                        onError={e => { e.target.onerror = null; e.target.src = "/placeholder.png"; }}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = "/placeholder.png";
+                        }}
                       />
                     ))}
-                    {order.products?.length > 3 && (
-                      <span className="ml-2 text-gray-500 text-sm self-center">+{order.products.length - 3} more</span>
-                    )}
+                    {order.products?.length > 3 && <span className="ml-2 text-gray-500 text-sm self-center">+{order.products.length - 3} more</span>}
                   </div>
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Order #</span>
@@ -88,20 +75,16 @@ export default function Orders() {
                   <div className="mb-1">
                     <span className="font-medium text-gray-700">Total:</span>
                     <span className="text-gray-900 ml-1">₹{order.amount?.toLocaleString()}</span>
+                    {/* toLocaleString() formats data with commas like 1,000 */}
                   </div>
                   <div className="mb-1 flex items-center">
                     <FiTruck className="text-pink-600 mr-1" />
                     <span className="text-gray-700">{order.deliveryStatus || "Processing"}</span>
                   </div>
-                  <div className="mb-1 text-gray-500 text-sm">
-                    Placed on {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}
-                  </div>
+                  <div className="mb-1 text-gray-500 text-sm">Placed on {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "-"}</div>
                 </div>
                 <div className="flex flex-col justify-center items-center">
-                  <Link
-                    to={`/order/${order._id}`}
-                    className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
-                  >
+                  <Link to={`/order/${order._id}`} className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium">
                     View Details <FiChevronRight className="ml-2" />
                   </Link>
                 </div>

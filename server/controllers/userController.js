@@ -1,11 +1,10 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const validator = require("validator");
 const sendEmail = require("../utils/sendEmail");
 const { welcomeEmailTemplate } = require("../utils/emailTemplates/welcomeEmailTemplate");
-const NodeCache = require('node-cache');
-const cache = new NodeCache({ stdTTL: 60 * 30 }); // 30 min cache
+const { cookieOptions } = require("../utils/cookieOptions");
+const safeUserFields = "-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt";
 
 const handleSignup = async (req, res) => {
   try {
@@ -40,28 +39,26 @@ const handleSignup = async (req, res) => {
       }).catch(console.error);
     });
 
+    // setImmediate use karke hum keh rahe hain:-> "Pehle response bhej do user ko, baad mein email bhejna background mein chalu karo."
+
     // Generate JWT token
     const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    return res.status(201)
-    .cookie("token", token, {
-      httpOnly: true,   // cannot be accessed via JS
-      secure: false,    // set to true if using HTTPS
-      sameSite: "lax",  //balanced security
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    })
-    .json({
-      message: "Signup successful!",
-      token,
-      success: true,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-    });
+    return res
+      .status(201)
+      .cookie("token", token, cookieOptions)
+      .json({
+        message: "Signup successful!",
+        token,
+        success: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          role: user.role,
+        },
+      });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }
@@ -75,13 +72,13 @@ const handleLogin = async (req, res) => {
       return res.status(400).json({ message: "Email and password are required!" });
     }
 
-    const user = await User.findOne({ email }).select("name email password role phone addresses active").lean();
-
+    const user = await User.findOne({ email }).select("name email password role phone addresses active");
+    
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials!" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await user.isPasswordCorrect(password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials!" });
     }
@@ -92,28 +89,38 @@ const handleLogin = async (req, res) => {
 
     const token = jwt.sign({ userid: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    return res.status(200)
-    .cookie("token", token, {
-      httpOnly: true,   // cannot be accessed via JS
-      secure: false,    // set to true if using HTTPS
-      sameSite: "lax",  //balanced security
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-    })
-    .json({
-      message: "Login successful!",
-      token,
-      success: true,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        addresses: user.addresses,
-        role: user.role,
-      },
-    });
+    return res
+      .status(200)
+      .cookie("token", token, cookieOptions)
+      .json({
+        message: "Login successful!",
+        token,
+        success: true,
+        user: {
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          addresses: user.addresses,
+          role: user.role,
+        },
+      });
   } catch (error) {
     console.error("Login Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// GET single user (self)
+const getUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select(safeUserFields).lean();
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    return res.json(user);
+  } catch (error) {
+    console.error("Get User Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -125,20 +132,19 @@ const updateProfile = async (req, res) => {
     const { name, email, phone } = req.body;
 
     if (email && !validator.isEmail(email)) {
-      return res.status(400).json({ message: "Invalid email format" });
+      const emailExists = await User.exists({ email, _id: { $ne: userId } });
+      if (emailExists) {
+        return res.status(400).json({ message: "Email already in use" , success: false});
+      }
     }
 
     if (phone && !validator.isMobilePhone(phone, "any")) {
       return res.status(400).json({ message: "Invalid phone number format" });
     }
 
-    const hasUpdates = Boolean(name) || Boolean(email) || Boolean(phone);
-
-    if (!hasUpdates) {
-      const current = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
+    if (!name && !email && !phone) {
       return res.json({
-        message: "No changes to update",
-        user: current,
+        message: "All fields are empty",
       });
     }
 
@@ -152,7 +158,7 @@ const updateProfile = async (req, res) => {
       { $set: updateFields },
       {
         new: true,
-        select: "-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt",
+        select: safeUserFields,
         lean: true,
       }
     );
@@ -160,8 +166,6 @@ const updateProfile = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    // cache.del(`user-${userId}`);
 
     return res.json({
       message: "Profile updated successfully",
@@ -174,37 +178,10 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// GET single user (self)
-const getUser = async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    // const cacheKey = `user-${userId}`;
-    // const cached = cache.get(cacheKey);
-    // if (cached) {
-    //   return res.json(cached);
-    // }
-
-    const user = await User.findById(userId).select("-password -resetPasswordToken -resetPasswordExpires -createdAt -updatedAt").lean();
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // cache.set(cacheKey, user);
-    return res.json(user);
-  } catch (error) {
-    console.error("Get User Error:", error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
 // GET all users (admin)
 const getAllUsers = async (req, res) => {
   try {
-    // const cacheKey = "all-users";
-    // const cached = cache.get(cacheKey);
-    // if (cached) return res.json(cached);
-
     const users = await User.find().select("_id name phone role active createdAt updatedAt").lean();
-    // cache.set(cacheKey, users);
     return res.json(users);
   } catch (error) {
     console.error("Get All Users Error:", error);
@@ -239,10 +216,8 @@ const updateUserRole = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // cache.del(`all-users`);
-    // cache.del(`user-${id}`); // Clear cache for updated user
-    
     return res.json({
+      success: true,
       message: "User updated successfully",
       user,
     });
@@ -260,12 +235,10 @@ const deleteUser = async (req, res) => {
     const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" , success: false});
     }
 
-  // cache.del(`all-users`);
-  // cache.del(`user-${id}`);
-    return res.json({ message: "User deleted successfully" });
+    return res.json({ message: "User deleted successfully" , success: true });
   } catch (error) {
     console.error("Delete User Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -276,10 +249,15 @@ const deleteUser = async (req, res) => {
 const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email is required!" });
+    if (!email) return res.status(400).json({ message: "Email is required!" , success: false});
 
     // Generate 6 digit reset code
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    /*resetCode = Math.floor(100000 + 0.83746 * 900000).toString();
+           = Math.floor(100000 + 753714)
+           = Math.floor(853714)
+           = "853714"
+    */       
     const resetExpires = Date.now() + 15 * 60 * 1000; // 15 minutes
 
     const user = await User.findOneAndUpdate(
@@ -302,11 +280,9 @@ const forgotPassword = async (req, res) => {
              <p>This code will expire in 15 minutes.</p>`,
     });
 
-    const userId = user._id.toString();
-    // cache.del(`user-${userId}`);
     return res.json({
       success: true,
-      message: "Password reset code sent to email",
+      message: `Password reset code sent to email : ${email}`,
     });
   } catch (error) {
     console.error("Forgot Password Error:", error);
@@ -325,7 +301,7 @@ const resetPassword = async (req, res) => {
     const user = await User.findOne({
       email,
       resetPasswordToken: otp,
-      resetPasswordExpires: { $gt: Date.now() },
+      resetPasswordExpires: { $gt: Date.now() },//Find users where the resetPasswordExpires timestamp is greater than the current time , means resetPasswordToken does not expire
     }).select("resetPasswordToken resetPasswordExpires");
 
     if (!user) return res.status(400).json({ message: "Invalid or expired password reset token" });
@@ -334,9 +310,6 @@ const resetPassword = async (req, res) => {
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
     await user.save();
-      // cache.del(`all-users`);
-      // const userId = user._id.toString();
-      // cache.del(`user-${userId}`);
     return res.json({ success: true, message: "Password has been reset successfully" });
   } catch (error) {
     console.error("Reset Password Error:", error);
@@ -349,7 +322,7 @@ const changePassword = async (req, res) => {
   try {
     const userId = req.user._id;
     const { currentPassword, newPassword } = req.body;
-    
+
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ message: "Current password and new password are required" });
     }
@@ -363,7 +336,7 @@ const changePassword = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    const isMatch = await user.isPasswordCorrect(currentPassword);
     if (!isMatch) {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
@@ -371,9 +344,9 @@ const changePassword = async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    return res.json({ 
-      success: true, 
-      message: "Password changed successfully" 
+    return res.json({
+      success: true,
+      message: "Password changed successfully",
     });
   } catch (error) {
     console.error("Change Password Error:", error);
@@ -383,11 +356,7 @@ const changePassword = async (req, res) => {
 
 const handleLogout = async (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax"
-    });
+    res.clearCookie("token", cookieOptions);
     return res.json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     console.error("Logout error:", error);
@@ -406,5 +375,5 @@ module.exports = {
   deleteUser,
   getUser,
   changePassword,
-  handleLogout
+  handleLogout,
 };

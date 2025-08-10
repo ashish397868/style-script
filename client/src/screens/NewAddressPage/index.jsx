@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { addressAPI } from "../../services/api";
-import useUserProfile from "../../redux/features/user/userProfileHook";
+import useUserHook from "../../redux/features/user/useUserHook";
 import { addressInitialValues, addressValidationSchema } from "../../utils/formConfig/addressFormConfig";
 
 const NewAddressPage = () => {
   const navigate = useNavigate();
-  const { user, updateProfile } = useUserProfile();
+  const { user, updateUserProfile } = useUserHook();
 
   const handleSubmit = async (values, { setSubmitting, setFieldError }) => {
     try {
@@ -15,7 +15,7 @@ const NewAddressPage = () => {
       const newAddress = res?.data || values;
 
       // update redux user profile with new address
-      await updateProfile({
+      await updateUserProfile({
         addresses: [...(user?.addresses || []), newAddress],
       });
 
@@ -98,10 +98,10 @@ const NewAddressPage = () => {
 
             {/* Buttons */}
             <div className="flex justify-end gap-3 mt-8">
-              <button type="button" onClick={() => navigate("/addresses")} className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+              <button type="button" onClick={() => navigate("/addresses")} className="cursor-pointer px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
               </button>
-              <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 flex items-center justify-center" disabled={isSubmitting}>
+              <button type="submit" className="cursor-pointer px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 flex items-center justify-center" disabled={isSubmitting}>
                 {isSubmitting ? "Adding..." : "Add Address"}
               </button>
             </div>
@@ -113,3 +113,30 @@ const NewAddressPage = () => {
 };
 
 export default NewAddressPage;
+
+{/* 
+----------------------------------------------
+📌 Formik `<Field>` Component Kaise Kaam Karta Hai:
+----------------------------------------------
+1. Jab hum `<Formik>` component use karte hain, wo apne children 
+   (Form, Field, ErrorMessage, etc.) ko ek "context" deta hai.
+   Is context me `values`, `errors`, `touched` aur form handlers 
+   (`handleChange`, `handleBlur`, `setFieldValue`, etc.) hote hain.
+
+2. `<Field name="phone" />` likhne ka matlab hai:
+   - Formik ke `values.phone` se value bind karo.
+   - `onChange` ko Formik ke `handleChange` se bind karo.
+   - `onBlur` ko Formik ke `handleBlur` se bind karo.
+   - Ye sab kaam internally `getFieldProps(name)` call karke hota hai.
+
+3. Is wajah se hume manually `onChange`, `onBlur` ya `value` 
+   pass karne ki zarurat nahi padti.
+
+4. Agar hum `<input>` direct use karein bina `<Field>` ke,
+   to hume ye sab props manually dene padte:
+5. `<ErrorMessage name="phone" />` sirf Formik ke `errors.phone` 
+se error text nikalta hai aur display karta hai agar wo exist kare.
+
+⚡ Summary: `<Field>` = `getFieldProps(name)` + automatic binding
+----------------------------------------------
+*/}

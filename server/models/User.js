@@ -3,21 +3,33 @@ const { Schema, model } = require("mongoose");
 
 const UserSchema = new Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    phone: { type: String },
+    name: { type: String, required: true, trim: true }, //trim " aaa " -> "aaa" trim starting aur ending ke spaces remove krdeta hai
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+
+    /*
+    unique: true automatically creates a unique index, which also serves the purpose of indexing.
+    Shortcut inside schema definition to create index index: true
+     */
+
+    password: { type: String, required: true, select: false },
+    
+    /* 
+    Whenever you use Mongoose's .find() or .findOne() — it won’t return password by default. Ye security ke liye hota hai. agr password chaiye to aise likhna pdega 
+    const user = await User.findOne({ email: "test@gmail.com" }).select('+password');
+    */
+
+    phone: { type: String, trim: true, index: true },
     addresses: [
       {
-        name: { type: String, default: "" },
-        phone: { type: String, default: "" },
-        country: { type: String, default: "India" },
-        addressLine1: { type: String, default: "" },
-        addressLine2: { type: String, default: "" },
-        city: { type: String, default: "" },
-        state: { type: String, default: "" },
-        pincode: { type: String, default: "" },
-      }
+        name: { type: String, default: "", trim: true },
+        phone: { type: String, default: "", trim: true },
+        country: { type: String, default: "India", trim: true },
+        addressLine1: { type: String, default: "", trim: true },
+        addressLine2: { type: String, default: "", trim: true },
+        city: { type: String, default: "", trim: true },
+        state: { type: String, default: "", trim: true },
+        pincode: { type: String, default: "", trim: true },
+      },
     ],
     role: {
       type: String,
@@ -27,7 +39,7 @@ const UserSchema = new Schema(
     active: {
       type: Boolean,
       default: true,
-    },
+    }, 
     resetPasswordToken: { type: String, default: null },
     resetPasswordExpires: { type: Date, default: null },
   },
@@ -40,5 +52,10 @@ UserSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 8);
   next();
 });
+
+// function to compare password , Jab kisi specific document ka data process karna ho to use methods
+UserSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password);
+};
 
 module.exports = model("User", UserSchema);

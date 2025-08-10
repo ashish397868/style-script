@@ -1,5 +1,5 @@
-export function welcomeEmailTemplate(name){
-    return `
+export function welcomeEmailTemplate(name) {
+  return `
   <div style="font-family: 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
     <div style="background: linear-gradient(135deg, #6b21a8, #9333ea); padding: 20px 30px; color: #fff;">
       <h1 style="margin: 0;">Welcome, ${name}!</h1>
@@ -28,5 +28,5 @@ export function welcomeEmailTemplate(name){
       You’re receiving this email because you signed up at ScriptStyle.<br>
       <a href="https://scriptstyle.com/unsubscribe" style="color: #6b21a8; text-decoration: none;">Unsubscribe</a>
     </div>
-  </div>`
+  </div>`;
 }

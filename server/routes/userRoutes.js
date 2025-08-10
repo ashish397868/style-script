@@ -19,9 +19,17 @@ const{
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 10, // 10 login attempts per windowMs per IP
-  standardHeaders: 'draft-7',
+  standardHeaders: 'draft-7', // newer format for rate limit headers
   message: 'Too many login attempts from this IP, please try again after 15 minutes'
 });
+
+/*
+Ek IP 15 minutes ke andar sirf 10 requests hi kar sakti hai in routes par:
+/signup
+/login
+/forgot-password
+/reset-password
+*/
 
 // Public routes
 router.post('/signup', authLimiter,  handleSignup);//tested
@@ -30,13 +38,13 @@ router.post('/forgot-password', authLimiter, forgotPassword);//tested
 router.post('/reset-password', authLimiter, resetPassword);//tested
 
 // Protected routes
-router.get('/users/profile', authenticateUser, getUser);
-router.patch('/users/profile', authenticateUser,updateProfile);//tested
-router.post('/users/change-password', authenticateUser, changePassword);
+router.get('/profile', authenticateUser, getUser);
+router.patch('/profile', authenticateUser,updateProfile);//tested
+router.post('/change-password', authenticateUser, changePassword);
 
 // Admin routes
-router.get('/users', authenticateUser, isAdmin, getAllUsers);//tested
-router.patch('/users/:id', authenticateUser, isAdmin,updateUserRole);
-router.delete('/users/:id', authenticateUser, isAdmin,deleteUser);
+router.get('/', authenticateUser, isAdmin, getAllUsers);//tested
+router.patch('/:id', authenticateUser, isAdmin,updateUserRole);
+router.delete('/:id', authenticateUser, isAdmin,deleteUser);
 
 module.exports = router;

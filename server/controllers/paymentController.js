@@ -1,105 +1,104 @@
+// controllers/paymentController.js
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const { v4: uuidv4 } = require("uuid");
 const Order = require("../models/Order");
-const sendEmail = require("../utils/sendEmail");
+const Product = require("../models/Product");
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// 1️⃣ Create a Razorpay order
+// 1️⃣ Simplified Razorpay Order Creation
 exports.createPaymentOrder = async (req, res) => {
   try {
     const { amount, currency = "INR" } = req.body;
-    if (!amount) {
-      return res.status(400).json({ message: "Amount is required" });
+
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ message: "Invalid amount" });
     }
 
-    // generate your own internal order ID (receipt)
-    const receiptId = "order_" + Date.now();
+    // Generate unique internal orderId (receipt)
+    const receipt = uuidv4().slice(0, 20); // max 40 chars, 20 is enough
 
-    // Razorpay expects amount in paise
-    const options = {
-      amount: amount * 100, //paise
+    // Create Razorpay Order
+    const razorOrder = await razorpay.orders.create({
+      amount: amount * 100, // ₹ → paise
       currency,
-      receipt: receiptId,
-    };
+      receipt,
+    });
 
-    const razorOrder = await razorpay.orders.create(options);
-
-    // return both DB order and Razorpay order
-    res.json({
+    return res.json({
       success: true,
-      order: {
+      razorpayOrder: {
         id: razorOrder.id,
         amount: razorOrder.amount,
         currency: razorOrder.currency,
       },
-      receipt: receiptId,
+      receipt,
     });
-  } catch (error) {
-    console.error("Create Payment Order Error:", error);
-    res.status(500).json({ message: "Failed to create Razorpay order" });
+  } catch (err) {
+    console.error("createPaymentOrder error:", err);
+    return res.status(500).json({ message: "Server error while creating payment order" });
   }
 };
 
-// 2️⃣ Verify payment and update your Order
+// Verify Payment
 exports.verifyPayment = async (req, res) => {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature,
-      receipt, // your internal orderId
-    } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, receipt } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !receipt) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    // 1. Recompute signature
-    const generatedSignature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-    .digest("hex");
-
-    if (generatedSignature !== razorpay_signature) {
-      return res.status(400).json({ message: "Unauthorized payment attempt" });
-    }
-
-    // 2. Find & update your Order
-    const order = await Order.findOneAndUpdate(
-      { orderId: receipt },
-      {
-        status: "Paid",
-        paymentInfo: { razorpay_order_id, razorpay_payment_id, razorpay_signature },
-      },
-      { new: true }
-    );
-
+    const order = await Order.findOne({ orderId: receipt });
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // 3. Send confirmation email (optional)
-    setImmediate(()=>{
-      sendEmail({
-          to: req.user.email,
-          subject: `Payment Received for ${receipt}`,
-          html: `
-            <h2>Thank you for your purchase!</h2>
-            <p>Your payment for <strong>Order ${receipt}</strong> of amount <strong>₹${order.amount}</strong> has been received successfully.</p>
-            <p>We’re now processing your order and will notify you once it’s shipped.</p>
-            <br/>
-            <p>Happy Shopping,<br/><strong>ScriptStyle Team</strong></p>
-          `,
-        })
-    })
+    const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(`${razorpay_order_id}|${razorpay_payment_id}`).digest("hex");
 
-    res.json({ success: true, message: "Payment verified and order updated", order });
-  } catch (error) {
-    console.error("Verify Payment Error:", error);
-    res.status(500).json({ message: "Payment verification failed" });
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({ message: "Invalid payment signature" });
+    }
+
+    const payment = await razorpay.payments.fetch(razorpay_payment_id);
+    const paidAmount = payment.amount / 100;
+
+    // ✅ 1. Update Order Info
+    order.status = "Paid";
+    order.amount = paidAmount;
+    order.paymentInfo = {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+    };
+
+    await order.save();
+
+    for (let item of order.products) {
+      const qty = Number(item.quantity);
+      await Product.updateOne({ _id: item.productId, "variants._id": item.variantId }, { $inc: { "variants.$.availableQty": -qty } });
+    }
+
+    return res.json({
+      success: true,
+      message: "Payment verified & stock updated",
+      order,
+    });
+  } catch (err) {
+    console.error("verifyPayment error:", err);
+    return res.status(500).json({ message: "Payment verification failed", error: err.message });
   }
 };
+
+/**
+  ❗ Important Notes:
+  .find() sirf pehla matching item return karta hai
+
+  Agar multiple items match karte ho, sirf pehla milega
+
+  return karta hai pura object/value, not just true/false (woh filter() karta hai)
+ */

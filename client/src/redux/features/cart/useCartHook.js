@@ -14,10 +14,18 @@ const useCart = () => {
 
   // wrap all dispatches with useCallback
   const addItem = useCallback((key, qty, itemDetails) => {
+    if (!key || !qty || !itemDetails) {
+      console.error("Missing required parameters for adding item to cart");
+      return;
+    }
     dispatch(addToCart({ key, qty, itemDetails }));
   }, [dispatch]);
 
-  const removeItem = useCallback((key, qty) => {
+  const removeItem = useCallback((key, qty = 1) => {
+    if (!key) {
+      console.error("Missing key for removing item from cart");
+      return;
+    }
     dispatch(removeFromCart({ key, qty }));
   }, [dispatch]);
 

@@ -1,7 +1,7 @@
 // controllers/reviewController.js
-const Review  = require("../models/Review");
-const NodeCache = require('node-cache');
-const cache = new NodeCache({ stdTTL: 60 * 5 }); // 5 mins cache
+const Review = require("../models/Review");
+const { cache, invalidateReviewCache } = require("../utils/cache");
+const updateProductRating = require("../utils/updateProductRating");
 
 // Create a new review (authenticated users)
 exports.createReview = async (req, res) => {
@@ -14,7 +14,11 @@ exports.createReview = async (req, res) => {
       return res.status(400).json({ message: "productId and rating are required" });
     }
 
-    // Optional: prevent duplicate reviews by same user
+    if (rating != null && (rating < 1 || rating > 5)) {
+      return res.status(400).json({ message: "Invalid rating" });
+    }
+
+    //prevent duplicate reviews by same user
     const existing = await Review.exists({ productId, userId });
     if (existing) {
       return res.status(400).json({ message: "You have already reviewed this product" });
@@ -22,38 +26,12 @@ exports.createReview = async (req, res) => {
 
     const review = await Review.create({ productId, userId, rating, comment });
 
-    cache.del("all-reviews");
-    cache.del(`reviews-product-${productId}`);
+    await updateProductRating(productId);
+    invalidateReviewCache(productId);
+
     return res.status(201).json({ message: "Review created", review });
   } catch (err) {
     console.error("createReview error:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-};
-
-// Get all reviews for a product (public)
-exports.getReviewsForProduct = async (req, res) => {
-  try {
-    const { productId } = req.params;
-
-    const cacheKey = `reviews-product-${productId}`;
-
-    // Try cache first
-    const cached = cache.get(cacheKey);
-    if (cached) {
-      return res.json(cached);
-    }
-
-    const reviews = await Review.find({ productId })
-      .populate("userId", "name") 
-      .sort({ createdAt: -1 })
-      .lean();
-
-    cache.set(cacheKey, reviews)
-
-    return res.json(reviews);
-  } catch (err) {
-    console.error("getReviewsForProduct error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
@@ -63,9 +41,11 @@ exports.getReviewById = async (req, res) => {
   try {
     const { id } = req.params;
     const review = await Review.findById(id).populate("userId", "name").lean();
+
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
+
     return res.json(review);
   } catch (err) {
     console.error("getReviewById error:", err);
@@ -84,15 +64,23 @@ exports.updateReview = async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
+
     if (!review.userId.equals(userId)) {
+      // .equals() is built into Mongoose (via BSON ObjectId) , in this === not works because In Mongoose, review.userId is usually a MongoDB ObjectId (ObjectId("...")), not a plain string.
       return res.status(403).json({ message: "Not authorized" });
     }
 
+    if (rating != null && (rating < 1 || rating > 5)) {
+      return res.status(400).json({ message: "Invalid rating" });
+    }
+
     if (rating != null) review.rating = rating;
-    if (comment!= null) review.comment = comment;
+    if (comment != null) review.comment = comment;
+
     await review.save();
 
-     cache.del("all-reviews");
+    await updateProductRating(review.productId);
+    invalidateReviewCache(review.productId);
 
     return res.json({ message: "Review updated", review });
   } catch (err) {
@@ -111,13 +99,17 @@ exports.deleteReview = async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
-    // allow admin or owner
+
+    // Only allow if user is the review owner OR an admin
     if (!review.userId.equals(userId) && req.user.role !== "admin") {
       return res.status(403).json({ message: "Not authorized" });
     }
 
     await Review.findByIdAndDelete(id);
-    cache.del("all-reviews");
+
+    await updateProductRating(review.productId);
+    invalidateReviewCache(review.productId);
+
     return res.json({ message: "Review deleted" });
   } catch (err) {
     console.error("deleteReview error:", err);
@@ -125,10 +117,33 @@ exports.deleteReview = async (req, res) => {
   }
 };
 
+// Get all reviews for a product (public)
+exports.getReviewsForProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const cacheKey = `reviews-product-${productId}`;
+
+    // Try cache first
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      return res.json(cached);
+    }
+
+    const reviews = await Review.find({ productId }).populate("userId", "name").sort({ createdAt: -1 }).lean();
+
+    cache.set(cacheKey, reviews);
+
+    return res.json(reviews);
+  } catch (err) {
+    console.error("getReviewsForProduct error:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
 // Admin: get all reviews (admin)
 exports.getAllReviews = async (req, res) => {
   try {
-
     const cacheKey = "all-reviews";
 
     const cached = cache.get(cacheKey);
@@ -136,13 +151,9 @@ exports.getAllReviews = async (req, res) => {
       return res.json(cached);
     }
 
-    const reviews = await Review.find()
-      .populate("userId", "name email")
-      .populate("productId", "title slug")
-      .sort({ createdAt: -1 })
-      .lean();
+    const reviews = await Review.find().populate("userId", "name email").populate("productId", "title slug").sort({ createdAt: -1 }).lean();
 
-      cache.set(cacheKey, reviews); // Cache the result
+    cache.set(cacheKey, reviews); // Cache the result
     return res.json(reviews);
   } catch (err) {
     console.error("getAllReviews error:", err);

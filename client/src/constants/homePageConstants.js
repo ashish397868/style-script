@@ -41,8 +41,8 @@ const features = [
   },
   {
     icon: "₹",
-    title: "Exciting Offers",
-    description: "We provide amazing offers & discounts on our products.",
+    title: "Great Offers",
+    description: "Amazing offers & discounts available.",
   },
 ];
 

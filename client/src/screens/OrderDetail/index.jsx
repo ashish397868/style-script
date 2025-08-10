@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Loader from "../../components/Loader"; 
+import Loader from "../../components/Loader";
 import { orderAPI } from "../../services/api";
 import { FiChevronLeft, FiTruck, FiShoppingBag } from "react-icons/fi";
 
@@ -18,7 +18,7 @@ export default function OrderDetail() {
         setOrder(res.data);
         setError(null);
       } catch (err) {
-        setError("Failed to fetch order details.",err);
+        setError("Failed to fetch order details.", err);
       } finally {
         setLoading(false);
       }
@@ -27,17 +27,11 @@ export default function OrderDetail() {
   }, [id]);
 
   if (loading) {
-    return (
- <Loader />
-    );
+    return <Loader />;
   }
 
   if (error || !order) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">
-        {error || "Order not found."}
-      </div>
-    );
+    return <div className="min-h-screen flex items-center justify-center text-red-500 text-xl">{error || "Order not found."}</div>;
   }
 
   const { _id, products = [], amount, deliveryStatus, createdAt, address } = order;
@@ -67,11 +61,7 @@ export default function OrderDetail() {
             <div className="divide-y divide-gray-100 mb-6">
               {products.map((product) => (
                 <div key={product._id} className="flex items-center py-4 gap-4">
-                  <img
-                    src={product.image || "/placeholder.png"}
-                    alt={product.name || "Product image"}
-                    className="w-16 h-16 object-contain rounded-lg border"
-                  />
+                  <img src={product.image || "/placeholder.png"} alt={product.name || "Product image"} className="w-16 h-16 object-contain rounded-lg border" />
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">{product.name || "Product"}</div>
                     <div className="text-gray-500 text-sm">Qty: {product.quantity || 1}</div>
@@ -82,7 +72,7 @@ export default function OrderDetail() {
             </div>
             <div className="mb-2 flex justify-between items-center">
               <span className="font-medium text-gray-700">Delivery Charges</span>
-              <span className="text-gray-900 font-semibold">₹99</span>
+              <span className="text-gray-900 font-semibold">₹{amount > 1000 ? 0 : 99}</span>
             </div>
             <div className="mb-4">
               <h4 className="font-medium text-gray-700 mb-1">Shipping Address</h4>
@@ -90,7 +80,9 @@ export default function OrderDetail() {
                 {address?.name && <div>{address.name}</div>}
                 {address?.street && <div>{address.street}</div>}
                 {address?.city && address?.state && (
-                  <div>{address.city}, {address.state}</div>
+                  <div>
+                    {address.city}, {address.state}
+                  </div>
                 )}
                 {address?.pincode && <div>Pincode: {address.pincode}</div>}
                 {address?.phone && <div>Phone: {address.phone}</div>}
@@ -101,10 +93,7 @@ export default function OrderDetail() {
               <div className="font-bold text-pink-600 text-lg">₹{amount?.toLocaleString()}</div>
             </div>
             <div className="mt-6 text-center">
-              <Link
-                to="/"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium"
-              >
+              <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-lg hover:from-pink-700 hover:to-purple-700 font-medium">
                 Continue Shopping
               </Link>
             </div>

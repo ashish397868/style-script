@@ -9,7 +9,7 @@ import { addressInitialValues, addressValidationSchema } from "../../utils/formC
 const EditAddressPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, fetchUserProfile, updateUserProfile, setUserState } = useUserHook();
+  const { user, updateUserProfile } = useUserHook();
 
   const [initialValues, setInitialValues] = useState(addressInitialValues);
   const [loading, setLoading] = useState(true);
@@ -134,10 +134,10 @@ useEffect(() => {
 
             {/* Actions */}
             <div className="flex justify-end gap-3 mt-8">
-              <button type="button" onClick={() => navigate("/addresses")} className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
+              <button type="button" onClick={() => navigate("/addresses")} className="cursor-pointer px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
               </button>
-              <button type="submit" className="px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600" disabled={submitLoading}>
+              <button type="submit" className="cursor-pointer px-4 py-2 bg-pink-500 text-white rounded-md hover:bg-pink-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled={submitLoading}>
                 {submitLoading ? "Saving..." : "Save Address"}
               </button>
             </div>

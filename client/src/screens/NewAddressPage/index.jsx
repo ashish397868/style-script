@@ -113,3 +113,30 @@ const NewAddressPage = () => {
 };
 
 export default NewAddressPage;
+
+{/* 
+----------------------------------------------
+📌 Formik `<Field>` Component Kaise Kaam Karta Hai:
+----------------------------------------------
+1. Jab hum `<Formik>` component use karte hain, wo apne children 
+   (Form, Field, ErrorMessage, etc.) ko ek "context" deta hai.
+   Is context me `values`, `errors`, `touched` aur form handlers 
+   (`handleChange`, `handleBlur`, `setFieldValue`, etc.) hote hain.
+
+2. `<Field name="phone" />` likhne ka matlab hai:
+   - Formik ke `values.phone` se value bind karo.
+   - `onChange` ko Formik ke `handleChange` se bind karo.
+   - `onBlur` ko Formik ke `handleBlur` se bind karo.
+   - Ye sab kaam internally `getFieldProps(name)` call karke hota hai.
+
+3. Is wajah se hume manually `onChange`, `onBlur` ya `value` 
+   pass karne ki zarurat nahi padti.
+
+4. Agar hum `<input>` direct use karein bina `<Field>` ke,
+   to hume ye sab props manually dene padte:
+5. `<ErrorMessage name="phone" />` sirf Formik ke `errors.phone` 
+se error text nikalta hai aur display karta hai agar wo exist kare.
+
+⚡ Summary: `<Field>` = `getFieldProps(name)` + automatic binding
+----------------------------------------------
+*/}

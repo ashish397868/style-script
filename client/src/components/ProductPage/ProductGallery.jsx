@@ -23,7 +23,7 @@ export default function ProductGallery({ product }) {
             <button
               key={index}
               onClick={() => setSelectedImageIndex(index)}
-              className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
+              className={`cursor-pointer flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
                 selectedImageIndex === index 
                   ? "border-pink-600 scale-105" 
                   : "border-gray-200 hover:border-gray-400"

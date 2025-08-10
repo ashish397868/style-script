@@ -1,10 +1,23 @@
 // components/ui/CartSidebar.js
+import { useEffect } from "react";
 import { AiFillDelete, AiFillMinusCircle, AiFillPlusCircle } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import { BsFillBagCheckFill } from "react-icons/bs";
 import { RxCrossCircled } from "react-icons/rx";
 
 const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCart, subTotal }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.documentElement.classList.add("overflow-hidden");
+    } else {
+      document.documentElement.classList.remove("overflow-hidden");
+    }
+
+    return () => {
+      document.documentElement.classList.remove("overflow-hidden");
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   console.log("Cart items:", cart);
@@ -22,7 +35,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
       size: item.variantInfo.size,
       color: item.variantInfo.color,
       image: item.image,
-      variantInfo: item.variantInfo
+      variantInfo: item.variantInfo,
     });
   };
 
@@ -41,7 +54,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                 {/* Header with Cart Button (used as close) */}
                 <div className="flex items-start justify-between">
                   <h2 className="text-lg font-medium text-gray-900">Shopping Cart</h2>
-                  <RxCrossCircled onClick={onClose} className="cursor-pointer text-gray-500 hover:text-gray-700 w-8 h-8"/>
+                  <RxCrossCircled onClick={onClose} className="cursor-pointer text-gray-500 hover:text-gray-700 w-8 h-8" />
                 </div>
 
                 <div className="mt-8">
@@ -58,7 +71,7 @@ const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCa
                               alt={cart[key].name}
                               className="w-full h-full object-center object-contain"
                               onError={(e) => {
-                                e.target.src = '/placeholder-image.jpg'; // Fallback image
+                                e.target.src = "/placeholder-image.jpg"; // Fallback image
                               }}
                             />
                           </div>

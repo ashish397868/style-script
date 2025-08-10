@@ -1,17 +1,17 @@
 // src/pages/AddressSelection.jsx
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { FiPlus, FiMapPin, FiRefreshCw } from "react-icons/fi";
 import { addressAPI, userAPI } from "../../services/api";
 import { setSelectedAddress as setSelectedAddressAction } from "../../redux/features/checkout/checkoutSlice";
+import { setUser } from "../../redux/features/user/userSlice"; // <-- ADD: Redux action for updating user
 import useUser from "../../redux/features/user/useUserHook";
 import AddressCard from "./AddressCard";
 import AddressFormModal from "./AddressFormModal";
 import { addressInitialValues } from "../../utils/formConfig/addressFormConfig";
 
-// Bind modal to #root
 if (typeof window !== "undefined") {
   Modal.setAppElement("#root");
 }
@@ -19,50 +19,31 @@ if (typeof window !== "undefined") {
 export default function AddressSelection({ onAddressSelect }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, initializeAuth, isAuthenticated } = useUser();
+  const { user } = useUser();
 
-  const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentAddress, setCurrentAddress] = useState(null);
 
-  // Load or refresh user auth on mount
+  const addresses = useMemo(() => {
+    return Array.isArray(user?.addresses) ? user.addresses : [];
+  }, [user?.addresses]);
+
+  // Set default selected address when addresses change
   useEffect(() => {
-    if (!isAuthenticated && localStorage.getItem("token")) {
-      initializeAuth();
+    if (!selectedAddress || !addresses.some((a) => a._id === selectedAddress._id)) {
+      setSelectedAddress(addresses[0] || null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // ✅ run only once on mount
+  }, [addresses, selectedAddress]);
 
-
-  // Whenever user changes, extract addresses & set selection
-  useEffect(() => {
-    if (!user) return;
-    const list = Array.isArray(user.addresses)
-      ? user.addresses
-      : [];
-    setAddresses(list);
-
-    // if no selection or selected removed, pick first
-    const stillExists = list.some(a => selectedAddress && a._id === selectedAddress._id);
-    if (!selectedAddress || !stillExists) {
-      setSelectedAddress(list[0] || null);
-    }
-  }, [user, selectedAddress]);
-
-  // Fetch fresh profile & addresses
+  // Manual refresh
   const fetchUserData = async () => {
     setIsRefreshing(true);
     try {
-      await initializeAuth();
       const { data } = await userAPI.getProfile();
-      // console.log("Profile API data:", data);
-      const list = Array.isArray(data.addresses) ? data.addresses : [];
-      setAddresses(list);
-      if (!selectedAddress && list.length) setSelectedAddress(list[0]);
+      dispatch(setUser(data)); // update redux user
     } catch (err) {
       console.error(err);
     } finally {
@@ -70,28 +51,27 @@ export default function AddressSelection({ onAddressSelect }) {
     }
   };
 
-  // Add / Edit modal handlers
+  // Add new address
   const handleAddNew = () => {
     if (!user) return;
-
-  const prefilledValues = {
-    ...addressInitialValues,
-    name: user.name || "",
-    phone: user.phone || "",
-  };
-
-  setCurrentAddress(prefilledValues);
+    const prefilledValues = {
+      ...addressInitialValues,
+      name: user.name || "",
+      phone: user.phone || "",
+    };
+    setCurrentAddress(prefilledValues);
     setIsEditing(false);
     setIsModalOpen(true);
   };
 
+  // Edit address
   const handleEdit = (address) => {
     setCurrentAddress({ ...address });
     setIsEditing(true);
     setIsModalOpen(true);
   };
 
-  // Called by modal on submit
+  // Add/Edit submit
   const handleSubmitAddress = async (values) => {
     try {
       if (isEditing) {
@@ -99,8 +79,9 @@ export default function AddressSelection({ onAddressSelect }) {
       } else {
         await addressAPI.addAddress(values);
       }
-      // await initializeAuth();
-      await fetchUserData();
+      // Backend se latest user profile leke redux update
+      const { data } = await userAPI.getProfile();
+      dispatch(setUser(data));
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,17 +103,9 @@ export default function AddressSelection({ onAddressSelect }) {
         <div className="bg-gradient-to-r from-pink-600 to-pink-700 p-6 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-white">Select a delivery address</h1>
-            <p className="text-pink-100 mt-2">
-              {addresses.length
-                ? `You have ${addresses.length} saved address${addresses.length > 1 ? "es" : ""}`
-                : "You don't have any saved address yet"}
-            </p>
+            <p className="text-pink-100 mt-2">{addresses.length ? `You have ${addresses.length} saved address${addresses.length > 1 ? "es" : ""}` : "You don't have any saved address yet"}</p>
           </div>
-          <button
-            onClick={fetchUserData}
-            disabled={isRefreshing}
-            className="text-white hover:text-pink-200 transition-colors"
-          >
+          <button onClick={fetchUserData} disabled={isRefreshing} className="text-white hover:text-pink-200 transition-colors">
             <FiRefreshCw className={`w-5 h-5 ${isRefreshing ? "animate-spin" : ""}`} />
           </button>
         </div>
@@ -146,13 +119,7 @@ export default function AddressSelection({ onAddressSelect }) {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {addresses.map((addr) => (
-                  <AddressCard
-                    key={addr._id}
-                    address={addr}
-                    isSelected={selectedAddress?._id === addr._id}
-                    onSelect={() => setSelectedAddress(addr)}
-                    onEdit={() => handleEdit(addr)}
-                  />
+                  <AddressCard key={addr._id} address={addr} isSelected={selectedAddress?._id === addr._id} onSelect={() => setSelectedAddress(addr)} onEdit={handleEdit} />
                 ))}
               </div>
             </>
@@ -167,17 +134,11 @@ export default function AddressSelection({ onAddressSelect }) {
           )}
 
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleAddNew}
-              className="flex items-center px-5 py-3 bg-white border border-pink-600 text-pink-600 rounded-lg hover:bg-pink-50 font-medium"
-            >
+            <button onClick={handleAddNew} className="cursor-pointer flex items-center px-5 py-3 bg-white border border-pink-600 text-pink-600 rounded-lg hover:bg-pink-50 font-medium">
               <FiPlus className="mr-2" /> Add a new delivery address
             </button>
             {addresses.length > 0 && selectedAddress && (
-              <button
-                onClick={handleDeliver}
-                className="px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all shadow-lg font-medium"
-              >
+              <button onClick={handleDeliver} className="cursor-pointer px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 transition-all shadow-lg font-medium">
                 Deliver to this address
               </button>
             )}
@@ -186,15 +147,7 @@ export default function AddressSelection({ onAddressSelect }) {
       </div>
 
       {/* Address Form Modal */}
-      {isModalOpen && (
-        <AddressFormModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={handleSubmitAddress}
-          initialValues={currentAddress}
-          isEditing={isEditing}
-        />
-      )}
+      {isModalOpen && <AddressFormModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSubmit={handleSubmitAddress} initialValues={currentAddress} isEditing={isEditing} />}
     </div>
   );
 }

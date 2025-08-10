@@ -60,7 +60,7 @@ export default function AddressFormModal({
               setSubmitting(false);
             }}
           >
-            {({ isSubmitting }) => (
+            {({ isSubmitting , isValid }) => (
               <Form className="space-y-5">
                 {/* Full Name */}
                 <div>
@@ -161,15 +161,15 @@ export default function AddressFormModal({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex items-center justify-center px-5 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
+                    className="cursor-pointer flex items-center justify-center px-5 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium"
                   >
                     <FiX className="mr-2" />
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="flex items-center justify-center px-5 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 font-medium"
+                    disabled={isSubmitting || !isValid}
+                    className="cursor-pointer flex items-center justify-center px-5 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white rounded-lg hover:from-pink-700 hover:to-pink-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <FiCheck className="mr-2" />
                     {isEditing ? "Update Address" : "Save Address"}

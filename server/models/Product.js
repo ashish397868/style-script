@@ -27,6 +27,8 @@ const ProductSchema = new Schema(
     isFeatured: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: false },
     isOutOfStock: { type: Boolean, default: false },
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
 
     variants: [VariantSchema], // ✅ new structure for multiple size/color options
   },

@@ -1,38 +1,30 @@
-// src/components/ReviewForm.jsx
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../../services/api";
 import { useSelector } from "react-redux";
 
 export default function ReviewForm({ productId, onSuccess }) {
-  const navigate = useNavigate();
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+  const isAuthenticated = useSelector(state => state.user.isAuthenticated);
+
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!isAuthenticated) {
-      toast.info("Please login to submit a review");
-      navigate("/login", { state: { from: window.location.pathname } });
-      return;
-    }
-    
+
     if (!rating || !comment.trim()) {
       return toast.error("Please provide a rating and comment.");
     }
+
     setSubmitting(true);
     try {
       await api.post("/reviews", { productId, rating, comment });
       toast.success("Review submitted!");
-      setComment("");
       setRating(5);
-      // Call onSuccess safely after successful submission
-      if (typeof onSuccess === "function") {
-        try { onSuccess(); } catch (e) { /* ignore */ }
-      }
+      setComment("");
+      onSuccess?.(); // Agar onSuccess exist karta hai aur function hai, tab usse call karo, warna kuch mat karo.
     } catch (err) {
       toast.error(err?.response?.data?.message || "Failed to submit review.");
     } finally {
@@ -40,7 +32,6 @@ export default function ReviewForm({ productId, onSuccess }) {
     }
   };
 
-  // If not authenticated, show a message with login link
   if (!isAuthenticated) {
     return (
       <div className="mt-8 p-4 border border-gray-200 rounded-md bg-gray-50">
@@ -59,6 +50,7 @@ export default function ReviewForm({ productId, onSuccess }) {
   return (
     <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-3">
       <h3 className="text-lg font-semibold">Add a Review</h3>
+      
       <label className="flex items-center gap-2">
         <span>Rating:</span>
         <select
@@ -73,6 +65,7 @@ export default function ReviewForm({ productId, onSuccess }) {
           ))}
         </select>
       </label>
+
       <textarea
         value={comment}
         onChange={e => setComment(e.target.value)}
@@ -81,11 +74,20 @@ export default function ReviewForm({ productId, onSuccess }) {
         className="border rounded px-2 py-1"
         required
       />
+
       <button
         type="submit"
         disabled={submitting}
-        className="cursor-pointer self-start bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded disabled:opacity-50"
+        className="flex items-center gap-2 cursor-pointer self-start bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded disabled:opacity-50"
       >
+        {submitting && (
+          <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 
+             5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 
+             3 7.938l3-2.647z"></path>
+          </svg>
+        )}
         {submitting ? "Submitting..." : "Submit Review"}
       </button>
     </form>

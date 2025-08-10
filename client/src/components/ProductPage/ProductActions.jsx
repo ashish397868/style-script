@@ -1,142 +1,88 @@
-// ProductActions.jsx
 function ProductActions({ product, color, size, variants, onAddToCart, onBuyNow }) {
-  // Helper function to check variant availability
-  const isVariantAvailable = (selectedColor, selectedSize) => {
-    return variants.some(v => 
-      v.color === selectedColor && 
-      v.size === selectedSize && 
-      v.availableQty > 0
-    );
-  };
+  // Find the variant matching current selection
+  const selectedVariant = color && size ? variants.find((v) => v.color === color && v.size === size) : null;
 
-  const currentSelectionAvailable = color && size ? isVariantAvailable(color, size) : false;
+  // Price helper fallback
+  const getVariantPrice = () => selectedVariant?.price || product.basePrice;
 
-  const handleAddToCart = () => {
-    if (!product || !color || !size) return;
+  // const handleAddToCart = () => {
+  //   if (!product || !selectedVariant) return;
 
-    const selectedVariant = variants.find(
-      (v) => v.color === color && v.size === size && v.availableQty > 0
-    );
+  //   const key = `${product._id}-${size}-${color}`;
+  //   const price = getVariantPrice();
 
-    if (!selectedVariant) {
-      console.error("No variant found for", { color, size, variants });
-      return;
-    }
+  //   onAddToCart(key, 1, {
+  //     productId: product._id,
+  //     price,
+  //     name: product.title,
+  //     image: selectedVariant.images?.[0] || product.images?.[0],
+  //     sku: selectedVariant.sku,
+  //     brand: product.brand,
+  //     category: product.category,
+  //     variantInfo: {
+  //       size,
+  //       color,
+  //       price,
+  //       sku: selectedVariant.sku,
+  //       availableQty: selectedVariant.availableQty,
+  //     },
+  //   });
+  // };
 
-    console.log("Selected variant:", {
-      color,
-      size,
-      price: selectedVariant.price,
-      sku: selectedVariant.sku,
-      availableQty: selectedVariant.availableQty
-    });
+  // const handleBuyNow = () => {
+  //   if (!product || !selectedVariant) return;
 
-    const key = `${product._id}-${size}-${color}`;
-    // Ensure we have a valid price
-    const variantPrice = selectedVariant.price || product.basePrice;
-    
-    onAddToCart(key, 1, {
-      productId: product._id,
-      price: variantPrice,
-      name: product.title,
-      image: selectedVariant.images?.[0] || product.images?.[0],
-      sku: selectedVariant.sku,
-      brand: product.brand,
-      category: product.category,
-      variantInfo: {
-        size,
-        color,
-        price: variantPrice,
-        sku: selectedVariant.sku,
-        availableQty: selectedVariant.availableQty
-      }
-    });
-  };
+  //   const key = `${product._id}-${size}-${color}`;
+  //   const price = getVariantPrice();
 
-  const handleBuyNow = () => {
-    if (!product || !color || !size) return;
-
-    const selectedVariant = variants.find(
-      (v) => v.color === color && v.size === size && v.availableQty > 0
-    );
-
-    if (!selectedVariant) return;
-
-    const key = `${product._id}-${size}-${color}`;
-    // Ensure we have a valid price
-    const variantPrice = selectedVariant.price || product.basePrice;
-
-    onBuyNow(key, 1, {
-      productId: product._id,
-      price: variantPrice,
-      name: product.title,
-      image: selectedVariant.images?.[0] || product.images?.[0],
-      sku: selectedVariant.sku,
-      brand: product.brand,
-      category: product.category,
-      variantInfo: {
-        size,
-        color,
-        price: variantPrice,
-        sku: selectedVariant.sku,
-        availableQty: selectedVariant.availableQty
-      }
-    });
-  };
+  //   onBuyNow(key, 1, {
+  //     productId: product._id,
+  //     price,
+  //     name: product.title,
+  //     image: selectedVariant.images?.[0] || product.images?.[0],
+  //     sku: selectedVariant.sku,
+  //     brand: product.brand,
+  //     category: product.category,
+  //     variantInfo: {
+  //       size,
+  //       color,
+  //       price,
+  //       sku: selectedVariant.sku,
+  //       availableQty: selectedVariant.availableQty,
+  //     },
+  //   });
+  // };
 
   return (
     <div className="mb-8">
       <div className="flex items-center mb-6">
-        {color && size ? (
-          <div className="flex items-center">
-            {(() => {
-              const selectedVariant = variants.find(v => v.color === color && v.size === size);
-              const variantPrice = selectedVariant?.price;
-              const maxPrice = product.maxPrice || 0;
-              
-              return (
-                <>
-                  <span className="text-3xl font-bold text-gray-900">
-                    ₹{variantPrice ? variantPrice.toLocaleString() : product.basePrice.toLocaleString()}
-                  </span>
-                  {maxPrice > (variantPrice || product.basePrice) && (
-                    <>
-                      <span className="ml-3 text-xl text-gray-500 line-through">₹{maxPrice.toLocaleString()}</span>
-                      <span className="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">
-                        {Math.round((1 - (variantPrice || product.basePrice) / maxPrice) * 100)}% OFF
-                      </span>
-                    </>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        ) : (
-          <div className="flex items-center">
-            <span className="text-3xl font-bold text-gray-900">₹{product.basePrice.toLocaleString()}</span>
-            {product.maxPrice > product.basePrice && (
-              <span className="ml-3 text-sm text-gray-500">
-                - ₹{product.maxPrice.toLocaleString()}
-              </span>
-            )}
-          </div>
-        )}
+        <div className="flex items-center">
+          {/* Original price (15% more) with strikethrough */}
+          <span className="text-gray-500 text-xl line-through mr-3">₹{Math.round(getVariantPrice() * 1.15).toLocaleString()}</span>
+
+          {/* Final discounted price */}
+          <span className="text-3xl font-bold text-green-600">₹{getVariantPrice().toLocaleString()}</span>
+
+          {/* Discount percentage */}
+          <span className="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">15% OFF</span>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button
-          disabled={!currentSelectionAvailable || !color || !size}
-          onClick={handleAddToCart}
-          className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!color || !size}
+          onClick={onAddToCart}
+          className="cursor-pointer flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Add to Cart'}
+          {!color || !size ? "Select Options" : "Add to Cart"}
         </button>
+
         <button
-          disabled={!currentSelectionAvailable || !color || !size}
-          onClick={handleBuyNow}
-          className="flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!color || !size}
+          onClick={onBuyNow}
+          className="cursor-pointer flex-1 min-w-[140px] bg-pink-600 hover:bg-pink-700 text-white py-3 px-6 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {!color || !size ? 'Select Options' : !currentSelectionAvailable ? 'Out of Stock' : 'Buy Now'}
+          {!color || !size ? "Select Options" : "Buy Now"}
         </button>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { RxCrossCircled } from "react-icons/rx";
 const CartSidebar = ({ isOpen, onClose, cart, addToCart, removeFromCart, clearCart, subTotal }) => {
   if (!isOpen) return null;
 
-  // console.log("Cart items:", cart);
+  console.log("Cart items:", cart);
 
   const handleIncrement = (key, qty) => {
     const item = cart[key];

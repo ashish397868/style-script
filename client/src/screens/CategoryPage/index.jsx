@@ -1,40 +1,53 @@
 import { useParams } from "react-router-dom";
 import ProductCard from "../../components/ProductCard";
 import { useEffect, useState } from "react";
-import { productAPI } from "../../services/api";
+// import { productAPI } from "../../services/api";
 import Loader from "../../components/Loader";
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductsByCategory } from '../../redux/features/product/productSlice';
 
 const CategoryPage = () => {
   const { category } = useParams();
+  const dispatch = useDispatch();
+  const { categoryProducts, loading, error } = useSelector(state => state.product);
+  // console.log("Category Products:", categoryProducts);
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const products = categoryProducts[category]?.products || [];
+
+  // const [products, setProducts] = useState([]);
+  // const [loading, setLoading] = useState(true);
+  // const [error, setError] = useState(null);
+
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    setTitle(`${category} Collection`);
+    setSubtitle(`Browse our latest collection of ${category.toLowerCase()}.`);
 
-    const fetchProducts = async () => {
-      try {
-        setTitle(`${category} Collection`);
-        setSubtitle(`Browse our latest collection of ${category.toLowerCase()}.`);
+    // setLoading(true);
+    // setError(null);
 
-        const response = await productAPI.getProductsByCategory(category);
-        // console.log("Products received:", response.data);
-        setProducts(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        setError(err.message || "Failed to load products");
-        setLoading(false);
-      }
-    };
+    // const fetchProducts = async () => {
+    //   try {
+    //     setTitle(`${category} Collection`);
+    //     setSubtitle(`Browse our latest collection of ${category.toLowerCase()}.`);
 
-    fetchProducts();
-  }, [category]);
+    //     const response = await productAPI.getProductsByCategory(category);
+    //     // console.log("Products received:", response.data);
+    //     setProducts(response.data);
+    //     setLoading(false);
+    //   } catch (err) {
+    //     console.error("Error fetching products:", err);
+    //     setError(err.message || "Failed to load products");
+    //     setLoading(false);
+    //   }
+
+    dispatch(fetchProductsByCategory(category));
+
+  }, [category, dispatch]);
+
+
 
   if (loading) {
     return (

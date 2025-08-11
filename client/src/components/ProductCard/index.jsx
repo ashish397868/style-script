@@ -1,11 +1,17 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate , useLocation } from "react-router-dom";
 import colorMap from "../../constants/colorMap";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log("ProductCard location:", location.pathname);
 
   const handleCardClick = () => {
-    navigate(`/product/${product.slug}`);
+    if (location.pathname.toLowerCase().includes("/accessories/")) {
+      navigate(`/accessories/${product.slug}`);
+    } else {
+      navigate(`/product/${product.slug}`);
+    }
   };
 
   const availableVariants = Array.isArray(product.variants) ? product.variants : [];

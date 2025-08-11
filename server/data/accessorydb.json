@@ -1,0 +1,126 @@
+[{
+  "_id": { "$oid": "6898dbf3f2fe46375b5ac354" },
+  "title": "Nike Unisex's Cap",
+  "slug": "nike-unisex-cap",
+  "description": "Show off effortless streetwear vibes with the Nike Club Cap, featuring a classic mid-depth, 6-panel silhouette crafted from smooth cotton twill. The soft, unstructured crown and gently pre-curved brim deliver a laid-back look, while the adjustable tri-glide closure at the back ensures a comfortable fit. A small embroidered Swoosh logo on the side completes the minimalistic aesthetic—an ideal combo of casual style and function for everyday wear.",
+  "basePrice": 999,
+  "maxPrice": 999,
+  "images": [
+    "https://m.media-amazon.com/images/I/71Jl8EkMJrL._SX679_.jpg"
+  ],
+  "category": "CAP",
+  "brand": "NIKE",
+  "theme": "SPORT",
+  "tags": ["cap", "unisex"],
+  "isFeatured": true,
+  "isPublished": true,
+  "isOutOfStock": false,
+  "averageRating": 0,
+  "reviewCount": 0,
+  "targetAudience": "UNISEX",
+  "ageGroup": "ADULT",
+  "specifications": {
+    "materialType": "Polyester",
+    "occasionType": "Wedding, Anniversary, Birthday",
+    "style": "Sport",
+    "outerMaterial": "Synthetic",
+    "careInstructions": "Machine Wash",
+    "closureType": "Pull-On",
+    "countryOfOrigin": "Vietnam"
+  },
+  "variants": [
+    {
+      "_id": { "$oid": "6898dbf3f2fe46375b5ac355" },
+      "size": "FREE",
+      "color": "black",
+      "price": 999,
+      "availableQty": 200,
+      "sku": "CAP-BLK-001",
+      "images": ["https://m.media-amazon.com/images/I/71Jl8EkMJrL._SX679_.jpg"]
+    },
+    {
+      "_id": { "$oid": "6898dbf3f2fe46375b5ac356" },
+      "size": "FREE",
+      "color": "white",
+      "price": 999,
+      "availableQty": 150,
+      "sku": "CAP-WHI-002",
+      "images": ["https://m.media-amazon.com/images/I/51oOIT6wAfL._SX679_.jpg"]
+    }
+  ],
+  "createdAt": { "$date": "2025-08-10T17:50:43.248Z" },
+  "updatedAt": { "$date": "2025-08-10T17:50:43.248Z" }
+},
+{
+  "_id": { "$oid": "6898de92f2fe46375b5ac35e" },
+  "title": "Craftsmanship Series Silver Snake Automatic Watch",
+  "slug": "craftsmanship-series-silver-snake-automatic-watch",
+  "description": "Discover the Craftsmanship Series Green Snake Automatic Watch, a stunning tribute to artistry and precision. Featuring a meticulously hand-engraved and hand-painted 925 silver snake, this exceptional timepiece combines bold design with expert craftsmanship.\n\nThe intricate snake motif comes to life with its vibrant green details, while its tongue adds a dynamic touch, moving in and out at the strike of every hour. Powered by precise automatic movement, this watch is not just a statement of style but a testament to unparalleled craftsmanship. Elevate your wristwear with this truly exquisite creation.",
+  "basePrice": 180000,
+  "maxPrice": 180000,
+  "images": [
+    "https://luckyharveywatch.in/cdn/shop/files/1_c9637f32-b1d0-423d-8746-33e6da7567fa.png?v=1729167442&width=700",
+    "https://luckyharveywatch.in/cdn/shop/files/1_1075276e-7db3-498f-b13e-9da38e1d3be4.jpg?v=1735913714&width=700",
+    "https://luckyharveywatch.in/cdn/shop/files/5_34816ed7-7475-47ea-becc-353c8754e9d3.jpg?v=1735913714&width=700"
+  ],
+  "category": "WATCH",
+  "brand": "LUCKY HARVEY",
+  "theme": "LUXURY",
+  "tags": ["watch", "automatic", "luxury", "men"],
+  "isFeatured": true,
+  "isPublished": true,
+  "isOutOfStock": false,
+  "averageRating": 0,
+  "reviewCount": 0,
+  "targetAudience": "MEN",
+  "ageGroup": "ADULT",
+  "specifications": {
+    "movement": "Automatic",
+    "powerReserve": "40 Hours",
+    "vibrationFrequency": "28800 (Times/Hour)",
+    "weight": "121 Grams",
+    "shape": "Round",
+    "dialDiameter": "43MM",
+    "dialThickness": "16MM",
+    "strapLength": "80*120MM",
+    "strapWidth": "22MM",
+    "caseMaterial": "316L",
+    "glass": "Sapphire Crystal",
+    "buckleStyle": "Pin Buckle",
+    "strapMaterial": "Leather & Fluororubber",
+    "waterResistance": "3 ATM",
+    "warranty": "2 Years",
+    "manufacturer": "Lucky Harvey Commercial Company Ltd (Hong Kong)",
+    "importer": "Tara & Lotus Ventures LLP (Delhi)"
+  },
+  "variants": [
+    {
+      "_id": { "$oid": "6898de92f2fe46375b5ac35f" },
+      "size": "FREE",
+      "color": "silver",
+      "price": 180000,
+      "availableQty": 420,
+      "sku": "WATCH-SNAKE-SILVER",
+      "images": [
+        "https://luckyharveywatch.in/cdn/shop/files/2_ddc9b834-41e2-4d3f-8d8c-1643e2cff0e0.png?v=1729167435&width=700",
+        "https://luckyharveywatch.in/cdn/shop/files/3_279a49bd-46b7-42b8-b567-ca0c563d9814.jpg?v=1735913732&width=700"
+      ]
+    },
+    {
+      "_id": { "$oid": "6898de92f2fe46375b5ac360" },
+      "size": "FREE",
+      "color": "green",
+      "price": 180000,
+      "availableQty": 690,
+      "sku": "WATCH-SNAKE-GREEN",
+      "images": [
+        "https://luckyharveywatch.in/cdn/shop/files/1_c9637f32-b1d0-423d-8746-33e6da7567fa.png?v=1729167442&width=700",
+        "https://luckyharveywatch.in/cdn/shop/files/1_1075276e-7db3-498f-b13e-9da38e1d3be4.jpg?v=1735913714&width=700",
+        "https://luckyharveywatch.in/cdn/shop/files/5_34816ed7-7475-47ea-becc-353c8754e9d3.jpg?v=1735913714&width=700"
+      ]
+    }
+  ],
+  "createdAt": { "$date": "2025-08-10T18:01:54.783Z" },
+  "updatedAt": { "$date": "2025-08-10T18:01:54.783Z" }
+}
+]

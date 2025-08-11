@@ -15,6 +15,7 @@ const pincodeRoutes = require("./routes/pincodeRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const accessoryRoutes = require("./routes/accessoryRoutes");
 
 // Apply middleware
 applyMiddleware(app);
@@ -27,6 +28,7 @@ app.use("/api/users/", userRoutes);
 app.use("/api/users/", addressRoutes);
 app.use("/api/", pincodeRoutes);
 app.use("/api/products/", productRoutes);
+app.use("/api/accessories/", accessoryRoutes);
 app.use("/api/media/", mediaRoutes);
 
 // Sensitive routes (with stricter rate limiting)

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 export default function ColorAndSizeSelector({ variants, color, size, setColor, setSize }) {
-  const STANDARD_SIZES = ["S", "M", "L", "XL", "XXL"];
+  const STANDARD_SIZES = ["S", "M", "L", "XL", "XXL","FREE"];
 
   // Unique colors
   const colorOptions = [...new Set(variants.map((v) => v.color).filter(Boolean))];

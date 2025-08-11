@@ -48,3 +48,7 @@ export const NotFound = lazy(() => import("../screens/NotFound"));
 
 // Protected
 export const ProtectedRoute = lazy(() => import("../screens/ProtectedRoute"));
+
+// Accessory
+export const AccessoryCategory = lazy(() => import("../screens/AccessoryCategory"));
+export const AccessoryDetailPage = lazy(() => import("../screens/AccessoryDetailsPage"));

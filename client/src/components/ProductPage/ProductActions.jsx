@@ -1,5 +1,10 @@
 function ProductActions({ product, color, size, variants, onAddToCart, onBuyNow }) {
   // Find the variant matching current selection
+
+  // console.log("PRoduct ",product)
+  console.log("Variants ",variants)
+
+
   const selectedVariant = color && size ? variants.find((v) => v.color === color && v.size === size) : null;
 
   // Price helper fallback
@@ -61,7 +66,10 @@ function ProductActions({ product, color, size, variants, onAddToCart, onBuyNow 
           <span className="text-gray-500 text-xl line-through mr-3">₹{Math.round(getVariantPrice() * 1.15).toLocaleString()}</span>
 
           {/* Final discounted price */}
-          <span className="text-3xl font-bold text-green-600">₹{getVariantPrice().toLocaleString()}</span>
+<span className="text-3xl font-bold text-green-600">
+  ₹{Number(getVariantPrice() ?? 0).toLocaleString()}
+</span>
+
 
           {/* Discount percentage */}
           <span className="ml-3 bg-red-100 text-red-700 px-2 py-1 rounded text-sm font-medium">15% OFF</span>

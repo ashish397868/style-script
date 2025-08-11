@@ -141,4 +141,10 @@ export const mediaAPI = {
   })
 };
 
+// Accessory Routes
+export const accessoryAPI = {
+  getAccessoryBySlug: (slug) => api.get(`/accessories/slug/${slug}`),
+  getAccessoryByCategory: (category) => api.get(`/accessories/category/${category}`),
+};
+
 export default api;

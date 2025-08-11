@@ -9,26 +9,30 @@ const VariantSchema = new Schema({
   images: { type: [String], default: [] },
 });
 
-const AccessoryProductSchema = new Schema(
+const AccessorySchema = new Schema(
   {
     title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true, lowercase: true },
-    description: { type: String, trim: true },
-
+    slug: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    description: { type: String, required: true, trim: true },
+    basePrice: { type: Number },
+    maxPrice: { type: Number },
+    images: { type: [String], default: [] },
     category: {
       type: String,
       required: true,
       enum: ["CAP", "BELT", "WATCH", "KEYCHAIN", "BRACELET"],
       uppercase: true,
+      index: true,
+      trim: true,
     },
-
-    brand: { type: String, trim: true, uppercase: true },
-    images: { type: [String], default: [] },
+    brand: { type: String, required: true, trim: true, uppercase: true, index: true },
+    theme: { type: String, required: true, uppercase: true, index: true, trim: true },
     tags: [{ type: String, trim: true, lowercase: true }],
     isFeatured: { type: Boolean, default: false },
     isPublished: { type: Boolean, default: false },
-
-    // ✅ Audience targeting
+    isOutOfStock: { type: Boolean, default: false },
+    averageRating: { type: Number, default: 0 },
+    reviewCount: { type: Number, default: 0 },
     targetAudience: {
       type: String,
       enum: ["MEN", "WOMEN", "KIDS", "UNISEX"],
@@ -39,20 +43,16 @@ const AccessoryProductSchema = new Schema(
       enum: ["INFANT", "TODDLER", "CHILD", "TEEN", "ADULT"],
       default: "ADULT",
     },
-
-    // ✅ Extra metadata/specifications
     specifications: {
       type: Map,
       of: String,
       default: {},
     },
-
     variants: [VariantSchema],
   },
   { timestamps: true }
 );
 
-// ✅ Full-text search index
-AccessoryProductSchema.index({ title: "text", description: "text", tags: "text" });
+AccessorySchema.index({ title: "text", description: "text", tags: "text" });
 
-module.exports = model("AccessoryProduct", AccessoryProductSchema);
+module.exports = model("Accessory", AccessorySchema);
